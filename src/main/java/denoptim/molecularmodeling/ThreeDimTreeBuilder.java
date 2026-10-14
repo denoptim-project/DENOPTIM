@@ -240,10 +240,10 @@ public class ThreeDimTreeBuilder
                     throws DENOPTIMException
     {
         // initialize data structures for storing logging info
-        Map<Long,ArrayList<AttachmentPoint>> apsPerVertexId = new HashMap<>();
-        Map<Edge,ArrayList<AttachmentPoint>> apsPerEdge = new HashMap<>();
-        Map<IAtom,ArrayList<AttachmentPoint>> apsPerAtom = new HashMap<>();
-        Map<IBond,ArrayList<AttachmentPoint>> apsPerBond = new HashMap<>();
+        Map<Long,List<AttachmentPoint>> apsPerVertexId = new HashMap<>();
+        Map<Edge,List<AttachmentPoint>> apsPerEdge = new HashMap<>();
+        Map<IAtom,List<AttachmentPoint>> apsPerAtom = new HashMap<>();
+        Map<IBond,List<AttachmentPoint>> apsPerBond = new HashMap<>();
 
         // initialize the atom container to be returned
         IAtomContainer mol = builder.newAtomContainer();
@@ -321,7 +321,7 @@ public class ThreeDimTreeBuilder
             int i=0;
             for (long v : apsPerVertexId.keySet())
             {
-                ArrayList<AttachmentPoint> aps = apsPerVertexId.get(v);
+                List<AttachmentPoint> aps = apsPerVertexId.get(v);
                 for (AttachmentPoint ap : aps)
                 {
                     i++;
@@ -341,7 +341,7 @@ public class ThreeDimTreeBuilder
             sb.append("AP-per-Edge"+NL);
             for (Edge e : apsPerEdge.keySet())
             {
-                ArrayList<AttachmentPoint> aps = apsPerEdge.get(e);
+                List<AttachmentPoint> aps = apsPerEdge.get(e);
                 for (AttachmentPoint ap : aps)
                 {
                     sb.append("Edge: "+e+" AP = "+ap+NL);
@@ -350,7 +350,7 @@ public class ThreeDimTreeBuilder
             sb.append("AP-per-Atom"+NL);
             for (IAtom a : apsPerAtom.keySet())
             {
-                ArrayList<AttachmentPoint> aps = apsPerAtom.get(a);
+                List<AttachmentPoint> aps = apsPerAtom.get(a);
                 for (AttachmentPoint ap : aps)
                 {
                     sb.append("Atom: "+mol.indexOf(a) +" AP = "+ap+NL);
@@ -359,7 +359,7 @@ public class ThreeDimTreeBuilder
             sb.append("AP-per-Bond"+NL);
             for (IBond b : apsPerBond.keySet())
             {
-                ArrayList<AttachmentPoint> aps = apsPerBond.get(b);
+                List<AttachmentPoint> aps = apsPerBond.get(b);
                 for (AttachmentPoint ap : aps)
                 {
                     sb.append("Bond: "+mol.indexOf(b.getAtom(0))
@@ -382,7 +382,7 @@ public class ThreeDimTreeBuilder
                 continue;
             }
             
-            ArrayList<AttachmentPoint> aps = apsPerAtom.get(a);
+            List<AttachmentPoint> aps = apsPerAtom.get(a);
             for (AttachmentPoint ap : aps)
             {
                 if (ap.isAvailableThroughout())
@@ -436,10 +436,10 @@ public class ThreeDimTreeBuilder
     private void append3DFragmentsDisconnected(Vertex rootVrtx, 
             IAtomContainer mol, DGraph graph,
             boolean removeUsedRCAs, boolean rebuild,
-            Map<Long, ArrayList<AttachmentPoint>> apsPerVertexId,
-            Map<Edge,ArrayList<AttachmentPoint>> apsPerEdge,
-            Map<IAtom,ArrayList<AttachmentPoint>> apsPerAtom,
-            Map<IBond,ArrayList<AttachmentPoint>> apsPerBond) 
+            Map<Long, List<AttachmentPoint>> apsPerVertexId,
+            Map<Edge,List<AttachmentPoint>> apsPerEdge,
+            Map<IAtom,List<AttachmentPoint>> apsPerAtom,
+            Map<IBond,List<AttachmentPoint>> apsPerBond) 
                     throws DENOPTIMException
     {
         rootVrtx.setProperty(DENOPTIMConstants.VISITEDBY3DBUILDER, true);
@@ -480,7 +480,7 @@ public class ThreeDimTreeBuilder
         }
 
         // Store APs per building block and per atom (if atom exists)
-        ArrayList<AttachmentPoint> apsOnThisFrag = new ArrayList<>();
+        List<AttachmentPoint> apsOnThisFrag = new ArrayList<>();
         for (AttachmentPoint ap : rootVrtx.getAttachmentPoints())
         {
             // For vertices other than the first, we adjust the pointer to the
@@ -497,7 +497,7 @@ public class ThreeDimTreeBuilder
                 }
                 else
                 {
-                    ArrayList<AttachmentPoint> apsOnThisAtm = 
+                    List<AttachmentPoint> apsOnThisAtm = 
                             new ArrayList<AttachmentPoint>();
                     apsOnThisAtm.add(ap);
                     apsPerAtom.put(srcAtm,apsOnThisAtm);
@@ -513,7 +513,7 @@ public class ThreeDimTreeBuilder
             AttachmentPoint apSrc = edge.getSrcAP();
 
             // Add APs to the map of APs per Edges
-            ArrayList<AttachmentPoint> apOnThisEdge =
+            List<AttachmentPoint> apOnThisEdge =
                                       new ArrayList<AttachmentPoint>();
             apOnThisEdge.add(apSrc);
             apOnThisEdge.add(edge.getTrgAP());
@@ -583,10 +583,10 @@ public class ThreeDimTreeBuilder
     private void append3DFragmentsViaEdges(IAtomContainer mol, DGraph graph,
             int idSrcAtmA, Point3d srcApA, Point3d trgApA, Edge edge, 
             boolean removeUsedRCAs, boolean rebuild,
-            Map<Long, ArrayList<AttachmentPoint>> apsPerVertexId,
-            Map<Edge,ArrayList<AttachmentPoint>> apsPerEdge,
-            Map<IAtom,ArrayList<AttachmentPoint>> apsPerAtom,
-            Map<IBond,ArrayList<AttachmentPoint>> apsPerBond) 
+            Map<Long, List<AttachmentPoint>> apsPerVertexId,
+            Map<Edge,List<AttachmentPoint>> apsPerEdge,
+            Map<IAtom,List<AttachmentPoint>> apsPerAtom,
+            Map<IBond,List<AttachmentPoint>> apsPerBond) 
                     throws DENOPTIMException
     {   
         logger.log(Level.FINE, "Appending 3D fragment via edge: "+edge + NL 
@@ -835,7 +835,7 @@ public class ThreeDimTreeBuilder
             mol.addBond(bnd);
             
             // Store the APs related to this atom-to-RCA bond
-            ArrayList<AttachmentPoint> apsOnBond = new ArrayList<>();
+            List<AttachmentPoint> apsOnBond = new ArrayList<>();
             apsOnBond.add(edge.getSrcAP());
             apsOnBond.add(edge.getTrgAP());
             apsPerBond.put(bnd,apsOnBond);
@@ -845,7 +845,7 @@ public class ThreeDimTreeBuilder
                 atmToBind.setProperty(DENOPTIMConstants.RCAPROPAPCTORCA, 
                         edge.getSrcAP().getAPClass());
                 //Since inVtx is RCV there can be only one ring, if any...
-                ArrayList<Ring> rings = graph.getRingsInvolvingVertex(inVtx);
+                List<Ring> rings = graph.getRingsInvolvingVertex(inVtx);
                 if (rings.size()>0)
                 {
                     // We record the type of the ring-closing bond, not that
@@ -863,7 +863,7 @@ public class ThreeDimTreeBuilder
         }
         
         // Store APs per building block and per atom (if atom exists)
-        ArrayList<AttachmentPoint> apsOnThisFrag = new ArrayList<>();
+        List<AttachmentPoint> apsOnThisFrag = new ArrayList<>();
         for (AttachmentPoint ap : inVtx.getAttachmentPoints())
         {
             // For vertices other than the first, we adjust the pointer to the
@@ -880,7 +880,7 @@ public class ThreeDimTreeBuilder
                 }
                 else
                 {
-                    ArrayList<AttachmentPoint> apsOnThisAtm = 
+                    List<AttachmentPoint> apsOnThisAtm = 
                             new ArrayList<AttachmentPoint>();
                     apsOnThisAtm.add(ap);
                     apsPerAtom.put(srcAtm,apsOnThisAtm);
@@ -893,7 +893,7 @@ public class ThreeDimTreeBuilder
         for (Edge nextEdge : graph.getEdgesWithSrc(inVtx))
         {
             // Add APs to the map of APs per Edges
-            ArrayList<AttachmentPoint> apOnThisEdge =
+            List<AttachmentPoint> apOnThisEdge =
                                       new ArrayList<AttachmentPoint>();
             apOnThisEdge.add(nextEdge.getSrcAP());
             apOnThisEdge.add(nextEdge.getTrgAP());

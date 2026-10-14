@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -65,7 +66,7 @@ public class ParallelFragmentationAlgorithmTest
         String formulaeFile = tempDir.getAbsolutePath() + SEP + "forms.txt";
 
         StringBuilder formulaeTextBuilder = new StringBuilder();
-        ArrayList<IAtomContainer> mols = new ArrayList<IAtomContainer>();
+        List<IAtomContainer> mols = new ArrayList<IAtomContainer>();
         for (int i=0; i<7; i++)
         {
             IAtomContainer mol = builder.newAtomContainer();
@@ -103,7 +104,7 @@ public class ParallelFragmentationAlgorithmTest
             assertTrue(newStructureFile.contains(tempDir.getAbsolutePath()));
             assertTrue(structFile.exists());
 
-            ArrayList<String> lines = DenoptimIO.readList(newStructureFile);
+            List<String> lines = DenoptimIO.readList(newStructureFile);
             int n = 0;
             for (String line : lines)
                 if (line.contains((CharSequence) DENOPTIMConstants.FORMULASTR))

@@ -20,7 +20,7 @@
 package denoptim.programs.moldecularmodelbuilder;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -85,7 +85,7 @@ public class MolecularModelBuilder extends ProgramTask
 
         boolean normalTerm = false;
         try {
-            ArrayList<IAtomContainer> nmols = mbuild.buildMulti3DStructure();
+            List<IAtomContainer> nmols = mbuild.buildMulti3DStructure();
             for (int i = 0; i<nmols.size(); i++)
             {
                 //NB: here we reset the IAC properties, so, any property that

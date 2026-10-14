@@ -426,7 +426,7 @@ public class MathUtils
     public static Vector3d getNormalDirection(Vector3d vecA)
     {
         Vector3d normalDir = new Vector3d();
-        ArrayList<Vector3d> candidates = new ArrayList<>();
+        List<Vector3d> candidates = new ArrayList<>();
         candidates.add(new Vector3d(1.0, 0.0, 0.0));
         candidates.add(new Vector3d(0.0, 1.0, 0.0));
         candidates.add(new Vector3d(0.0, 0.0, 1.0));

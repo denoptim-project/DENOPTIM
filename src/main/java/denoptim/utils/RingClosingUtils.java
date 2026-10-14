@@ -49,9 +49,9 @@ public class RingClosingUtils
      * @return the list of pseudoatoms as <code>RingClosingAttractor</code>s
      */
 
-    public static ArrayList<RingClosingAttractor> findAttractors(IAtomContainer mol)
+    public static List<RingClosingAttractor> findAttractors(IAtomContainer mol)
     {
-        ArrayList<RingClosingAttractor> attractors =
+        List<RingClosingAttractor> attractors =
                                          new ArrayList<RingClosingAttractor>();
 
         for (IAtom atm : mol.atoms())

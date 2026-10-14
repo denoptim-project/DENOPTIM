@@ -25,7 +25,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -596,7 +595,7 @@ public class VertexViewPanel extends JPanel
      * viewer.
      * @return the list of attachment points indexes
      */
-    public ArrayList<Integer> getSelectedAPIDs()
+    public List<Integer> getSelectedAPIDs()
     {
         return activeViewer.getSelectedAPIDs();
     }
@@ -607,7 +606,7 @@ public class VertexViewPanel extends JPanel
 	 * Identifies the atoms that are selected in the Jmol viewer
 	 * @return the list of selected atoms
 	 */
-    protected ArrayList<IAtom> getAtomsSelectedFromJMol()
+    protected List<IAtom> getAtomsSelectedFromJMol()
     {
         return fragViewer.getAtomsSelectedFromJMol();
     }

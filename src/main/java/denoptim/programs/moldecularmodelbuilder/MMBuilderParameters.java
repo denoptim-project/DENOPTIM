@@ -22,6 +22,7 @@ package denoptim.programs.moldecularmodelbuilder;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.integration.tinker.TinkerUtils;
@@ -89,32 +90,32 @@ public class MMBuilderParameters extends RunTimeParameters
     /**
      * Parameters for PSS part of Tinker's PSSROT step
      */
-    protected ArrayList<String> pssrotParams_Init;
+    protected List<String> pssrotParams_Init;
 
     /**
      * Parameters for linear search part of Tinker's PSSROT step
      */
-    protected ArrayList<String> pssrotParams_Rest;
+    protected List<String> pssrotParams_Rest;
 
     /**
      * Keywords for Tinker's conformational search
      */
-    protected ArrayList<String> keyFileParams;
+    protected List<String> keyFileParams;
 
     /**
      * Parameters for PSS part of Tinker's ring-closing PSSROT step
      */
-    protected ArrayList<String> rsPssrotParams_Init;
+    protected List<String> rsPssrotParams_Init;
 
     /**
      * Parameters for linear search part of Tinker's ring-closing PSSROT step
      */
-    protected ArrayList<String> rsPssrotParams_Rest;
+    protected List<String> rsPssrotParams_Rest;
 
     /**
      * Keywords for Tinker's ring-closing conformational search
      */
-    protected ArrayList<String> rsKeyFileParams;
+    protected List<String> rsKeyFileParams;
 
     /**
      * Flag controlling the criterion used to reorder atom lists.
@@ -220,35 +221,35 @@ public class MMBuilderParameters extends RunTimeParameters
 
 //------------------------------------------------------------------------------
 
-    public ArrayList<String> getInitPSSROTParams()
+    public List<String> getInitPSSROTParams()
     {
         return pssrotParams_Init;
     }
 
 //------------------------------------------------------------------------------
 
-    public ArrayList<String> getRSInitPSSROTParams()
+    public List<String> getRSInitPSSROTParams()
     {
         return rsPssrotParams_Init;
     }
 
 //------------------------------------------------------------------------------
 
-    public ArrayList<String> getRestPSSROTParams()
+    public List<String> getRestPSSROTParams()
     {
         return pssrotParams_Rest;
     }
 
 //------------------------------------------------------------------------------
 
-    public ArrayList<String> getRSRestPSSROTParams()
+    public List<String> getRSRestPSSROTParams()
     {
         return rsPssrotParams_Rest;
     }
 
 //------------------------------------------------------------------------------
 
-    public ArrayList<String> getKeyFileParams()
+    public List<String> getKeyFileParams()
     {
         return keyFileParams;
     }
@@ -262,7 +263,7 @@ public class MMBuilderParameters extends RunTimeParameters
 
 //------------------------------------------------------------------------------
 
-    public ArrayList<String> getRSKeyFileParams()
+    public List<String> getRSKeyFileParams()
     {
         return rsKeyFileParams;
     }

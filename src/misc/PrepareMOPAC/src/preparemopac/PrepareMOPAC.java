@@ -22,6 +22,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,7 +45,7 @@ public class PrepareMOPAC
 
     private static final Logger LOGGER = Logger.getLogger(PrepareMOPAC.class.getName());
     private String OBABEL_EXE = "";
-    private ArrayList<String> MOPAC_KEYWORDS = null;
+    private List<String> MOPAC_KEYWORDS = null;
     private String inpSDF = "";
     private String outMOP = "";
     private String kwdsFile = "";

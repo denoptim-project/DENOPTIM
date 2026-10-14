@@ -972,9 +972,9 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 	 * Identifies which attachment points are selected in the visualized table
 	 * @return the list of attachment points
 	 */
-	public ArrayList<AttachmentPoint> getSelectedAPs()
+	public List<AttachmentPoint> getSelectedAPs()
 	{
-		ArrayList<AttachmentPoint> selected = 
+		List<AttachmentPoint> selected = 
 				new ArrayList<AttachmentPoint>();
 		
 		for (int rowId : apTable.getSelectedRows())
@@ -990,9 +990,9 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 	 * Identifies which attachment points are selected in the visualized table
 	 * @return the list of attachment points indexes
 	 */
-	public ArrayList<Integer> getSelectedAPIDs()
+	public List<Integer> getSelectedAPIDs()
 	{
-		ArrayList<Integer> selected = new ArrayList<Integer>();
+		List<Integer> selected = new ArrayList<Integer>();
 		for (int rowId : apTable.getSelectedRows())
 		{
 			selected.add(rowId);
@@ -1006,9 +1006,9 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 	 * Identifies the atoms that are selected in the Jmol viewer
 	 * @return the list of selected atoms
 	 */
-    public ArrayList<IAtom> getAtomsSelectedFromJMol()
+    public List<IAtom> getAtomsSelectedFromJMol()
     {
-    	ArrayList<IAtom> selectedAtms = new ArrayList<IAtom>();
+    	List<IAtom> selectedAtms = new ArrayList<IAtom>();
     	
     	if (fragment == null || fragment.getAtomCount()==0)
     	{

@@ -128,7 +128,7 @@ public class FragmentSpaceTest
 
         String rootName = tempDir.getAbsolutePath() + SEP;
 
-    	ArrayList<Vertex> fragLib = new ArrayList<Vertex>();
+    	List<Vertex> fragLib = new ArrayList<Vertex>();
     	Fragment frg1 = new Fragment();
     	Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
     	Atom a2 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
@@ -187,7 +187,7 @@ public class FragmentSpaceTest
         String fragLibFile = rootName + "frags.sdf";
         DenoptimIO.writeVertexesToSDF(new File(fragLibFile), fragLib, false);
         
-    	ArrayList<Vertex> scaffLib = new ArrayList<Vertex>();
+    	List<Vertex> scaffLib = new ArrayList<Vertex>();
         Fragment scaf0 = new Fragment();
         Atom a41 = new Atom("O", new Point3d(new double[]{0.0, 1.1, 2.2}));
         Atom a42 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
@@ -216,7 +216,7 @@ public class FragmentSpaceTest
         String scaffLibFile = rootName + "scaff.sdf";
         DenoptimIO.writeVertexesToSDF(new File(scaffLibFile), scaffLib, false);
         
-        ArrayList<Vertex> cappLib = new ArrayList<Vertex>();
+        List<Vertex> cappLib = new ArrayList<Vertex>();
         Fragment cap1 = new Fragment();
         Atom a61 = new Atom("H", new Point3d(new double[]{10.0, 1.1, 2.2}));
         cap1.addAtom(a61);
@@ -234,16 +234,16 @@ public class FragmentSpaceTest
         String capLibFile = rootName + "caps.sdf";
         DenoptimIO.writeVertexesToSDF(new File(capLibFile), cappLib, false);
         
-    	HashMap<APClass,ArrayList<APClass>> cpMap = 
-    	        new HashMap<APClass,ArrayList<APClass>>();
-    	ArrayList<APClass> lst1 = new ArrayList<APClass>();
+    	HashMap<APClass,List<APClass>> cpMap = 
+    	        new HashMap<APClass,List<APClass>>();
+    	List<APClass> lst1 = new ArrayList<APClass>();
     	lst1.add(APC1);
     	lst1.add(APC2);
     	cpMap.put(APCS, lst1);
-    	ArrayList<APClass> lst2 = new ArrayList<APClass>();
+    	List<APClass> lst2 = new ArrayList<APClass>();
     	lst2.add(APC2);
     	cpMap.put(APC1, lst2);
-    	ArrayList<APClass> lst3 = new ArrayList<APClass>();
+    	List<APClass> lst3 = new ArrayList<APClass>();
     	lst3.add(APC2);
     	lst3.add(APC3);
     	cpMap.put(APC2, lst3);
@@ -261,8 +261,8 @@ public class FragmentSpaceTest
 
     	/*
     	//Just in case one day we want to have also an RC-CPMap
-    	HashMap<APClass,ArrayList<APClass>> rcCpMap = 
-    			new HashMap<APClass,ArrayList<APClass>>();
+    	HashMap<APClass,List<APClass>> rcCpMap = 
+    			new HashMap<APClass,List<APClass>>();
     	*/
     	
     	FragmentSpaceParameters fsp = new FragmentSpaceParameters();
@@ -304,7 +304,7 @@ public class FragmentSpaceTest
         FragmentSpaceParameters fsp = buildFragmentSpace();
         FragmentSpace fs = fsp.getFragmentSpace();
         assertTrue(fs.isDefined(),"FragmentSpace is defined");
-    	ArrayList<IdFragmentAndAP> l = fs.getFragsWithAPClass(APC2);
+    	List<IdFragmentAndAP> l = fs.getFragsWithAPClass(APC2);
     	assertEquals(4,l.size(),"Wrong size of AP IDs with given APClass.");
 
     	int i = -1;
@@ -326,7 +326,7 @@ public class FragmentSpaceTest
         FragmentSpaceParameters fsp = buildFragmentSpace();
         FragmentSpace fs = fsp.getFragmentSpace();
         assertTrue(fs.isDefined(),"FragmentSpace is defined");
-        ArrayList<Vertex> lst = fs.getVerticesWithAPClass(APC2);
+        List<Vertex> lst = fs.getVerticesWithAPClass(APC2);
         assertEquals(4,lst.size(),"Wrong size of AP IDs with given APClass.");
 
         for (Vertex v : lst)
@@ -467,7 +467,7 @@ public class FragmentSpaceTest
         FragmentSpaceParameters fsp = buildFragmentSpace();
         FragmentSpace fs = fsp.getFragmentSpace();
         assertTrue(fs.isDefined(),"FragmentSpace is defined");
-    	ArrayList<IdFragmentAndAP> lst = fs.getFragAPsCompatibleWithClass(APC1);
+    	List<IdFragmentAndAP> lst = fs.getFragAPsCompatibleWithClass(APC1);
     	
     	assertEquals(4,lst.size(),"Size of compatible APs list is wrong.");
 
@@ -493,7 +493,7 @@ public class FragmentSpaceTest
         assertTrue(fs.isDefined(),"FragmentSpace is defined");
     	IdFragmentAndAP src1 = new IdFragmentAndAP(-1,2,BBTFRAG,0,-1,-1);
     	IdFragmentAndAP src2 = new IdFragmentAndAP(-1,2,BBTFRAG,1,-1,-1);
-    	ArrayList<IdFragmentAndAP> srcAPs = new ArrayList<IdFragmentAndAP>();
+    	List<IdFragmentAndAP> srcAPs = new ArrayList<IdFragmentAndAP>();
     	srcAPs.add(src1);
     	srcAPs.add(src2);
     	Vertex src1V = Vertex.newVertexFromLibrary(-1,
@@ -515,7 +515,7 @@ public class FragmentSpaceTest
                 fs.getAPClassForFragment(src2)));
     	*/
     	
-    	ArrayList<IdFragmentAndAP> lst = fs.getFragAPsCompatibleWithTheseAPs(
+    	List<IdFragmentAndAP> lst = fs.getFragAPsCompatibleWithTheseAPs(
     	        srcAPs);
     	
     	assertEquals(4,lst.size(),"Size of compatible APs list is wrong.");
@@ -543,11 +543,11 @@ public class FragmentSpaceTest
         assertTrue(fs.isDefined(),"FragmentSpace is defined");
     	IdFragmentAndAP src1 = new IdFragmentAndAP(-1,2,BBTFRAG,0,-1,-1);
     	IdFragmentAndAP src2 = new IdFragmentAndAP(-1,2,BBTFRAG,1,-1,-1);
-    	ArrayList<IdFragmentAndAP> srcAPs = new ArrayList<IdFragmentAndAP>();
+    	List<IdFragmentAndAP> srcAPs = new ArrayList<IdFragmentAndAP>();
     	srcAPs.add(src1);
     	srcAPs.add(src2);
     	
-    	ArrayList<Vertex> lst = fs.getFragmentsCompatibleWithTheseAPs(
+    	List<Vertex> lst = fs.getFragmentsCompatibleWithTheseAPs(
     	        srcAPs);
     	
     	assertEquals(3,lst.size(),"Wrong number of compatible fragments.");	
@@ -564,23 +564,23 @@ public class FragmentSpaceTest
         APClass apcA = APClass.make("A",0);
         APClass apcB = APClass.make("B",0);
         
-        HashMap<APClass,ArrayList<APClass>> cpMap = 
-                new HashMap<APClass,ArrayList<APClass>>();
-        ArrayList<APClass> lstA = new ArrayList<APClass>();
+        HashMap<APClass,List<APClass>> cpMap = 
+                new HashMap<APClass,List<APClass>>();
+        List<APClass> lstA = new ArrayList<APClass>();
         lstA.add(rcvP);
         cpMap.put(apcA, lstA);
-        ArrayList<APClass> lstB = new ArrayList<APClass>();
+        List<APClass> lstB = new ArrayList<APClass>();
         lstB.add(rcvP);
         lstB.add(rcvM);
         cpMap.put(apcB, lstB);
         
-        HashMap<APClass,ArrayList<APClass>> rcCPMap = 
-                new HashMap<APClass,ArrayList<APClass>>();
-        ArrayList<APClass> lstC = new ArrayList<APClass>();
+        HashMap<APClass,List<APClass>> rcCPMap = 
+                new HashMap<APClass,List<APClass>>();
+        List<APClass> lstC = new ArrayList<APClass>();
         lstC.add(apcB);
         rcCPMap.put(apcA, lstC);
         
-        ArrayList<Vertex> fragments = new ArrayList<Vertex>();
+        List<Vertex> fragments = new ArrayList<Vertex>();
         
         Fragment frg2 = new Fragment();
         Atom a21 = new Atom("N", new Point3d(new double[]{0.0, 1.1, 2.2}));
@@ -658,23 +658,23 @@ public class FragmentSpaceTest
         APClass apcA = APClass.make("A",0);
         APClass apcB = APClass.make("B",0);
         
-        HashMap<APClass,ArrayList<APClass>> cpMap = 
-                new HashMap<APClass,ArrayList<APClass>>();
-        ArrayList<APClass> lstA = new ArrayList<APClass>();
+        HashMap<APClass,List<APClass>> cpMap = 
+                new HashMap<APClass,List<APClass>>();
+        List<APClass> lstA = new ArrayList<APClass>();
         lstA.add(rcvP);
         cpMap.put(apcA, lstA);
-        ArrayList<APClass> lstB = new ArrayList<APClass>();
+        List<APClass> lstB = new ArrayList<APClass>();
         lstB.add(rcvP);
         lstB.add(rcvM);
         cpMap.put(apcB, lstB);
         
-        HashMap<APClass,ArrayList<APClass>> rcCPMap = 
-                new HashMap<APClass,ArrayList<APClass>>();
-        ArrayList<APClass> lstC = new ArrayList<APClass>();
+        HashMap<APClass,List<APClass>> rcCPMap = 
+                new HashMap<APClass,List<APClass>>();
+        List<APClass> lstC = new ArrayList<APClass>();
         lstC.add(apcB);
         rcCPMap.put(apcA, lstC);
         
-        ArrayList<Vertex> fragments = new ArrayList<Vertex>();
+        List<Vertex> fragments = new ArrayList<Vertex>();
         
         Fragment frg2 = new Fragment();
         Atom a21 = new Atom("N", new Point3d(new double[]{0.0, 1.1, 2.2}));

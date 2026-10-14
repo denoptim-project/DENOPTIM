@@ -105,10 +105,10 @@ public class RingClosureTool
      * @throws TinkerException 
      */
 
-    public ArrayList<ChemicalObjectModel> attemptAllRingClosures(
+    public List<ChemicalObjectModel> attemptAllRingClosures(
             ChemicalObjectModel mol) throws DENOPTIMException
     {
-        ArrayList<ChemicalObjectModel> rcMols = new ArrayList<ChemicalObjectModel>();
+        List<ChemicalObjectModel> rcMols = new ArrayList<ChemicalObjectModel>();
         for (int i=0; i<mol.getRCACombinations().size(); i++)
         {
             Set<ObjectPair> rcaComb = mol.getRCACombinations().get(i);
@@ -527,7 +527,7 @@ public class RingClosureTool
         /*
                         //Choose capping group
                         String freeAPClass = rca.getApClass();
-                        ArrayList<String> capAPClasses = 
+                        List<String> capAPClasses = 
                                     CGParameters.getCompatibilityMap().get(freeAPClass);
         */
         		// We force the conversion to H with a fixed bond length

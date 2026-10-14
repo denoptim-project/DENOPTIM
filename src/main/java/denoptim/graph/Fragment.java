@@ -375,7 +375,7 @@ public class Fragment extends Vertex
         
         IAtom srcAtm = mol.getAtom(atomPositionNumber);
         
-        ArrayList<AttachmentPoint> apList = new ArrayList<>();
+        List<AttachmentPoint> apList = new ArrayList<>();
         if (getAPCountOnAtom(srcAtm) > 0) {
             apList = getAPsFromAtom(srcAtm);
         }
@@ -437,7 +437,7 @@ public class Fragment extends Vertex
         
         IAtom srcAtm = mol.getAtom(ap.getAtomPositionNumber());
         
-        ArrayList<AttachmentPoint> apList = new ArrayList<>();
+        List<AttachmentPoint> apList = new ArrayList<>();
         if (getAPCountOnAtom(srcAtm) > 0) {
             apList = getAPsFromAtom(srcAtm);
         }
@@ -452,13 +452,13 @@ public class Fragment extends Vertex
 //-----------------------------------------------------------------------------
     
     @SuppressWarnings("unchecked")
-    public ArrayList<AttachmentPoint> getAPsFromAtom(IAtom srcAtm)
+    public List<AttachmentPoint> getAPsFromAtom(IAtom srcAtm)
     {
-        ArrayList<AttachmentPoint> apsOnAtm = new ArrayList<AttachmentPoint>();
+        List<AttachmentPoint> apsOnAtm = new ArrayList<AttachmentPoint>();
         Object prop = srcAtm.getProperty(DENOPTIMConstants.ATMPROPAPS);
         if (prop!=null)
         {
-            apsOnAtm = (ArrayList<AttachmentPoint>) prop;
+            apsOnAtm = (List<AttachmentPoint>) prop;
         }
         return apsOnAtm;
     }
@@ -492,7 +492,7 @@ public class Fragment extends Vertex
     	int num = 0;
     	if (srcAtm.getProperty(DENOPTIMConstants.ATMPROPAPS) != null)
     	{
-			ArrayList<AttachmentPoint> apsOnAtm = 
+			List<AttachmentPoint> apsOnAtm = 
 					getAPsFromAtom(srcAtm);
         	num = apsOnAtm.size();
     	}
@@ -548,7 +548,7 @@ public class Fragment extends Vertex
         {
         	if (srcAtm.getProperty(DENOPTIMConstants.ATMPROPAPS) != null)
             {
-        		ArrayList<AttachmentPoint> apsOnAtm = 
+        		List<AttachmentPoint> apsOnAtm = 
         				getAPsFromAtom(srcAtm);
         		lstAPs.addAll(apsOnAtm);
             }
@@ -665,14 +665,14 @@ public class Fragment extends Vertex
             IAtom atm = mol.getAtom(atmID);
             if (atm.getProperty(DENOPTIMConstants.ATMPROPAPS) != null)
             {
-                ArrayList<AttachmentPoint> oldAPs = 
+                List<AttachmentPoint> oldAPs = 
                         getAPsFromAtom(atm);
                 oldAPs.add(ap);
                 atm.setProperty(DENOPTIMConstants.ATMPROPAPS,oldAPs);
             } 
             else
             {
-                ArrayList<AttachmentPoint> aps = new ArrayList<AttachmentPoint>();
+                List<AttachmentPoint> aps = new ArrayList<AttachmentPoint>();
                 aps.add(ap);
                 
                 atm.setProperty(DENOPTIMConstants.ATMPROPAPS,aps);
@@ -699,7 +699,7 @@ public class Fragment extends Vertex
                 continue;
             }
             int atmID = mol.indexOf(atm);
-            ArrayList<AttachmentPoint> apsOnAtm = 
+            List<AttachmentPoint> apsOnAtm = 
                     getAPsFromAtom(atm);
             for (AttachmentPoint ap : apsOnAtm)
             {
@@ -932,7 +932,7 @@ public class Fragment extends Vertex
             IAtom srcAtm = mol.getAtom(atmId);
             if (srcAtm.getProperty(DENOPTIMConstants.ATMPROPAPS) != null)
             {
-                ArrayList<AttachmentPoint> apsOnAtm = getAPsFromAtom(srcAtm);
+                List<AttachmentPoint> apsOnAtm = getAPsFromAtom(srcAtm);
                 for (int i = 0; i < apsOnAtm.size(); i++)
                 {
                     AttachmentPoint ap = apsOnAtm.get(i);

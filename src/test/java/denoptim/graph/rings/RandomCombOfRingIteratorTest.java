@@ -193,9 +193,9 @@ public class RandomCombOfRingIteratorTest
         IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(graph, true);
        
         // Fragment space allows all pairs of complementary RCVs to form chords
-        HashMap<APClass,ArrayList<APClass>> cpMap = 
-                new HashMap<APClass,ArrayList<APClass>>();
-        ArrayList<APClass> lstA = new ArrayList<APClass>();
+        HashMap<APClass,List<APClass>> cpMap = 
+                new HashMap<APClass,List<APClass>>();
+        List<APClass> lstA = new ArrayList<APClass>();
         lstA.add(apc);
         cpMap.put(apc, lstA);
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();

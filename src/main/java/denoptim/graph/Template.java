@@ -135,7 +135,7 @@ public class Template extends Vertex
      * {@link #getAttachmentPoints()} does not allocate a new list on every
      * call.
      */
-    private ArrayList<AttachmentPoint> cachedOuterAPs;
+    private List<AttachmentPoint> cachedOuterAPs;
 
     /**
      * Identity map from outer AP to its index in {@link #cachedOuterAPs}.
@@ -516,7 +516,7 @@ public class Template extends Vertex
      * @return the list of outer AP
      */
     @Override
-    public ArrayList<AttachmentPoint> getAttachmentPoints()
+    public List<AttachmentPoint> getAttachmentPoints()
     {
         ensureOuterAPCache();
         return cachedOuterAPs;
@@ -738,8 +738,8 @@ public class Template extends Vertex
                     continue;
                 }
                 @SuppressWarnings("unchecked")
-                ArrayList<AttachmentPoint> apLst = 
-                    (ArrayList<AttachmentPoint>) p;
+                List<AttachmentPoint> apLst = 
+                    (List<AttachmentPoint>) p;
                 for (AttachmentPoint apOnMol : apLst)
                 {
                     Object o = apOnMol.getProperty(DENOPTIMConstants.LINKAPS);

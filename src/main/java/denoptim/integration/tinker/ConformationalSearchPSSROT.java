@@ -83,7 +83,7 @@ public class ConformationalSearchPSSROT
      * @throws TinkerException if tinker fails.
      */
 
-    public static void performPSSROT(ArrayList<ChemicalObjectModel> mols, 
+    public static void performPSSROT(List<ChemicalObjectModel> mols, 
             Map<String, Integer> atmTypeMap,
             String runLabel, String ffFilePathName, List<String> keyFileLines, 
             List<String> subParamsInit, List<String> subParamsRest,
@@ -375,7 +375,7 @@ public class ConformationalSearchPSSROT
     public static void fixLongeLinesInXYZ(String filename) 
             throws DENOPTIMException 
     {
-    	ArrayList<String> txtLines = new ArrayList<String>();
+    	List<String> txtLines = new ArrayList<String>();
     	try {
     	    txtLines = DenoptimIO.readList(filename);
     	}

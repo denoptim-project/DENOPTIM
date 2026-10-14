@@ -107,7 +107,7 @@ public class GUIVertexInspector extends GUICardPanel
 	/**
 	 * The currently loaded list of fragments
 	 */
-	private ArrayList<Vertex> verticesLibrary = new ArrayList<Vertex>();
+	private List<Vertex> verticesLibrary = new ArrayList<Vertex>();
 	
 	/**
 	 * The currently loaded vertex
@@ -243,7 +243,7 @@ public class GUIVertexInspector extends GUICardPanel
 					return;
 				}
 				
-				ArrayList<Vertex> vrtxLib = new ArrayList<>();
+				List<Vertex> vrtxLib = new ArrayList<>();
 				try {
 				    vrtxLib = DenoptimIO.readVertexes(inFile, BBType.FRAGMENT);
 				} catch (Exception e1) {
@@ -303,7 +303,7 @@ public class GUIVertexInspector extends GUICardPanel
 						break;
 						
 					case 1:
-						ArrayList<Vertex> selectedVrtxs = 
+						List<Vertex> selectedVrtxs = 
 								new ArrayList<Vertex>();
 					    GUIVertexSelector vrtxSelector = new GUIVertexSelector(
 					            btnAddVrtx,true);
@@ -314,9 +314,9 @@ public class GUIVertexInspector extends GUICardPanel
 						if (selected != null)
 						{
 						    @SuppressWarnings("unchecked")
-                            ArrayList<ArrayList<Integer>> selList = 
-						            (ArrayList<ArrayList<Integer>>) selected;
-						    for (ArrayList<Integer> pair : selList)
+                            List<List<Integer>> selList = 
+						            (List<List<Integer>>) selected;
+						    for (List<Integer> pair : selList)
 						    {
 						        selectedVrtxs.add(vrtxLib.get(pair.get(0)));
 						    }
@@ -415,7 +415,7 @@ public class GUIVertexInspector extends GUICardPanel
                 {
                     return;
                 }
-                ArrayList<Vertex> lst = new ArrayList<Vertex>(1);
+                List<Vertex> lst = new ArrayList<Vertex>(1);
                 lst.add((EmptyVertex) ev);
                 GUIVertexSelector fragSelector = new GUIVertexSelector(
                         btnEmptFrag,false);
@@ -446,7 +446,7 @@ public class GUIVertexInspector extends GUICardPanel
 			public void actionPerformed(ActionEvent e) {
 				vertex = vertexViewer.getLoadedStructure();
 				
-				ArrayList<IAtom> selectedAtms = 
+				List<IAtom> selectedAtms = 
 				        vertexViewer.getAtomsSelectedFromJMol();
 				
 				if (selectedAtms.size() == 0)
@@ -472,7 +472,7 @@ public class GUIVertexInspector extends GUICardPanel
 					}
 					String apClass = selectedAPCs.get(0).toString();
 					
-					ArrayList<IAtom> failed = new ArrayList<IAtom>();
+					List<IAtom> failed = new ArrayList<IAtom>();
 					for (IAtom atm : selectedAtms)
 					{
 						if (!convertAtomToAP(atm, apClass))
@@ -794,9 +794,9 @@ public class GUIVertexInspector extends GUICardPanel
                         if (selected != null)
                         {
                             @SuppressWarnings("unchecked")
-                            List<ArrayList<Integer>> selList = 
-                                    (ArrayList<ArrayList<Integer>>) selected;
-                            for (ArrayList<Integer> pair : selList)
+                            List<List<Integer>> selList = 
+                                    (List<List<Integer>>) selected;
+                            for (List<Integer> pair : selList)
                             {
                                 selectedVrtxs.add(fragments.get(pair.get(0)));
                             }
@@ -931,9 +931,9 @@ public class GUIVertexInspector extends GUICardPanel
                         if (selected != null)
                         {
                             @SuppressWarnings("unchecked")
-                            List<ArrayList<Integer>> selList = 
-                                    (ArrayList<ArrayList<Integer>>) selected;
-                            for (ArrayList<Integer> pair : selList)
+                            List<List<Integer>> selList = 
+                                    (List<List<Integer>>) selected;
+                            for (List<Integer> pair : selList)
                             {
                                 selectedVrtxs.add(fragments.get(pair.get(0)));
                             }
@@ -1077,9 +1077,9 @@ public class GUIVertexInspector extends GUICardPanel
                         if (selected != null)
                         {
                             @SuppressWarnings("unchecked")
-                            List<ArrayList<Integer>> selList = 
-                                    (ArrayList<ArrayList<Integer>>) selected;
-                            for (ArrayList<Integer> pair : selList)
+                            List<List<Integer>> selList = 
+                                    (List<List<Integer>>) selected;
+                            for (List<Integer> pair : selList)
                             {
                                 selectedVrtxs.add(fragments.get(pair.get(0)));
                             }
@@ -1102,7 +1102,7 @@ public class GUIVertexInspector extends GUICardPanel
 				+ "undone!");
 		btnDelSel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ArrayList<IAtom> selectedAtms = 
+				List<IAtom> selectedAtms = 
 				        vertexViewer.getAtomsSelectedFromJMol();
 				
 				if (selectedAtms.size() == 0)
@@ -1161,7 +1161,7 @@ public class GUIVertexInspector extends GUICardPanel
 				{
 					return;
 				}
-				ArrayList<Vertex> vrtxLib = new ArrayList<>();
+				List<Vertex> vrtxLib = new ArrayList<>();
                 try {
                     vrtxLib = DenoptimIO.readVertexes(inFile, BBType.FRAGMENT);
                 } catch (Exception e1) {
@@ -1476,7 +1476,7 @@ public class GUIVertexInspector extends GUICardPanel
 	{	
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		
-		ArrayList<Vertex> vrtxLib = new ArrayList<>();
+		List<Vertex> vrtxLib = new ArrayList<>();
         try {
             vrtxLib = DenoptimIO.readVertexes(file, BBType.FRAGMENT);
         } catch (Exception e1) {
@@ -1692,14 +1692,14 @@ public class GUIVertexInspector extends GUICardPanel
     
 //----------------------------------------------------------------------------
 
-    private void removeAtoms(ArrayList<IAtom> atmsToDels)
+    private void removeAtoms(List<IAtom> atmsToDels)
     {
         if (!(vertex instanceof Fragment))
         {
             return;
         }
         Fragment frag = (Fragment) vertex;
-    	ArrayList<IBond> bnsToDel = new ArrayList<IBond>();
+    	List<IBond> bnsToDel = new ArrayList<IBond>();
     	for (IAtom atm : atmsToDels)
     	{
 	    	for (IBond bnd : frag.bonds())
@@ -1718,7 +1718,7 @@ public class GUIVertexInspector extends GUICardPanel
     	{
     	    if (atm.getProperty(DENOPTIMConstants.ATMPROPAPS)!=null)
     	    {
-    	        ArrayList<AttachmentPoint> apsOnAtm = frag.getAPsFromAtom(atm);
+    	        List<AttachmentPoint> apsOnAtm = frag.getAPsFromAtom(atm);
     	        frag.getAttachmentPoints().removeAll(apsOnAtm);
     	    }
     	    frag.removeAtom(atm);
@@ -2058,7 +2058,7 @@ public class GUIVertexInspector extends GUICardPanel
         }
       
         // Interpret the selection made by the user
-        ArrayList<APClass> selectedSPCs = new ArrayList<APClass>();
+        List<APClass> selectedSPCs = new ArrayList<APClass>();
         int[] selectedIds = apClassList.getSelectedIndices();
         if (selectedIds.length > 0)
         {

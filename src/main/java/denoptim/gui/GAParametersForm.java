@@ -29,6 +29,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -1614,7 +1615,7 @@ public class GAParametersForm extends ParametersForm
 	{	
         levelProbData = new DefaultXYDataset();
         
-        ArrayList<Double> y = new ArrayList<Double>();
+        List<Double> y = new ArrayList<Double>();
 		try
 		{
 			int scheme = GAParameters.convertProbabilityScheme(
@@ -1714,7 +1715,7 @@ public class GAParametersForm extends ParametersForm
     {
         molSizeProbData = new DefaultXYDataset();
 
-        ArrayList<Double> y = new ArrayList<Double>();
+        List<Double> y = new ArrayList<Double>();
         try
         {
           int scheme = GAParameters.convertProbabilityScheme(
@@ -1814,7 +1815,7 @@ public class GAParametersForm extends ParametersForm
     {   
         crowdProbData = new DefaultXYDataset();
         
-        ArrayList<Double> y = new ArrayList<Double>();
+        List<Double> y = new ArrayList<Double>();
         try
         {
             int scheme = GAParameters.convertProbabilityScheme(

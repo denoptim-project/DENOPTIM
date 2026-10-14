@@ -21,6 +21,7 @@ package denoptim.gui;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -40,14 +41,14 @@ public class JUNGGraphSnapshot
     /**
      * The collection of vertexes with labels (by label type)
      */
-    private Map<LabelType,ArrayList<String>> vertexesWithLabels =
-                    new HashMap<LabelType,ArrayList<String>>();
+    private Map<LabelType,List<String>> vertexesWithLabels =
+                    new HashMap<LabelType,List<String>>();
     
     /**
      * The collection of edges with labels (by label type)
      */
-    private Map<LabelType,ArrayList<String>> edgesWithLabels =
-                    new HashMap<LabelType,ArrayList<String>>();
+    private Map<LabelType,List<String>> edgesWithLabels =
+                    new HashMap<LabelType,List<String>>();
     
     /**
      * Positions of nodes
@@ -112,7 +113,7 @@ public class JUNGGraphSnapshot
         {
             vertexesWithLabels.get(lt).add(v.idStr);
         } else {
-            ArrayList<String> lst = new ArrayList<String>();
+            List<String> lst = new ArrayList<String>();
             lst.add(v.idStr);
             vertexesWithLabels.put(lt, lst);
         }
@@ -126,7 +127,7 @@ public class JUNGGraphSnapshot
         {
             edgesWithLabels.get(lt).add(e.id);
         } else {
-            ArrayList<String> lst = new ArrayList<String>();
+            List<String> lst = new ArrayList<String>();
             lst.add(e.id);
             edgesWithLabels.put(lt, lst);
         }
@@ -134,7 +135,7 @@ public class JUNGGraphSnapshot
     
 //-----------------------------------------------------------------------------
 
-    public ArrayList<String> getVertexeIDsWithLabel(LabelType labelName)
+    public List<String> getVertexeIDsWithLabel(LabelType labelName)
     {
         if (vertexesWithLabels.containsKey(labelName))
             return vertexesWithLabels.get(labelName);
@@ -144,7 +145,7 @@ public class JUNGGraphSnapshot
     
 //-----------------------------------------------------------------------------
 
-    public ArrayList<String> getEdgeIDsWithLabel(LabelType labelName)
+    public List<String> getEdgeIDsWithLabel(LabelType labelName)
     {
         if (edgesWithLabels.containsKey(labelName))
             return edgesWithLabels.get(labelName);

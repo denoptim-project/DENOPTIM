@@ -32,6 +32,7 @@ import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
@@ -60,7 +61,7 @@ public class RingClosuresArchive
      * conformations from the archive of serialized objects, and 
      * (ii) the closability of the chain.
      */
-    private HashMap<String,ArrayList<String>> rccsPerChainId =
+    private HashMap<String,List<String>> rccsPerChainId =
 							     new HashMap<>();
 
     /**
@@ -72,7 +73,7 @@ public class RingClosuresArchive
      * identified by the molecular fragment Id in the proper library of
      * fragments.
      */
-    private HashMap<Integer,ArrayList<ClosableChain>> libCCxTPIdx =
+    private HashMap<Integer,List<ClosableChain>> libCCxTPIdx =
                                                              new HashMap<>();
     
     /**
@@ -174,7 +175,7 @@ public class RingClosuresArchive
             String closability) throws DENOPTIMException
     {
         // Create record for RCC
-        ArrayList<String> record = new ArrayList<String>();
+        List<String> record = new ArrayList<String>();
         record.add(rccIdNum);
         record.add(closability);
 
@@ -195,7 +196,7 @@ public class RingClosuresArchive
             }
             else
             {
-                ArrayList<ClosableChain> lstCC = new ArrayList<ClosableChain>();
+                List<ClosableChain> lstCC = new ArrayList<ClosableChain>();
                 lstCC.add(cc);
                 libCCxTPIdx.put(tpId,lstCC);
             }
@@ -339,7 +340,7 @@ public class RingClosuresArchive
      * @param tpId the turning point molecule Id in the libraries.
      */
 
-    public ArrayList<ClosableChain> getCCFromTurningPointId(int tpId)
+    public List<ClosableChain> getCCFromTurningPointId(int tpId)
     {
         if (libCCxTPIdx.containsKey(tpId))
         {
@@ -379,7 +380,7 @@ public class RingClosuresArchive
 
     public boolean getClosabilityOfChain(String chainId)
     {
-        ArrayList<String> rccRecord = rccsPerChainId.get(chainId);
+        List<String> rccRecord = rccsPerChainId.get(chainId);
         String closability = rccRecord.get(1);
         return closability.equals("T");
     }
@@ -393,7 +394,7 @@ public class RingClosuresArchive
 
     public RingClosingConformations getRCCsOfChain(String chainId)
     {
-        ArrayList<String> rccRecord = rccsPerChainId.get(chainId);
+        List<String> rccRecord = rccsPerChainId.get(chainId);
         int rccId = Integer.parseInt(rccRecord.get(0));
         String closability = rccRecord.get(1);
 

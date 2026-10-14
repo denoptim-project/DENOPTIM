@@ -1050,7 +1050,7 @@ public class GraphViewerPanel extends JPanel
 	private void inheritFeatures(JUNGGraphSnapshot prevStatus, boolean lock)
     {
 	    // Set labels on vertexes
-	    ArrayList<String> lst = prevStatus.getVertexeIDsWithLabel(
+	    List<String> lst = prevStatus.getVertexeIDsWithLabel(
 	            LabelType.BBID);
         for(JVertex jv : loadedGraph.getVertices())
         {
@@ -1061,9 +1061,9 @@ public class GraphViewerPanel extends JPanel
         }
         
         // Set labels on edges
-        ArrayList<String> lstBT = prevStatus.getEdgeIDsWithLabel(LabelType.BT);
-        ArrayList<String> lstAPC = prevStatus.getEdgeIDsWithLabel(LabelType.APC);
-        ArrayList<String> lstAPID = prevStatus.getEdgeIDsWithLabel(
+        List<String> lstBT = prevStatus.getEdgeIDsWithLabel(LabelType.BT);
+        List<String> lstAPC = prevStatus.getEdgeIDsWithLabel(LabelType.APC);
+        List<String> lstAPID = prevStatus.getEdgeIDsWithLabel(
                 LabelType.APID);
         for(JEdge je : loadedGraph.getEdges())
         {

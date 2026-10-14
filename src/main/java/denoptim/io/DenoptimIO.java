@@ -149,7 +149,7 @@ public class DenoptimIO
         {
             case VRTXSDF:
             {
-                ArrayList<Vertex> vrtxs = readVertexes(file, BBType.FRAGMENT);
+                List<Vertex> vrtxs = readVertexes(file, BBType.FRAGMENT);
                 if (vrtxs.size()>1)
                     data = vrtxs;
                 else
@@ -159,7 +159,7 @@ public class DenoptimIO
             
             case VRTXJSON:
             {
-                ArrayList<Vertex> vrtxs = readVertexes(file, BBType.FRAGMENT);
+                List<Vertex> vrtxs = readVertexes(file, BBType.FRAGMENT);
                 if (vrtxs.size()>1)
                     data = vrtxs;
                 else
@@ -169,7 +169,7 @@ public class DenoptimIO
                 
             case CANDIDATESDF:
             {
-                ArrayList<Candidate> cands = readCandidates(file, true);
+                List<Candidate> cands = readCandidates(file, true);
                 if (cands.size()>1)
                     data = cands;
                 else
@@ -179,7 +179,7 @@ public class DenoptimIO
                 
             case GRAPHSDF:
             {
-                ArrayList<DGraph> graphs = readDENOPTIMGraphsFromFile(file, 
+                List<DGraph> graphs = readDENOPTIMGraphsFromFile(file, 
                         format);
                 if (graphs.size()>1)
                     data = graphs;
@@ -190,7 +190,7 @@ public class DenoptimIO
                 
             case GRAPHJSON:
             {
-                ArrayList<DGraph> graphs = readDENOPTIMGraphsFromFile(file, 
+                List<DGraph> graphs = readDENOPTIMGraphsFromFile(file, 
                         format);
                 if (graphs.size()>1)
                     data = graphs;
@@ -235,7 +235,7 @@ public class DenoptimIO
     public static List<Candidate> readGenerationFromSummary(File file) 
             throws DENOPTIMException
     {
-        ArrayList<Candidate> cands = new ArrayList<Candidate>();
+        List<Candidate> cands = new ArrayList<Candidate>();
         List<String> pathnames = readPopulationMemberPathnames(file);
         String genSummaryParentDir = file.getParent(); // GenXXX folder
         for (String candPathname : pathnames)
@@ -337,10 +337,10 @@ public class DenoptimIO
      * @return IAtomContainer[] an array of molecules
      * @throws DENOPTIMException
      */
-    public static ArrayList<IAtomContainer> readSDFFile(String fileName)
+    public static List<IAtomContainer> readSDFFile(String fileName)
             throws DENOPTIMException 
     {
-        ArrayList<IAtomContainer> lstContainers = new ArrayList<>();
+        List<IAtomContainer> lstContainers = new ArrayList<>();
 
         File file = new File(fileName);
         IteratingSDFReader reader = null;
@@ -478,7 +478,7 @@ public class DenoptimIO
     public static File writeVertexToFile(File file, FileFormat format,
             Vertex vertex, boolean append) throws DENOPTIMException 
     {
-        ArrayList<Vertex> lst = new ArrayList<Vertex>();
+        List<Vertex> lst = new ArrayList<Vertex>();
         lst.add(vertex);
         return writeVertexesToFile(file, format, lst, append);
     }
@@ -549,7 +549,7 @@ public class DenoptimIO
         Gson writer = DENOPTIMgson.getWriter();
         if (append)
         {
-            ArrayList<Vertex> allVertexes = readDENOPTIMVertexesFromJSONFile(
+            List<Vertex> allVertexes = readDENOPTIMVertexesFromJSONFile(
                     file.getAbsolutePath());
             allVertexes.addAll(vertexes);
             writeData(file.getAbsolutePath(), writer.toJson(allVertexes), false);
@@ -951,7 +951,7 @@ public class DenoptimIO
     public static double[] readPopulationProps(File file)
             throws DENOPTIMException {
         double[] vals = new double[4];
-        ArrayList<String> txt = readList(file.getAbsolutePath());
+        List<String> txt = readList(file.getAbsolutePath());
         for (String line : txt) {
             if (line.trim().length() < 8) {
                 continue;
@@ -993,7 +993,7 @@ public class DenoptimIO
             throws DENOPTIMException 
     {
         List<String>  vals = new ArrayList<String>();
-        ArrayList<String> txt = readList(file.getAbsolutePath());
+        List<String> txt = readList(file.getAbsolutePath());
         for (String line : txt) 
         {
             if (!line.contains(FS))
@@ -1064,7 +1064,7 @@ public class DenoptimIO
      * @return list of data
      * @throws DENOPTIMException
      */
-    public static ArrayList<String> readList(String fileName) 
+    public static List<String> readList(String fileName) 
             throws DENOPTIMException {
         return readList(fileName, false);
     }
@@ -1080,9 +1080,9 @@ public class DenoptimIO
      * @return list of data
      * @throws DENOPTIMException
      */
-    public static ArrayList<String> readList(String fileName, 
+    public static List<String> readList(String fileName, 
             boolean allowEmpty) throws DENOPTIMException {
-        ArrayList<String> lst = new ArrayList<>();
+        List<String> lst = new ArrayList<>();
         BufferedReader br = null;
         String line = null;
         try {
@@ -1159,7 +1159,7 @@ public class DenoptimIO
             List<String> propNames) throws DENOPTIMException 
     {
         List<Map<String,Object>> results = new ArrayList<Map<String,Object>>();
-        ArrayList<IAtomContainer> iacs =  DenoptimIO.readSDFFile(pathName);
+        List<IAtomContainer> iacs =  DenoptimIO.readSDFFile(pathName);
         for (IAtomContainer iac : iacs)
         {
             Map<String,Object> properties = new HashMap<String,Object>();
@@ -1203,7 +1203,7 @@ public class DenoptimIO
      * @param ends     container for the definition of forbidden ends
      */
     public static void writeCompatibilityMatrix(String fileName, 
-            HashMap<APClass, ArrayList<APClass>> cpMap,
+            HashMap<APClass, List<APClass>> cpMap,
             HashMap<APClass, APClass> capMap,
             HashSet<APClass> ends) throws DENOPTIMException {
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
@@ -1265,7 +1265,7 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void readCompatibilityMatrix(String fileName,HashMap<APClass, 
-            ArrayList<APClass>> compatMap, 
+            List<APClass>> compatMap, 
             HashMap<APClass, APClass> cappingMap, Set<APClass> forbiddenEndList)
             throws DENOPTIMException {
 
@@ -1291,7 +1291,7 @@ public class DenoptimIO
                     }
 
                     APClass srcAPC = APClass.make(str[1]);
-                    ArrayList<APClass> trgAPCs = new ArrayList<APClass>();
+                    List<APClass> trgAPCs = new ArrayList<APClass>();
                     for (String s : str[2].split(","))
                     {
                         trgAPCs.add(APClass.make(s.trim()));
@@ -1359,7 +1359,7 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void readRCCompatibilityMatrix(String fileName, 
-            HashMap<APClass, ArrayList<APClass>> rcCompatMap)
+            HashMap<APClass, List<APClass>> rcCompatMap)
             throws DENOPTIMException {
         BufferedReader br = null;
         String line = null;
@@ -1391,7 +1391,7 @@ public class DenoptimIO
                         if (rcCompatMap.containsKey(srcAPC)) {
                             rcCompatMap.get(srcAPC).add(trgAPC);
                         } else {
-                            ArrayList<APClass> list = new ArrayList<APClass>();
+                            List<APClass> list = new ArrayList<APClass>();
                             list.add(trgAPC);
                             rcCompatMap.put(srcAPC, list);
                         }
@@ -1399,7 +1399,7 @@ public class DenoptimIO
                         if (rcCompatMap.containsKey(trgAPC)) {
                             rcCompatMap.get(trgAPC).add(srcAPC);
                         } else {
-                            ArrayList<APClass> list = new ArrayList<APClass>();
+                            List<APClass> list = new ArrayList<APClass>();
                             list.add(srcAPC);
                             rcCompatMap.put(trgAPC, list);
                         }
@@ -1461,8 +1461,8 @@ public class DenoptimIO
             boolean allowNoUID) throws DENOPTIMException 
     {
         String filename = file.getAbsolutePath();
-        ArrayList<Candidate> candidates = new ArrayList<>();
-        ArrayList<IAtomContainer> iacs = readSDFFile(file.getAbsolutePath());
+        List<Candidate> candidates = new ArrayList<>();
+        List<IAtomContainer> iacs = readSDFFile(file.getAbsolutePath());
         
         // Try to identify the generation at which this candidate was generated
         int genID = -1;
@@ -1504,7 +1504,7 @@ public class DenoptimIO
             file = new File(file.getAbsoluteFile() + "." 
                     + FileFormat.CANDIDATESDF.getExtension());
         }
-        ArrayList<IAtomContainer> lst = new ArrayList<IAtomContainer>();
+        List<IAtomContainer> lst = new ArrayList<IAtomContainer>();
         for (Candidate g : popMembers) 
         {
             lst.add(g.getFitnessProviderOutputRepresentation());
@@ -1543,10 +1543,10 @@ public class DenoptimIO
      * @return the list of editing tasks
      * @throws DENOPTIMException
      */
-    public static ArrayList<GraphEdit> readDENOPTIMGraphEditFromFile(
+    public static List<GraphEdit> readDENOPTIMGraphEditFromFile(
             String fileName) throws DENOPTIMException 
     {
-        ArrayList<GraphEdit> graphEditTasks = new ArrayList<>();
+        List<GraphEdit> graphEditTasks = new ArrayList<>();
         Gson reader = DENOPTIMgson.getReader();
 
         BufferedReader br = null;
@@ -1613,7 +1613,7 @@ public class DenoptimIO
      * @throws Exception 
      */
     
-    public static ArrayList<DGraph> readDENOPTIMGraphsFromFile(File inFile) 
+    public static List<DGraph> readDENOPTIMGraphsFromFile(File inFile) 
             throws Exception 
     {
         FileFormat ff = FileUtils.detectFileFormat(inFile);
@@ -1633,7 +1633,7 @@ public class DenoptimIO
      * @throws Exception 
      */
     
-    public static ArrayList<DGraph> readDENOPTIMGraphsFromFile(File inFile,
+    public static List<DGraph> readDENOPTIMGraphsFromFile(File inFile,
             FileFormat format) throws Exception 
     {
         switch (format) 
@@ -1656,8 +1656,8 @@ public class DenoptimIO
                     inFile.getAbsolutePath());
                 
             case VRTXSDF:
-                ArrayList<DGraph> graphs = new ArrayList<DGraph>();
-                ArrayList<Vertex> vertexes = readVertexes(inFile, 
+                List<DGraph> graphs = new ArrayList<DGraph>();
+                List<Vertex> vertexes = readVertexes(inFile, 
                         BBType.UNDEFINED);
                 for (Vertex v : vertexes)
                 {
@@ -1688,11 +1688,11 @@ public class DenoptimIO
      * @return the list of graphs
      * @throws DENOPTIMException
      */
-    public static ArrayList<DGraph> readDENOPTIMGraphsFromSDFile(
+    public static List<DGraph> readDENOPTIMGraphsFromSDFile(
             String fileName) throws DENOPTIMException 
     {
-        ArrayList<DGraph> lstGraphs = new ArrayList<DGraph>();
-        ArrayList<IAtomContainer> mols = DenoptimIO.readSDFFile(fileName);
+        List<DGraph> lstGraphs = new ArrayList<DGraph>();
+        List<IAtomContainer> mols = DenoptimIO.readSDFFile(fileName);
         int i = 0;
         for (IAtomContainer mol : mols) 
         {
@@ -1814,11 +1814,11 @@ public class DenoptimIO
      * @return the list of graphs.
      * @throws DENOPTIMException
      */
-    public static ArrayList<DGraph> readDENOPTIMGraphsFromTxtFile(
+    public static List<DGraph> readDENOPTIMGraphsFromTxtFile(
             String fileName, FragmentSpace fragSpace, Logger logger)
                     throws DENOPTIMException 
     {
-        ArrayList<DGraph> lstGraphs = new ArrayList<DGraph>();
+        List<DGraph> lstGraphs = new ArrayList<DGraph>();
         BufferedReader br = null;
         String line = null;
         try {
@@ -1871,10 +1871,10 @@ public class DenoptimIO
      * @return the list of vertexes.
      * @throws DENOPTIMException
      */
-    public static ArrayList<Vertex>  readDENOPTIMVertexesFromJSONFile(
+    public static List<Vertex>  readDENOPTIMVertexesFromJSONFile(
             String fileName) throws DENOPTIMException 
     {
-        ArrayList<Vertex> result = new ArrayList<Vertex>();
+        List<Vertex> result = new ArrayList<Vertex>();
         Gson reader = DENOPTIMgson.getReader();
 
         BufferedReader br = null;
@@ -1937,10 +1937,10 @@ public class DenoptimIO
      * @return the list of graphs
      * @throws DENOPTIMException
      */
-    public static ArrayList<DGraph>  readDENOPTIMGraphsFromJSONFile(
+    public static List<DGraph>  readDENOPTIMGraphsFromJSONFile(
             String fileName) throws DENOPTIMException 
     {
-        ArrayList<DGraph> list_of_graphs = new ArrayList<DGraph>();
+        List<DGraph> list_of_graphs = new ArrayList<DGraph>();
         Gson reader = DENOPTIMgson.getReader();
 
         BufferedReader br = null;
@@ -2133,7 +2133,7 @@ public class DenoptimIO
             boolean append, Logger logger, Randomizer randomizer) 
                     throws DENOPTIMException
     {
-        ArrayList<DGraph> lst = new ArrayList<>(1);
+        List<DGraph> lst = new ArrayList<>(1);
         lst.add(graph);
         writeGraphsToSDF(file, lst, append, logger, randomizer);
     }
@@ -2171,7 +2171,7 @@ public class DenoptimIO
             List<DGraph> modGraphs, boolean append, boolean make3D, 
             Logger logger, Randomizer randomizer) throws DENOPTIMException
     {
-        ArrayList<IAtomContainer> lst = new ArrayList<IAtomContainer>();
+        List<IAtomContainer> lst = new ArrayList<IAtomContainer>();
         for (DGraph g : modGraphs) 
         {
             ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder(logger, randomizer);
@@ -2205,7 +2205,7 @@ public class DenoptimIO
     public static void writeGraphToJSON(File file, DGraph graph) 
             throws DENOPTIMException
     {
-        ArrayList<DGraph> graphs = new ArrayList<DGraph>();
+        List<DGraph> graphs = new ArrayList<DGraph>();
         graphs.add(graph);
         writeGraphsToJSON(file, graphs);
     }
@@ -2322,11 +2322,11 @@ public class DenoptimIO
      * @throws IllegalArgumentException 
      * @throws Exception
      */
-    public static ArrayList<Vertex> readVertexes(File file,
+    public static List<Vertex> readVertexes(File file,
             Vertex.BBType bbt) throws UndetectedFileFormatException, 
     IOException, IllegalArgumentException, DENOPTIMException
     {
-        ArrayList<Vertex> vertexes = new ArrayList<Vertex>();
+        List<Vertex> vertexes = new ArrayList<Vertex>();
         FileFormat ff = FileUtils.detectFileFormat(file);
         switch (ff)
         {
@@ -2341,7 +2341,7 @@ public class DenoptimIO
                 break;
                     
             case GRAPHSDF:
-                ArrayList<DGraph> lstGraphs = 
+                List<DGraph> lstGraphs = 
                     readDENOPTIMGraphsFromSDFile(file.getAbsolutePath());
                 for (DGraph g : lstGraphs)
                 {
@@ -2352,7 +2352,7 @@ public class DenoptimIO
                 break;
                     
             case GRAPHJSON:
-                ArrayList<DGraph> lstGraphs2 = 
+                List<DGraph> lstGraphs2 = 
                 readDENOPTIMGraphsFromJSONFile(file.getAbsolutePath());
                 for (DGraph g : lstGraphs2)
                 {
@@ -2379,10 +2379,10 @@ public class DenoptimIO
      * @return the list of vertexes.
      * @throws DENOPTIMException
      */
-    public static ArrayList<Vertex> readDENOPTIMVertexesFromSDFile(
+    public static List<Vertex> readDENOPTIMVertexesFromSDFile(
             String fileName, Vertex.BBType bbt) throws DENOPTIMException 
     {
-        ArrayList<Vertex> vertexes = new ArrayList<Vertex>();
+        List<Vertex> vertexes = new ArrayList<Vertex>();
         int i=0;
         Gson reader = DENOPTIMgson.getReader();
         for (IAtomContainer mol : readSDFFile(fileName)) 
@@ -2481,7 +2481,7 @@ public class DenoptimIO
     public static void readCuttingRules(BufferedReader reader, 
             List<CuttingRule> cutRules, String source) throws DENOPTIMException
     {
-        ArrayList<String> cutRulLines = new ArrayList<String>();
+        List<String> cutRulLines = new ArrayList<String>();
         try
         {
             String line = null;
@@ -2519,10 +2519,10 @@ public class DenoptimIO
     public static void readCuttingRules(File file, 
             List<CuttingRule> cutRules) throws DENOPTIMException
     {   
-        ArrayList<String> allLines = readList(file.getAbsolutePath());
+        List<String> allLines = readList(file.getAbsolutePath());
         
         //Now get the list of cutting rules
-        ArrayList<String> cutRulLines = new ArrayList<String>();
+        List<String> cutRulLines = new ArrayList<String>();
         allLines.stream()
             .filter(line -> line.trim().startsWith(
                     DENOPTIMConstants.CUTRULKEYWORD))
@@ -2547,7 +2547,7 @@ public class DenoptimIO
      * @throws DENOPTIMException in case there are errors in the formatting of 
      * the text contained in the file.
      */
-    public static void readCuttingRules(ArrayList<String> cutRulLines,
+    public static void readCuttingRules(List<String> cutRulLines,
             List<CuttingRule> cutRules, String source) throws DENOPTIMException
     {   
         Set<Integer> usedPriorities = new HashSet<Integer>();
@@ -2564,7 +2564,7 @@ public class DenoptimIO
             }
 
             // further details in map of options
-            ArrayList<String> opts = new ArrayList<String>();
+            List<String> opts = new ArrayList<String>();
             if (words.length >= 7)
             {
                 for (int wi=6; wi<words.length; wi++)

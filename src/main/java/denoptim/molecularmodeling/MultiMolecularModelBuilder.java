@@ -20,6 +20,7 @@
 package denoptim.molecularmodeling;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -84,7 +85,7 @@ public class MultiMolecularModelBuilder
      * @throws TinkerException if Tinker fails
      */
 
-    public ArrayList<IAtomContainer> buildMulti3DStructure() 
+    public List<IAtomContainer> buildMulti3DStructure() 
             throws DENOPTIMException
     {
         logger.log(Level.INFO, "Building Multiple 3D representations for "
@@ -111,7 +112,7 @@ public class MultiMolecularModelBuilder
         // Evaluate source of isomerism
         // 1: Attempt Ring Closures 
         RingClosureTool rct = new RingClosureTool(settings);
-        ArrayList<ChemicalObjectModel> structures =new ArrayList<ChemicalObjectModel>();
+        List<ChemicalObjectModel> structures =new ArrayList<ChemicalObjectModel>();
         boolean skipConfSearch = false;
         if (rcParams.allowRingClosures() && mol.getGraph().hasOrEmbedsRings())
         {
@@ -211,7 +212,7 @@ public class MultiMolecularModelBuilder
         }
         
         // Convert and return results
-        ArrayList<IAtomContainer> results = new ArrayList<IAtomContainer>();
+        List<IAtomContainer> results = new ArrayList<IAtomContainer>();
         DummyAtomHandler dah = new DummyAtomHandler(
                 DENOPTIMConstants.DUMMYATMSYMBOL, logger);
         for (ChemicalObjectModel mol3db : structures)
@@ -275,12 +276,12 @@ public class MultiMolecularModelBuilder
         oa.setScheme(settings.getAtomOrderingScheme());
         int seedAtm = 0;
         IAtomContainer reorderedMol = oa.reorderStartingFrom(seedAtm, initMol);
-        ArrayList<Integer> newToOldMap = oa.getNewToOldOrder(seedAtm);
-        ArrayList<Integer> oldToNewMap = oa.getOldToNewOrder(seedAtm);
+        List<Integer> newToOldMap = oa.getNewToOldOrder(seedAtm);
+        List<Integer> oldToNewMap = oa.getOldToNewOrder(seedAtm);
         logger.log(Level.FINEST, "oldToNewMap: "+oldToNewMap);
         
         // Collect rotatable bonds defined by fragment-fragment connections
-        ArrayList<ObjectPair> rotBonds = RotationalSpaceUtils
+        List<ObjectPair> rotBonds = RotationalSpaceUtils
                 .defineRotatableBonds(reorderedMol,
                         ((FragmentSpaceParameters) settings.getParameters(
                                 ParametersType.FS_PARAMS)).getRotSpaceDefFile(),

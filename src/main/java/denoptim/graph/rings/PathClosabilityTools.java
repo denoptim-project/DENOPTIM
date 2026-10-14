@@ -144,7 +144,7 @@ public class PathClosabilityTools
         
         // Identify atoms of molecular representation that correspond to
         // this path of vertices
-        Map<Vertex,ArrayList<Integer>> vIdToAtmId =
+        Map<Vertex,List<Integer>> vIdToAtmId =
                 MoleculeUtils.getVertexToAtomIdMap(
                         (List<Vertex>) subGraph.getVertecesPath(),
                         mol);
@@ -156,7 +156,7 @@ public class PathClosabilityTools
 
         // Find atoms to remove: keep only the atoms that belong to the 
         // vertex path and their neighbours
-        ArrayList<IAtom> toRemove = new ArrayList<IAtom>();
+        List<IAtom> toRemove = new ArrayList<IAtom>();
         for (int i=0; i<mol.getAtomCount(); i++)
         {
             if (!atmIdsInVrtxPath.contains(i))
@@ -354,7 +354,7 @@ public class PathClosabilityTools
             List<IBond> bondsPath = subGraph.getBondPath();
 
             // Define rotatability
-            ArrayList<Boolean> rotatability = new ArrayList<Boolean>();
+            List<Boolean> rotatability = new ArrayList<Boolean>();
             for (int i=0; i < bondsPath.size(); i++)
             {
                 IBond bnd = bondsPath.get(i);
@@ -376,7 +376,7 @@ public class PathClosabilityTools
             //       but on the reference points that are unique for each bond
             //       This should allow to compare conformations of different
             //       chains that share one or more bonds
-            ArrayList<ArrayList<Point3d>> dihRefs = 
+            List<List<Point3d>> dihRefs = 
                                                subGraph.getDihedralRefPoints();
             if (dihRefs.size() != rotatability.size()-2)
             {
@@ -386,8 +386,8 @@ public class PathClosabilityTools
             }
 
             // find ring closing conformations
-            ArrayList<ArrayList<Double>> closableConfs = 
-                                        new ArrayList<ArrayList<Double>>();
+            List<List<Double>> closableConfs = 
+                                        new ArrayList<List<Double>>();
             closable = RingClosureFinder.evaluateClosability(atomsPath,
                                                          rotatability,
                                                          dihRefs,

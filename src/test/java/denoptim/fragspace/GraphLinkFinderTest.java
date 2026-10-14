@@ -64,23 +64,23 @@ public class GraphLinkFinderTest
         APCE = APClass.make("E", 13);
         APCF = APClass.make("F", 17);
         
-        HashMap<APClass,ArrayList<APClass>> cpMap = 
-                new HashMap<APClass,ArrayList<APClass>>();
-        ArrayList<APClass> lstA = new ArrayList<APClass>();
+        HashMap<APClass,List<APClass>> cpMap = 
+                new HashMap<APClass,List<APClass>>();
+        List<APClass> lstA = new ArrayList<APClass>();
         lstA.add(APCA);
         cpMap.put(APCA, lstA);
-        ArrayList<APClass> lstB = new ArrayList<APClass>();
+        List<APClass> lstB = new ArrayList<APClass>();
         lstB.add(APCB);
         lstB.add(APCC);
         cpMap.put(APCB, lstB);
-        ArrayList<APClass> lstC = new ArrayList<APClass>();
+        List<APClass> lstC = new ArrayList<APClass>();
         lstC.add(APCB);
         lstC.add(APCC);
         cpMap.put(APCC, lstC);
-        ArrayList<APClass> lstD = new ArrayList<APClass>();
+        List<APClass> lstD = new ArrayList<APClass>();
         lstD.add(APCD);
         cpMap.put(APCD, lstD);
-        ArrayList<APClass> lstE = new ArrayList<APClass>();
+        List<APClass> lstE = new ArrayList<APClass>();
         lstE.add(APCE);
         cpMap.put(APCE, lstE);
         

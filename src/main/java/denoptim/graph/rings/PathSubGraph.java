@@ -68,7 +68,7 @@ public class PathSubGraph
      */
     private String chainID;
     private String revChainID;
-    private ArrayList<String> allPossibleChainIDs = new ArrayList<String>();
+    private List<String> allPossibleChainIDs = new ArrayList<String>();
 
     /**
      * The vertex representing the first RCA: head of the path
@@ -110,7 +110,7 @@ public class PathSubGraph
     /**
      * Per each bond the pair of point used to define the torsion
      */
-    private ArrayList<ArrayList<Point3d>> dihedralRefPts;
+    private List<List<Point3d>> dihedralRefPts;
 
     /**
      * The flag defining whether this object has already a molecular
@@ -374,8 +374,8 @@ public class PathSubGraph
         // Build the graph and chain IDs for this sub graph
         chainID = "";
         revChainID = "";
-        ArrayList<Vertex> gVertices = new ArrayList<Vertex>();
-        ArrayList<Edge> gEdges = new ArrayList<Edge>();
+        List<Vertex> gVertices = new ArrayList<Vertex>();
+        List<Edge> gEdges = new ArrayList<Edge>();
         for (int i=1; i < vertPathVAVB.size()-1; i++)
         {
             Vertex vertBack = vertPathVAVB.get(i-1);
@@ -608,9 +608,9 @@ public class PathSubGraph
         // Build molecular representation 
         ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder(logger, randomizer);
         iacPathVAVB = tb.convertGraphTo3DAtomContainer(graph);
-        Map<IAtom,ArrayList<AttachmentPoint>> apsPerAtom = 
+        Map<IAtom,List<AttachmentPoint>> apsPerAtom = 
                 iacPathVAVB.getProperty(DENOPTIMConstants.MOLPROPAPxATOM);
-        Map<IBond,ArrayList<AttachmentPoint>> apsPerBond =
+        Map<IBond,List<AttachmentPoint>> apsPerBond =
                 iacPathVAVB.getProperty(DENOPTIMConstants.MOLPROPAPxBOND);
 
         if (debug)
@@ -771,11 +771,11 @@ public class PathSubGraph
 
         // Define points used to calculate dihedral angle of each bond
         // excluding the first and last
-        dihedralRefPts = new ArrayList<ArrayList<Point3d>>();
+        dihedralRefPts = new ArrayList<List<Point3d>>();
         String keyPropVrtID = DENOPTIMConstants.ATMPROPVERTEXID;
         for (int it=3; it<atomsPathVAVB.size(); it++)
         {
-            ArrayList<Point3d> fourPoints = new ArrayList<Point3d>();
+            List<Point3d> fourPoints = new ArrayList<Point3d>();
             Point3d p0;
             Point3d p1;
             Point3d p2;
@@ -887,7 +887,7 @@ public class PathSubGraph
         if (debug)
         {
             System.out.println("Points for dihedral angle definition: ");
-            for (ArrayList<Point3d> fp : dihedralRefPts)
+            for (List<Point3d> fp : dihedralRefPts)
             {
                 for (Point3d p : fp)
                 {
@@ -1074,7 +1074,7 @@ public class PathSubGraph
      * a dihedral angle.
      */
 
-    public ArrayList<ArrayList<Point3d>> getDihedralRefPoints()
+    public List<List<Point3d>> getDihedralRefPoints()
     {
         return dihedralRefPts;
     }

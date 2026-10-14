@@ -98,7 +98,7 @@ import denoptim.utils.StatUtils;
 public class EAUtils
 {
     // cluster the fragments based on their #APs
-    protected static HashMap<Integer, ArrayList<Integer>> fragmentPool;
+    protected static HashMap<Integer, List<Integer>> fragmentPool;
     
     /**
      * Locale used to write reports
@@ -117,7 +117,7 @@ public class EAUtils
     }
     
     // for each fragment store the reactions associated with it
-    protected static HashMap<Integer, ArrayList<String>> lstFragmentClass;
+    protected static HashMap<Integer, List<String>> lstFragmentClass;
 
     /**
      * A chosen method for generation of new {@link Candidate}s.
@@ -480,7 +480,7 @@ public class EAUtils
             if (!settings.xoverFailureTolerant)
             {
                 t.printStackTrace();
-                ArrayList<DGraph> parents = new ArrayList<DGraph>();
+                List<DGraph> parents = new ArrayList<DGraph>();
                 parents.add(gA);
                 parents.add(gB);
                 DenoptimIO.writeGraphsToSDF(new File(settings.getDataDirectory()
@@ -550,7 +550,7 @@ public class EAUtils
             {
                 if (!settings.xoverGraphFailedEvalTolerant)
                 {
-                    ArrayList<DGraph> parents = new ArrayList<DGraph>();
+                    List<DGraph> parents = new ArrayList<DGraph>();
                     parents.add(gA);
                     parents.add(gB);
                     parents.add(gAClone);
@@ -765,7 +765,7 @@ public class EAUtils
         mnt.increase(CounterID.MANUALADDATTEMPTS);
         mnt.increase(CounterID.NEWCANDIDATEATTEMPTS);
 
-        ArrayList<DGraph> graphs;
+        List<DGraph> graphs;
         try
         {
             graphs = DenoptimIO.readDENOPTIMGraphsFromFile(srcFile);
@@ -1736,13 +1736,13 @@ public class EAUtils
         }
         else
         {
-            ArrayList<List<Ring>> allCombsOfRings = 
+            List<List<Ring>> allCombsOfRings = 
                             cgh.getPossibleCombinationOfRings(mol, molGraph);
         
             // Keep closable chains that are relevant for chelate formation
             if (rcParams.buildChelatesMode())
             {
-                ArrayList<List<Ring>> toRemove = new ArrayList<>();
+                List<List<Ring>> toRemove = new ArrayList<>();
                 for (List<Ring> setRings : allCombsOfRings)
                 {
                     if (!cgh.checkChelatesGraph(molGraph,setRings))
@@ -2196,7 +2196,7 @@ public class EAUtils
     protected static void readUID(String infile, HashSet<String> lstInchi)
                                                     throws DENOPTIMException
     {
-        ArrayList<String> lst = DenoptimIO.readList(infile);
+        List<String> lst = DenoptimIO.readList(infile);
         for (String str:lst)
             lstInchi.add(str);
         lst.clear();

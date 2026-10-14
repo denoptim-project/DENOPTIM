@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -167,7 +168,7 @@ public final class DENOPTIMConstants
      * transition metals, actinides, lantanides, and post-transition metals from
      * the p-clock up to the off-diagonal elements (i.e., includes Ge and Sb).
      */
-    public static ArrayList<String> ALL_METALS = new ArrayList<String>(
+    public static List<String> ALL_METALS = new ArrayList<String>(
             Arrays.asList("Li", "Na", "K", "Rb", "Cs", "Fr",
             "Be", "Mg", "Ca", "Sr", "Ba", "Ra",
             "Al", "Ga", "In", "Tl", 

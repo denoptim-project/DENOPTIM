@@ -319,8 +319,8 @@ public class ParallelFragmentationAlgorithm extends ParallelAsynchronousTaskExec
         int batchId = 0;
         int buffersSize = 0;
         boolean relyingOnListSize = false;
-        List<ArrayList<IAtomContainer>> batches = 
-                new ArrayList<ArrayList<IAtomContainer>>();
+        List<List<IAtomContainer>> batches = 
+                new ArrayList<List<IAtomContainer>>();
         for (int i=0; i<numBatches; i++)
         {
             batches.add(new ArrayList<IAtomContainer>());

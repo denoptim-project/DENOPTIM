@@ -148,7 +148,7 @@ public class GUIVertexSelector extends GUIModalDialog
                 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    ArrayList<Integer> ids = vertexViewer.getSelectedAPIDs();
+                    List<Integer> ids = vertexViewer.getSelectedAPIDs();
                     if (ids.size() > 0)
                     {
                         // WARNING: we take only the first, if many are selected.
@@ -186,7 +186,7 @@ public class GUIVertexSelector extends GUIModalDialog
     			
                 @Override
     			public void actionPerformed(ActionEvent e) {
-    				ArrayList<Integer> ids = vertexViewer.getSelectedAPIDs();
+    				List<Integer> ids = vertexViewer.getSelectedAPIDs();
     				if (ids.size() > 0)
     				{
     					// WARNING: we take only the first, if many are selected.
@@ -248,11 +248,11 @@ public class GUIVertexSelector extends GUIModalDialog
     {
         if (result == null)
         {
-            result = new ArrayList<ArrayList<Integer>>();
+            result = new ArrayList<List<Integer>>();
         }
         boolean alreadySelected = false;
-        for (ArrayList<Integer> p : 
-            ((ArrayList<ArrayList<Integer>>)result))
+        for (List<Integer> p : 
+            ((List<List<Integer>>)result))
         {
             if ((p.get(0) == vrtxId) 
                     && (p.get(1) == apId))
@@ -263,10 +263,10 @@ public class GUIVertexSelector extends GUIModalDialog
         }
         if (!alreadySelected)
         {
-            ArrayList<Integer> pair = new ArrayList<Integer>();
+            List<Integer> pair = new ArrayList<Integer>();
             pair.add(vrtxId);
             pair.add(apId);
-            ((ArrayList<ArrayList<Integer>>)result).add(pair);
+            ((List<List<Integer>>)result).add(pair);
         }
     }
 

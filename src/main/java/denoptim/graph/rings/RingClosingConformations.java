@@ -20,6 +20,7 @@ package denoptim.graph.rings;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Serializable object to store/get a list of conformations that allow to close
@@ -75,11 +76,16 @@ public class RingClosingConformations implements Serializable
      * @param lstConfs the list of closable conformations 
      */
 
-    public RingClosingConformations(String chainID, 
-                                        ArrayList<ArrayList<Double>> lstConfs)
+    public RingClosingConformations(String chainID,
+                                        List<List<Double>> lstConfs)
     {
         this.chainID = chainID;
-        this.lstConfs = lstConfs;
+        // Field stays ArrayList so previously serialized archives still load.
+        this.lstConfs = new ArrayList<ArrayList<Double>>();
+        for (List<Double> conf : lstConfs)
+        {
+            this.lstConfs.add(new ArrayList<Double>(conf));
+        }
     }
 
 //-----------------------------------------------------------------------------
@@ -98,7 +104,7 @@ public class RingClosingConformations implements Serializable
 
 //-----------------------------------------------------------------------------
 
-    public ArrayList<ArrayList<Double>> getListOfConformations()
+    public List<ArrayList<Double>> getListOfConformations()
     {
         return lstConfs;
     }

@@ -512,7 +512,7 @@ public class FitnessExpressionParser
         }
         
         String fileName = line.substring(key.length()).trim();
-        ArrayList<String> lst = DenoptimIO.readList(fileName);
+        List<String> lst = DenoptimIO.readList(fileName);
         String[] arr = new String[lst.size()];
         arr = lst.toArray(arr);
         return arr;

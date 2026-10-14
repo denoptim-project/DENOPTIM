@@ -22,6 +22,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
@@ -237,7 +238,7 @@ public class SerConvParameters
             throw new DENOPTIMException(msg);
         }
 	
-        ArrayList outFormats = new ArrayList<String>();
+        List outFormats = new ArrayList<String>();
         outFormats.add("TXT");
         outFormats.add("SDF");
         if (!outFormats.contains(outFormat))

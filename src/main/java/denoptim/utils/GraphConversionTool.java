@@ -130,7 +130,7 @@ public class GraphConversionTool
         // split vertices on the comma
         String[] s2 = vStr.split(",");
 
-        ArrayList<Vertex> vertices = new ArrayList<>();
+        List<Vertex> vertices = new ArrayList<>();
 
         // for each vertex
         for (int i=0; i<s2.length; i++)
@@ -159,7 +159,7 @@ public class GraphConversionTool
             vertices.add(dv);
         }
         
-        ArrayList<Edge> edges = new ArrayList<>();
+        List<Edge> edges = new ArrayList<>();
 
         // split edges on the comma
         if (eStr.contains(","))
@@ -250,7 +250,7 @@ public class GraphConversionTool
         }
     
         // collect Rings
-        ArrayList<Ring> rings = new ArrayList<>();
+        List<Ring> rings = new ArrayList<>();
         String[] sr2 = rStr.split("DENOPTIMRing ");
         for (int i=1; i<sr2.length; i++)
         {
@@ -258,7 +258,7 @@ public class GraphConversionTool
             String sr5 = sr4.substring(sr4.indexOf("=") + 1).trim();
             sr5 = sr5.substring(1,sr5.length()-2);
             String[] sr6 = sr5.split(",\\s");
-            ArrayList<Vertex> lstVerteces =
+            List<Vertex> lstVerteces =
                     new ArrayList<Vertex>();
             for (int j=0; j<sr6.length; j++)
             {
@@ -290,7 +290,7 @@ public class GraphConversionTool
             String ss5 = ss4.substring(ss4.indexOf("=") + 1).trim();
             ss5 = ss5.substring(1,ss5.length()-2);
             String[] ss6 = ss5.split(",\\s");
-            ArrayList<Integer> symVrtxIds = new ArrayList<Integer>();
+            List<Integer> symVrtxIds = new ArrayList<Integer>();
             for (int j=0; j<ss6.length; j++)
             {
             	symVrtxIds.add(Integer.parseInt(ss6[j]));

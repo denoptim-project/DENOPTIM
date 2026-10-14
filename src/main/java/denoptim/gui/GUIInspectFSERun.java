@@ -111,14 +111,14 @@ public class GUIInspectFSERun extends GUICardPanel
 	
 	private JComboBox<String> cmbPlotType;
 	
-	private ArrayList<CandidateLW> allItems;
+	private List<CandidateLW> allItems;
 	private int itemsWithFitness = 0;
 	private int minLevel = 1;
 	private int maxLevel = -1;
 	private JLabel lblTotItems;
 	
 	private Map<Integer,CandidateLW> mapItemsInByLevel;
-	private ArrayList<CandidateLW> sorted;
+	private List<CandidateLW> sorted;
 	
 	// WARNING: integer key in the map is is just a 
 	// locally generated unique 

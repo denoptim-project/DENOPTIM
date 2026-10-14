@@ -228,7 +228,7 @@ public class FragmenterParameters extends RunTimeParameters
     /**
      * List of fragment that can be rejected.
      */
-    private ArrayList<Vertex> ignorableFragments = new ArrayList<Vertex>();
+    private List<Vertex> ignorableFragments = new ArrayList<Vertex>();
     
     /**
      * Pathname to file with fragments that will be retained, i.e., any 
@@ -240,7 +240,7 @@ public class FragmenterParameters extends RunTimeParameters
      * List of fragment that will be retained, i.e., any 
      * isomorphic fragment of any of these will be kept, all the rest rejected.
      */
-    private ArrayList<Vertex> targetFragments = new ArrayList<Vertex>();
+    private List<Vertex> targetFragments = new ArrayList<Vertex>();
     
     /**
      * <p>Flag signaling the need to manage isomorphic families, i.e., manage
@@ -796,7 +796,7 @@ public class FragmenterParameters extends RunTimeParameters
     /**
      * @return list of fragment that can be rejected.
      */
-    public ArrayList<Vertex> getIgnorableFragments()
+    public List<Vertex> getIgnorableFragments()
     {
         return ignorableFragments;
     }
@@ -807,7 +807,7 @@ public class FragmenterParameters extends RunTimeParameters
      * @return the list of fragment that will be retained, i.e., any 
      * isomorphic fragment of any of these will be kept, all the rest rejected.
      */
-    public ArrayList<Vertex> getTargetFragments()
+    public List<Vertex> getTargetFragments()
     {
         return targetFragments;
     }

@@ -59,23 +59,23 @@ public class APMapFinderTest
         APCD = APClass.make("D", 99);
         APCE = APClass.make("E", 13);
         
-        HashMap<APClass,ArrayList<APClass>> cpMap = 
-                new HashMap<APClass,ArrayList<APClass>>();
-        ArrayList<APClass> lstA = new ArrayList<APClass>();
+        HashMap<APClass,List<APClass>> cpMap = 
+                new HashMap<APClass,List<APClass>>();
+        List<APClass> lstA = new ArrayList<APClass>();
         lstA.add(APCA);
         cpMap.put(APCA, lstA);
-        ArrayList<APClass> lstB = new ArrayList<APClass>();
+        List<APClass> lstB = new ArrayList<APClass>();
         lstB.add(APCB);
         lstB.add(APCC);
         cpMap.put(APCB, lstB);
-        ArrayList<APClass> lstC = new ArrayList<APClass>();
+        List<APClass> lstC = new ArrayList<APClass>();
         lstC.add(APCB);
         lstC.add(APCC);
         cpMap.put(APCC, lstC);
-        ArrayList<APClass> lstD = new ArrayList<APClass>();
+        List<APClass> lstD = new ArrayList<APClass>();
         lstD.add(APCD);
         cpMap.put(APCD, lstD);
-        ArrayList<APClass> lstE = new ArrayList<APClass>();
+        List<APClass> lstE = new ArrayList<APClass>();
         lstE.add(APCE);
         cpMap.put(APCE, lstE);
         
@@ -336,8 +336,8 @@ public class APMapFinderTest
          */
         HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
         HashSet<APClass> forbEnds = new HashSet<APClass>();
-        HashMap<APClass,ArrayList<APClass>> cpMap = 
-                new HashMap<APClass,ArrayList<APClass>>();
+        HashMap<APClass,List<APClass>> cpMap = 
+                new HashMap<APClass,List<APClass>>();
         
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
         FragmentSpace fs = new FragmentSpace(fsp,
@@ -484,11 +484,11 @@ public class APMapFinderTest
         /*
          * Filling APClass compatibility (to some extent)
          */
-        cpMap = new HashMap<APClass,ArrayList<APClass>>();
-        ArrayList<APClass> lstO = new ArrayList<APClass>();
+        cpMap = new HashMap<APClass,List<APClass>>();
+        List<APClass> lstO = new ArrayList<APClass>();
         lstO.add(APCO1);
         cpMap.put(APCO0, lstO);
-        ArrayList<APClass> lstP = new ArrayList<APClass>();
+        List<APClass> lstP = new ArrayList<APClass>();
         lstP.add(APCO1);
         cpMap.put(APCP0, lstP);
         
@@ -556,7 +556,7 @@ public class APMapFinderTest
         /*
          * Filling APClass compatibility (to some larger extent)
          */
-        cpMap = new HashMap<APClass,ArrayList<APClass>>();
+        cpMap = new HashMap<APClass,List<APClass>>();
         lstO = new ArrayList<APClass>();
         lstO.add(APCO1);
         lstO.add(APCP1);
@@ -565,7 +565,7 @@ public class APMapFinderTest
         lstP.add(APCO1);
         lstP.add(APCP1);
         cpMap.put(APCP0, lstP);
-        ArrayList<APClass> lstQ = new ArrayList<APClass>();
+        List<APClass> lstQ = new ArrayList<APClass>();
         lstQ.add(APCO1);
         lstQ.add(APCP1);
         cpMap.put(APCQ0, lstQ);
@@ -659,7 +659,7 @@ public class APMapFinderTest
         gB.addVertex(v2);
         gB.appendVertexOnAP(v2.getAP(0), v3.getAP(0));
         
-        cpMap = new HashMap<APClass,ArrayList<APClass>>();
+        cpMap = new HashMap<APClass,List<APClass>>();
         lstO = new ArrayList<APClass>();
         lstO.add(APCO1);
         cpMap.put(APCO0, lstO);
@@ -692,7 +692,7 @@ public class APMapFinderTest
                 cpMap, 
                 new HashMap<APClass,APClass>(), 
                 new HashSet<APClass>(), 
-                new HashMap<APClass,ArrayList<APClass>>());
+                new HashMap<APClass,List<APClass>>());
         
         // Both fragment have only one AP and has SRC role, 
         // but CPMap says incompatible
@@ -724,7 +724,7 @@ public class APMapFinderTest
         
         // Add Compatibility, but incomplete)
         
-        cpMap = new HashMap<APClass,ArrayList<APClass>>();
+        cpMap = new HashMap<APClass,List<APClass>>();
         lstO = new ArrayList<APClass>();
         lstO.add(APCO1);
         cpMap.put(APCO0, lstO);
@@ -758,7 +758,7 @@ public class APMapFinderTest
                 cpMap, 
                 new HashMap<APClass,APClass>(), 
                 new HashSet<APClass>(), 
-                new HashMap<APClass,ArrayList<APClass>>());
+                new HashMap<APClass,List<APClass>>());
         
         // Both fragment have only one AP and has SRC role, 
         // but CPMap says incompatible
@@ -791,7 +791,7 @@ public class APMapFinderTest
 
         // Add Cross-compatibility
         
-        cpMap = new HashMap<APClass,ArrayList<APClass>>();
+        cpMap = new HashMap<APClass,List<APClass>>();
         lstO = new ArrayList<APClass>();
         lstO.add(APCO1);
         lstO.add(APCP1);
@@ -826,7 +826,7 @@ public class APMapFinderTest
                 cpMap, 
                 new HashMap<APClass,APClass>(), 
                 new HashSet<APClass>(), 
-                new HashMap<APClass,ArrayList<APClass>>());
+                new HashMap<APClass,List<APClass>>());
         
         // Both fragment have only one AP and has SRC role, 
         // and CPMap says they are compatible
@@ -875,29 +875,29 @@ public class APMapFinderTest
 
         // Add cross and backwards compatibility
         
-        cpMap = new HashMap<APClass,ArrayList<APClass>>();
-        ArrayList<APClass> lstO0 = new ArrayList<APClass>();
+        cpMap = new HashMap<APClass,List<APClass>>();
+        List<APClass> lstO0 = new ArrayList<APClass>();
         lstO0.add(APCO1);
         lstO0.add(APCP1);
         lstO0.add(APCP0);
         lstO0.add(APCQ1);
         cpMap.put(APCO0, lstO0);
-        ArrayList<APClass> lstP0 = new ArrayList<APClass>();
+        List<APClass> lstP0 = new ArrayList<APClass>();
         lstP0.add(APCO1);
         lstP0.add(APCP1);
         lstP0.add(APCO0);
         cpMap.put(APCP0, lstP0);
-        ArrayList<APClass> lstO1 = new ArrayList<APClass>();
+        List<APClass> lstO1 = new ArrayList<APClass>();
         lstO1.add(APCO0);
         lstO1.add(APCP0);
         lstO1.add(APCP1);
         cpMap.put(APCO1, lstO1);
-        ArrayList<APClass> lstP1 = new ArrayList<APClass>();
+        List<APClass> lstP1 = new ArrayList<APClass>();
         lstP1.add(APCO0);
         lstP1.add(APCP0);
         lstP1.add(APCO1);
         cpMap.put(APCP1, lstP1);
-        ArrayList<APClass> lstQ1 = new ArrayList<APClass>();
+        List<APClass> lstQ1 = new ArrayList<APClass>();
         lstQ1.add(APCO0);
         lstQ1.add(APCO1);
         lstQ1.add(APCP0);
@@ -929,7 +929,7 @@ public class APMapFinderTest
                 cpMap, 
                 new HashMap<APClass,APClass>(), 
                 new HashSet<APClass>(), 
-                new HashMap<APClass,ArrayList<APClass>>());
+                new HashMap<APClass,List<APClass>>());
         
         // Both fragment have only one AP and has SRC role, 
         // and CPMap says they are compatible

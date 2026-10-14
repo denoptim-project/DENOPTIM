@@ -19,10 +19,10 @@
 
 package denoptim.molecularmodeling;
 
+import java.util.List;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import denoptim.exception.DENOPTIMException;
 
@@ -45,7 +45,7 @@ public class MMBuilderUtils
      * @param data content of file (lines)
      * @throws DENOPTIMException
      */
-    public static void readKeyFileParams(String filename, ArrayList<String> data)
+    public static void readKeyFileParams(String filename, List<String> data)
             throws DENOPTIMException
     {
         BufferedReader br = null;

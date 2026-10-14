@@ -49,7 +49,7 @@ class RingSizeManager
      * List of Ring Closing Vertices (RCV as DENOPTIMVerex) each containing an 
      * available Ring Closing Attractor (RCA)
      */
-    private ArrayList<Vertex> lstVert;
+    private List<Vertex> lstVert;
     
     /**
      * Size of the list of available RCAs
@@ -77,7 +77,7 @@ class RingSizeManager
     /**
      * Map linking the list of vertices and atoms
      */
-    private Map<Vertex,ArrayList<Integer>> vIdToAtmId;
+    private Map<Vertex,List<Integer>> vIdToAtmId;
 
     /**
      * Parameters setting the bias for selecting rings of given size
@@ -341,7 +341,7 @@ class RingSizeManager
                         + parentAPClsI + " " + parentAPClsI.hashCode());
             return false;
         }
-        ArrayList<APClass> compatClassesI = fragSpace.getRCCompatibilityMatrix()
+        List<APClass> compatClassesI = fragSpace.getRCCompatibilityMatrix()
                 .get(parentAPClsI);
 
         // exclude if no entry in RC-Compatibility map
@@ -351,7 +351,7 @@ class RingSizeManager
                         + parentAPClsJ + " " + parentAPClsJ.hashCode());
             return false;
         }
-        ArrayList<APClass> compatClassesJ = fragSpace.getRCCompatibilityMatrix()
+        List<APClass> compatClassesJ = fragSpace.getRCCompatibilityMatrix()
                 .get(parentAPClsJ);
 
         // exclude loops included within a single vertex 

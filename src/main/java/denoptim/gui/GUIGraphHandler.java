@@ -109,14 +109,14 @@ public class GUIGraphHandler extends GUICardPanel
 	/**
 	 * The currently loaded list of graphs
 	 */
-	protected ArrayList<DGraph> dnGraphLibrary =
+	protected List<DGraph> dnGraphLibrary =
 			new ArrayList<DGraph>();
 	
 	/**
 	 * The currently loaded list of molecular representations 
 	 * of the graphs
 	 */
-	private ArrayList<IAtomContainer> molLibrary =
+	private List<IAtomContainer> molLibrary =
 			new ArrayList<IAtomContainer>();
 	
 	/**
@@ -191,7 +191,7 @@ public class GUIGraphHandler extends GUICardPanel
 	 * and are annotate with fragmentID and AP pointers meant to 
 	 * facilitate a quick selection of compatible connections.
 	 */
-	private ArrayList<Vertex> compatVrtxs;
+	private List<Vertex> compatVrtxs;
 	
 	/**
 	 * Map converting fragIDs in fragment library to fragIDs in subset
@@ -519,7 +519,7 @@ public class GUIGraphHandler extends GUICardPanel
 			                UIManager.getIcon("OptionPane.errorIcon"));
 					return;
 				}
-				ArrayList<AttachmentPoint> selAps = 
+				List<AttachmentPoint> selAps = 
 				        visualPanel.getAPsSelectedInViewer();				
 				if (selAps.size() == 0)
 				{
@@ -559,7 +559,7 @@ public class GUIGraphHandler extends GUICardPanel
         btnAddEmptyVrtx.setEnabled(true);
         btnAddEmptyVrtx.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ArrayList<AttachmentPoint> selAps = 
+                List<AttachmentPoint> selAps = 
                         new ArrayList<AttachmentPoint> ();
                 if (dnGraph != null)
                 {
@@ -589,7 +589,7 @@ public class GUIGraphHandler extends GUICardPanel
 		btnDelSel.setEnabled(false);
 		btnDelSel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ArrayList<Vertex> selVrtx = 
+				List<Vertex> selVrtx = 
 				        visualPanel.getSelectedNodesInViewer();
 				if (selVrtx.size() == 0)
 				{
@@ -646,7 +646,7 @@ public class GUIGraphHandler extends GUICardPanel
         btnAddChord.setEnabled(false);
         btnAddChord.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {    
-                ArrayList<Vertex> selVrtxs = 
+                List<Vertex> selVrtxs = 
                         visualPanel.getSelectedNodesInViewer();               
                 if (selVrtxs.size() != 2)
                 {
@@ -918,7 +918,7 @@ public class GUIGraphHandler extends GUICardPanel
 		        @SuppressWarnings("unchecked")
                 Map<String,List<Object>> configs = (Map<String,List<Object>>) o;
 		        
-		        ArrayList<Vertex> templates = 
+		        List<Vertex> templates = 
 		                new ArrayList<Vertex>();
 		        for (int i=0; i<dnGraphLibrary.size(); i++)
 		        {
@@ -1090,7 +1090,7 @@ public class GUIGraphHandler extends GUICardPanel
 //-----------------------------------------------------------------------------
 	
 	private void createEmptyVertexAndPlaceItInGraph(
-	        ArrayList<AttachmentPoint> selAps)
+	        List<AttachmentPoint> selAps)
 	{   
         GUIEmptyVertexMaker makeEmptyVertexDialog = 
                 new GUIEmptyVertexMaker(this, selAps.size()==0);
@@ -1101,7 +1101,7 @@ public class GUIGraphHandler extends GUICardPanel
             return;
         }
         Vertex ev = (EmptyVertex) evObj;
-        ArrayList<Vertex> lst = new ArrayList<Vertex>(1);
+        List<Vertex> lst = new ArrayList<Vertex>(1);
         lst.add(ev);
         GUIVertexSelector fragSelector = new GUIVertexSelector(this, false);
         fragSelector.ctrlPane.setVisible(false);
@@ -1121,8 +1121,8 @@ public class GUIGraphHandler extends GUICardPanel
         }
         
         @SuppressWarnings("unchecked")
-        ArrayList<Integer> trgFragApId = 
-            ((ArrayList<ArrayList<Integer>>)selected).get(0);
+        List<Integer> trgFragApId = 
+            ((List<List<Integer>>)selected).get(0);
         int incomingAPId = trgFragApId.get(1);
                       
         if (selAps.size() == 0)
@@ -1197,7 +1197,7 @@ public class GUIGraphHandler extends GUICardPanel
             res = res + 10;
         }
         
-        ArrayList<Vertex> vrtxLib = new  ArrayList<Vertex>();
+        List<Vertex> vrtxLib = new  ArrayList<Vertex>();
         switch (res)
         {
             case 0:
@@ -1222,7 +1222,7 @@ public class GUIGraphHandler extends GUICardPanel
                 // index-based operations on the fragment space that are done 
                 // after this 'switch' block make no sense. Instead, we use the 
                 // same method called by the "Add Empty Vertex" button.
-                ArrayList<AttachmentPoint> selectedAPs = new ArrayList<>();
+                List<AttachmentPoint> selectedAPs = new ArrayList<>();
                 createEmptyVertexAndPlaceItInGraph(selectedAPs);
                 return;
             
@@ -1251,7 +1251,7 @@ public class GUIGraphHandler extends GUICardPanel
 		}
 		
 		@SuppressWarnings("unchecked")
-        ArrayList<Integer> trgFragApId = ((ArrayList<ArrayList<Integer>>)selected)
+        List<Integer> trgFragApId = ((List<List<Integer>>)selected)
                 .get(0);
         int scaffFragId = trgFragApId.get(0);
 		
@@ -1308,7 +1308,7 @@ public class GUIGraphHandler extends GUICardPanel
 	 * selected vertices.
 	 * @param rcvs the selected vertices. Must be two vertices.
 	 */
-	private void addChordOnGraph(ArrayList<Vertex> rcvs)
+	private void addChordOnGraph(List<Vertex> rcvs)
 	{
         if (rcvs.size() != 2)
         {
@@ -1343,7 +1343,7 @@ public class GUIGraphHandler extends GUICardPanel
 	 * @param selAps attachment points on the growing graph.
 	 */
 	private void extendGraphFromFragSpace(
-	        ArrayList<AttachmentPoint> selAps)
+	        List<AttachmentPoint> selAps)
 	{
 		// For extensions of existing graphs we need to know where to extend
 		if (selAps.size() == 0)
@@ -1359,7 +1359,7 @@ public class GUIGraphHandler extends GUICardPanel
 		// Create clones of fragments and put the into 'compatFrags'
 		collectFragAndAPsCompatibleWithSelectedAPs(selAps);
 		
-		ArrayList<Vertex> vertxLib = new ArrayList<Vertex>();		
+		List<Vertex> vertxLib = new ArrayList<Vertex>();		
 		String[] options = new String[]{"Any Vertex",
 				"Compatible Vertices ("+compatVrtxs.size()+")",
 				"Capping group"};
@@ -1417,8 +1417,8 @@ public class GUIGraphHandler extends GUICardPanel
 			return;
 		}
 		@SuppressWarnings("unchecked")
-        ArrayList<Integer> trgFragApId = 
-		        ((ArrayList<ArrayList<Integer>>)selected).get(0);
+        List<Integer> trgFragApId = 
+		        ((List<List<Integer>>)selected).get(0);
 		Vertex chosenVrtx = vertxLib.get(trgFragApId.get(0));
 		
 		extendCurrentGraph(chosenVrtx.getAP(trgFragApId.get(1)),selAps);
@@ -1427,7 +1427,7 @@ public class GUIGraphHandler extends GUICardPanel
 //-----------------------------------------------------------------------------
 	
 	private void extendCurrentGraph(AttachmentPoint apOnIncomingVrtx,
-            ArrayList<AttachmentPoint> selAps)
+            List<AttachmentPoint> selAps)
 	{   
         Vertex chosenVrtx = apOnIncomingVrtx.getOwner();
         if (chosenVrtx == null)
@@ -1458,7 +1458,7 @@ public class GUIGraphHandler extends GUICardPanel
 //-----------------------------------------------------------------------------
 	
 	private void collectFragAndAPsCompatibleWithSelectedAPs(
-			ArrayList<AttachmentPoint> srcAPs) 
+			List<AttachmentPoint> srcAPs) 
 	{
 		compatVrtxs = new ArrayList<Vertex>();
 		
@@ -1469,7 +1469,7 @@ public class GUIGraphHandler extends GUICardPanel
 		// the selection GUI.
 		
     	// First we get all possible APs on any fragment
-    	ArrayList<AttachmentPoint> compatAps = 
+    	List<AttachmentPoint> compatAps = 
     	        fragSpace.getAPsCompatibleWithThese(srcAPs);
     	
     	// then keep unique fragment identifiers, and store unique
@@ -1680,10 +1680,10 @@ public class GUIGraphHandler extends GUICardPanel
 	private void appendGraphsFromFile(File file)
 	{
 	    // Reading graphs is format-agnostic
-		ArrayList<DGraph> graphs = readGraphsFromFile(file);
+		List<DGraph> graphs = readGraphsFromFile(file);
 		
 		// Try to read or make molecular representations
-		ArrayList<IAtomContainer> mols = new ArrayList<IAtomContainer>();
+		List<IAtomContainer> mols = new ArrayList<IAtomContainer>();
         FileFormat ff = null;
         try
         {
@@ -1733,9 +1733,9 @@ public class GUIGraphHandler extends GUICardPanel
 	
 //-----------------------------------------------------------------------------
 
-	private ArrayList<DGraph> readGraphsFromFile(File file)
+	private List<DGraph> readGraphsFromFile(File file)
 	{
-		ArrayList<DGraph> graphs = new ArrayList<DGraph>();
+		List<DGraph> graphs = new ArrayList<DGraph>();
 		try
 		{
     		try 

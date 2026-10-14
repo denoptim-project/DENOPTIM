@@ -119,7 +119,7 @@ public class FitnessProvider
 		this.descriptors = new ArrayList<DescriptorForFitness>();
 
 		// Make new instances of DescriptorForFitness
-		ArrayList<String> classnames = new ArrayList<String>();
+		List<String> classnames = new ArrayList<String>();
 		for (int i=0; i<descriptors.size(); i++)
 		{
 			DescriptorForFitness dff = descriptors.get(i);

@@ -27,6 +27,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeListenerProxy;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -467,9 +468,9 @@ public class GraphVertexMolViewerPanel extends JSplitPane
      * @return the list selected attachment points.
      */
     
-    public ArrayList<AttachmentPoint> getAPsSelectedInViewer()
+    public List<AttachmentPoint> getAPsSelectedInViewer()
     {
-        ArrayList<AttachmentPoint> aps = 
+        List<AttachmentPoint> aps = 
                 new ArrayList<AttachmentPoint>();
         for (JVertex jv : graphViewer.getSelectedNodes())
         {
@@ -487,9 +488,9 @@ public class GraphVertexMolViewerPanel extends JSplitPane
      * Identifies which vertices are selected in the graph viewer.
      * @return the list of identifiers
      */
-    public ArrayList<Vertex> getSelectedNodesInViewer()
+    public List<Vertex> getSelectedNodesInViewer()
     {
-        ArrayList<Vertex> selected = new ArrayList<Vertex>();
+        List<Vertex> selected = new ArrayList<Vertex>();
         for (JVertex jv : graphViewer.getSelectedNodes())
         {
             if (jv.vtype == JVertexType.AP)

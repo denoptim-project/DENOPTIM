@@ -93,16 +93,16 @@ public class EAUtilsTest
         APCB = APClass.make(b, 1,BondType.SINGLE);
         APCC = APClass.make(c, 2,BondType.SINGLE);
         
-        HashMap<APClass,ArrayList<APClass>> cpMap = 
-                new HashMap<APClass,ArrayList<APClass>>();
-        ArrayList<APClass> lstA = new ArrayList<APClass>();
+        HashMap<APClass,List<APClass>> cpMap = 
+                new HashMap<APClass,List<APClass>>();
+        List<APClass> lstA = new ArrayList<APClass>();
         lstA.add(APCA);
         cpMap.put(APCA, lstA);
-        ArrayList<APClass> lstB = new ArrayList<APClass>();
+        List<APClass> lstB = new ArrayList<APClass>();
         lstB.add(APCB);
         lstB.add(APCC);
         cpMap.put(APCB, lstB);
-        ArrayList<APClass> lstC = new ArrayList<APClass>();
+        List<APClass> lstC = new ArrayList<APClass>();
         lstC.add(APCB);
         lstC.add(APCC);
         cpMap.put(APCC, lstC);
@@ -235,7 +235,7 @@ public class EAUtilsTest
         GAParameters gaParams = new GAParameters();
         gaParams.setParameters(fsp);
         
-        ArrayList<Candidate> eligibleParents = new ArrayList<Candidate>();
+        List<Candidate> eligibleParents = new ArrayList<Candidate>();
         eligibleParents.add(c1);
         eligibleParents.add(c2);
         Population population = new Population(gaParams);
@@ -273,7 +273,7 @@ public class EAUtilsTest
         cE.setFitness(2.34);
         population.add(cE);
         
-        ArrayList<Candidate> eligibleParents = new ArrayList<Candidate>();
+        List<Candidate> eligibleParents = new ArrayList<Candidate>();
         eligibleParents.add(cA);
         eligibleParents.add(cE);
 
@@ -291,7 +291,7 @@ public class EAUtilsTest
         int maxLength = -1;
         for (Vertex v : g0.getVertexList())
         {
-            ArrayList<Vertex> childTree = new ArrayList<Vertex>();
+            List<Vertex> childTree = new ArrayList<Vertex>();
             g0.getChildrenTree(v, childTree);
             if (childTree.size()>maxLength)
             {
@@ -306,7 +306,7 @@ public class EAUtilsTest
         maxLength = -1;
         for (Vertex v : g1.getVertexList())
         {
-            ArrayList<Vertex> childTree = new ArrayList<Vertex>();
+            List<Vertex> childTree = new ArrayList<Vertex>();
             g1.getChildrenTree(v, childTree);
             if (childTree.size()>maxLength)
             {
@@ -352,7 +352,7 @@ public class EAUtilsTest
         Candidate cB = new Candidate("CB",gB);
         population.add(cB);
         
-        ArrayList<Candidate> eligibleParents = new ArrayList<Candidate>();
+        List<Candidate> eligibleParents = new ArrayList<Candidate>();
         eligibleParents.add(cA);
         eligibleParents.add(cB);
 
@@ -411,7 +411,7 @@ public class EAUtilsTest
         Candidate cB = new Candidate("CB",gB);
         population.add(cB);
         
-        ArrayList<Candidate> eligibleParents = new ArrayList<Candidate>();
+        List<Candidate> eligibleParents = new ArrayList<Candidate>();
         eligibleParents.add(cA);
         eligibleParents.add(cB);
 
@@ -475,7 +475,7 @@ public class EAUtilsTest
         population.add(cA);
         Candidate cB = new Candidate("CB",gB);
         population.add(cB);
-        ArrayList<Candidate> eligibleParents = new ArrayList<Candidate>();
+        List<Candidate> eligibleParents = new ArrayList<Candidate>();
         eligibleParents.add(cA);
         eligibleParents.add(cB);
 
@@ -775,15 +775,15 @@ public class EAUtilsTest
         capMap.put(apcG,hyd);
         capMap.put(apcNotFusable,hyd);
         
-        ArrayList<Vertex> cappingGroups = new ArrayList<Vertex>();
+        List<Vertex> cappingGroups = new ArrayList<Vertex>();
         Fragment capH = new Fragment();
         capH.addAtom(new Atom("H", new Point3d()));
         capH.addAP(0, new Point3d(1.0, 0, 0), hyd);
         cappingGroups.add(capH);
         
         // Allows some ring closures via APClass compatibility
-        HashMap<APClass,ArrayList<APClass>> rcCMap = 
-                new HashMap<APClass,ArrayList<APClass>>();
+        HashMap<APClass,List<APClass>> rcCMap = 
+                new HashMap<APClass,List<APClass>>();
         rcCMap.put(apcA, new ArrayList<APClass>(Arrays.asList(apcFusedBridge)));
         rcCMap.put(apcB, new ArrayList<APClass>(Arrays.asList(apcFusedBridge)));
         rcCMap.put(apcC, new ArrayList<APClass>(Arrays.asList(apcFusedBridge)));
@@ -798,7 +798,7 @@ public class EAUtilsTest
                 new ArrayList<Vertex>(), //no scaffolds
                 new ArrayList<Vertex>(), //no fragments
                 cappingGroups, //H as capping
-                new HashMap<APClass,ArrayList<APClass>>(), 
+                new HashMap<APClass,List<APClass>>(), 
                 capMap, new HashSet<APClass>(), 
                 rcCMap);
         fragSpace.setAPclassBasedApproach(true);
@@ -1756,15 +1756,15 @@ public class EAUtilsTest
         capMap.put(apcSymImposed, hyd);
         capMap.put(apcFree, hyd);
         
-        ArrayList<Vertex> cappingGroups = new ArrayList<Vertex>();
+        List<Vertex> cappingGroups = new ArrayList<Vertex>();
         Fragment capH = new Fragment();
         capH.addAtom(new Atom("H", new Point3d()));
         capH.addAP(0, new Point3d(1.0, 0, 0), hyd);
         cappingGroups.add(capH);
         
         // Allows some ring closures via APClass compatibility
-        HashMap<APClass,ArrayList<APClass>> rcCMap = 
-                new HashMap<APClass,ArrayList<APClass>>();
+        HashMap<APClass,List<APClass>> rcCMap = 
+                new HashMap<APClass,List<APClass>>();
         rcCMap.put(apcSymImposed, new ArrayList<APClass>(Arrays.asList(apcFusedBridge)));
         // NB: apcNotFusable is intentionally not added to RC-CPMap!
         
@@ -1773,7 +1773,7 @@ public class EAUtilsTest
                 new ArrayList<Vertex>(), //no scaffolds
                 new ArrayList<Vertex>(), //no fragments
                 cappingGroups, //H as capping
-                new HashMap<APClass,ArrayList<APClass>>(), 
+                new HashMap<APClass,List<APClass>>(), 
                 capMap, new HashSet<APClass>(), 
                 rcCMap);
         fragSpace.setAPclassBasedApproach(true);
@@ -1848,7 +1848,7 @@ public class EAUtilsTest
     @Test
     public void testGetUsableAromaticBridges() throws Exception
     {   
-        ArrayList<Vertex> libFrags = new ArrayList<Vertex>();
+        List<Vertex> libFrags = new ArrayList<Vertex>();
 
         APClass apcA = APClass.make("apcA:1");
         APClass APC2EL = APClass.make("2el:0");
@@ -1910,8 +1910,8 @@ public class EAUtilsTest
         libFrags.add(bridge2elB);
         
         // Only to trigger class-based approach
-        HashMap<APClass,ArrayList<APClass>> cpMap = 
-                new HashMap<APClass,ArrayList<APClass>>();
+        HashMap<APClass,List<APClass>> cpMap = 
+                new HashMap<APClass,List<APClass>>();
         cpMap.put(apcA, new ArrayList<APClass>());
         
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
@@ -1922,7 +1922,7 @@ public class EAUtilsTest
                 cpMap, 
                 new HashMap<APClass,APClass>(), 
                 new HashSet<APClass>(),
-                new HashMap<APClass,ArrayList<APClass>>()); 
+                new HashMap<APClass,List<APClass>>()); 
         
         // Wrong size is enough to find no match
         List<EAUtils.BridgeOption> lst = EAUtils.getUsableAromaticBridges("4el",
@@ -1949,7 +1949,7 @@ public class EAUtilsTest
     @Test
     public void testGetUsableAliphaticBridges() throws Exception
     {   
-        ArrayList<Vertex> libFrags = new ArrayList<Vertex>();
+        List<Vertex> libFrags = new ArrayList<Vertex>();
 
         APClass apcA = APClass.make("A:1");
         APClass apcB = APClass.make("B:0");
@@ -1999,8 +1999,8 @@ public class EAUtilsTest
         libFrags.add(frag3);
         
         // Only to trigger class-based approach
-        HashMap<APClass,ArrayList<APClass>> cpMap = 
-                new HashMap<APClass,ArrayList<APClass>>();
+        HashMap<APClass,List<APClass>> cpMap = 
+                new HashMap<APClass,List<APClass>>();
         cpMap.put(apcB, new ArrayList<APClass>(Arrays.asList(apcA)));
         cpMap.put(apcC, new ArrayList<APClass>(Arrays.asList(apcD)));
         
@@ -2012,7 +2012,7 @@ public class EAUtilsTest
                 cpMap, 
                 new HashMap<APClass,APClass>(), 
                 new HashSet<APClass>(),
-                new HashMap<APClass,ArrayList<APClass>>()); 
+                new HashMap<APClass,List<APClass>>()); 
         
         // Same class on both ends
         List<EAUtils.BridgeOption> lst = EAUtils.getUsableAliphaticBridges(apcB,

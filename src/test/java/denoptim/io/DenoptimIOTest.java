@@ -143,12 +143,12 @@ public class DenoptimIOTest
         v.addAP(APClass.make("myClass:2"));
         v.addAP(APClass.make("myClass:3"));
         
-        ArrayList<Vertex> initVrtxs = new ArrayList<Vertex>();
+        List<Vertex> initVrtxs = new ArrayList<Vertex>();
         initVrtxs.add(v);
 
         File tmpFile = new File(tempDir.getAbsolutePath() + SEP + "test.sdf");
         DenoptimIO.writeVertexesToFile(tmpFile, FileFormat.VRTXSDF, initVrtxs);
-        ArrayList<Vertex> readInVrtxs = 
+        List<Vertex> readInVrtxs = 
                 DenoptimIO.readVertexes(tmpFile, BBType.UNDEFINED);
         assertEquals(1,readInVrtxs.size(),"Number of vertexes");
         StringBuilder sb = new StringBuilder();
@@ -173,12 +173,12 @@ public class DenoptimIOTest
         
         Fragment v = FragmentTest.makeFragment();
         
-        ArrayList<Vertex> initVrtxs = new ArrayList<Vertex>();
+        List<Vertex> initVrtxs = new ArrayList<Vertex>();
         initVrtxs.add(v);
 
         File tmpFile = new File(tempDir.getAbsolutePath() + SEP + "test.sdf");
         DenoptimIO.writeVertexesToFile(tmpFile, FileFormat.VRTXSDF, initVrtxs);
-        ArrayList<Vertex> readInVrtxs = 
+        List<Vertex> readInVrtxs = 
                 DenoptimIO.readVertexes(tmpFile, BBType.SCAFFOLD);
         assertEquals(1,readInVrtxs.size(),"Number of vertexes");
         StringBuilder sb = new StringBuilder();
@@ -203,12 +203,12 @@ public class DenoptimIOTest
         
         Template v = TemplateTest.getTestAmideTemplate();
         
-        ArrayList<Vertex> initVrtxs = new ArrayList<Vertex>();
+        List<Vertex> initVrtxs = new ArrayList<Vertex>();
         initVrtxs.add(v);
 
         File tmpFile = new File(tempDir.getAbsolutePath() + SEP + "test.sdf");
         DenoptimIO.writeVertexesToFile(tmpFile, FileFormat.VRTXSDF, initVrtxs);
-        ArrayList<Vertex> readInVrtxs = 
+        List<Vertex> readInVrtxs = 
                 DenoptimIO.readVertexes(tmpFile, BBType.UNDEFINED);
         assertEquals(1,readInVrtxs.size(),"Number of vertexes");
         StringBuilder sb = new StringBuilder();
@@ -451,7 +451,7 @@ public class DenoptimIOTest
 		        new Point3d(1.0, 2.0, 2.0));
 		frag2.projectAPsToProperties();
 
-		ArrayList<Vertex> frags = new ArrayList<Vertex>();
+		List<Vertex> frags = new ArrayList<Vertex>();
 		frags.add(frag);
 		frags.add(frag2);
 
@@ -491,7 +491,7 @@ public class DenoptimIOTest
                 new Point3d(1.0, 0.0, 0.0));
         frag2.projectAPsToProperties();
 
-        ArrayList<Vertex> frags = new ArrayList<Vertex>();
+        List<Vertex> frags = new ArrayList<Vertex>();
         frags.add(frag);
         frags.add(frag2);
         
@@ -504,13 +504,13 @@ public class DenoptimIOTest
                 new Point3d(1.0, 0.0, 0.0));
         frag3.projectAPsToProperties();
 
-        ArrayList<Vertex> frags2 = new ArrayList<Vertex>();
+        List<Vertex> frags2 = new ArrayList<Vertex>();
         frags2.add(frag3);
         
         DenoptimIO.writeVertexesToFile(new File(pathName), FileFormat.VRTXJSON, 
                 frags2, true);
         
-        ArrayList<Vertex> frags3 = DenoptimIO.readDENOPTIMVertexesFromJSONFile(
+        List<Vertex> frags3 = DenoptimIO.readDENOPTIMVertexesFromJSONFile(
                 pathName);
         
         assertEquals(3,frags3.size());
@@ -634,14 +634,14 @@ public class DenoptimIOTest
         CuttingRule ctrB = new CuttingRule("myRuleB", 
                 "{$([*]@B)}", "BBB", "-", 1, null);
        
-        ArrayList<CuttingRule> cutRules = new ArrayList<CuttingRule>();
+        List<CuttingRule> cutRules = new ArrayList<CuttingRule>();
         cutRules.add(ctrA);
         cutRules.add(ctrB);
         
         File tmpFile = new File(tempDir.getAbsolutePath() + SEP + "cutRule");
         DenoptimIO.writeCuttingRules(tmpFile, cutRules);
         
-        ArrayList<CuttingRule> readInCutRules = new ArrayList<CuttingRule>();
+        List<CuttingRule> readInCutRules = new ArrayList<CuttingRule>();
         DenoptimIO.readCuttingRules(tmpFile, readInCutRules);
         
         assertEquals(cutRules.size(), readInCutRules.size());

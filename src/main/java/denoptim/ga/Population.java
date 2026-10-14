@@ -418,7 +418,7 @@ public class Population extends ArrayList<Candidate> implements Cloneable
      * Returns a list of crossover sites between the two given parents. The 
      * crossover sites are given using the same order used to specify the 
      * parents. This method should always be run after the 
-     * {@link Population#getXoverPartners(Candidate, ArrayList)}, which 
+     * {@link Population#getXoverPartners(Candidate, List)}, which 
      * populated the crossover compatibility data.
      * @param parentA
      * @param parentB

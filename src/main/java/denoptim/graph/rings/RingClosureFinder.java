@@ -63,9 +63,9 @@ public class RingClosureFinder
      */
 
     public static boolean evaluateClosability(List<IAtom> path, 
-                                   ArrayList<Boolean> rotatability,
-                                   ArrayList<ArrayList<Point3d>> dihRefs,
-                                   ArrayList<ArrayList<Double>> closableConfs,
+                                   List<Boolean> rotatability,
+                                   List<List<Point3d>> dihRefs,
+                                   List<List<Double>> closableConfs,
                                    RingClosureParameters settings)
     {
         boolean res = false;
@@ -106,15 +106,15 @@ public class RingClosureFinder
                                          path.get(h2).getPoint3d(),
                                          path.get(t1).getPoint3d(),
                                          path.get(t2).getPoint3d());
-        ArrayList<Double> clsablConds = rc.getClosabilityConditions(
+        List<Double> clsablConds = rc.getClosabilityConditions(
                 settings.getConfPathExtraTolerance());
         settings.getLogger().log(Level.FINE, "RingClosability conditions "
                 + "vector:" + clsablConds);
         
         // Make work vector of dihedrals (angles around rotatable bonds)
         // avoiding linearities
-        ArrayList<Double> dihedrals = new ArrayList<Double>();
-        ArrayList<Double> dihIncement = new ArrayList<Double>();
+        List<Double> dihedrals = new ArrayList<Double>();
+        List<Double> dihIncement = new ArrayList<Double>();
         int nn = 0;
         for (int i=2; i<ptsChain.size(); i++)
         {
@@ -139,7 +139,7 @@ public class RingClosureFinder
             }
             else
             {
-                ArrayList<Point3d> refPoints = dihRefs.get(i-3);
+                List<Point3d> refPoints = dihRefs.get(i-3);
                 dihedrals.add(MathUtils.computeDihedralAngle(
                                                         refPoints.get(0), 
                                                         refPoints.get(1), 
@@ -202,14 +202,14 @@ public class RingClosureFinder
      */
 
     public static boolean hasClosableRotamer(List<Point3d> chain, 
-                                ArrayList<Boolean> rotatability,
-                                ArrayList<Double> dihedrals,
-                                ArrayList<Double> dihIncement,
+                                List<Boolean> rotatability,
+                                List<Double> dihedrals,
+                                List<Double> dihIncement,
                                 int activeRot,
                                 double step,
                                 int h1, int h2, int t1, int t2,
-                                ArrayList<Double> clsablConds,
-                                ArrayList<ArrayList<Double>> closableConfs,
+                                List<Double> clsablConds,
+                                List<List<Double>> closableConfs,
                                 boolean doExhaustiveSearch,
                                 boolean writeAllConfs,
                                 Logger logger,
@@ -296,7 +296,7 @@ public class RingClosureFinder
                 if (res)
                 {
                     // Store vector of dihedrals
-                    ArrayList<Double> conf = new ArrayList<Double>();
+                    List<Double> conf = new ArrayList<Double>();
                     for (int ib=0; ib<dihedrals.size(); ib++)
                     {
                         double tot = dihedrals.get(ib) + dihIncement.get(ib);

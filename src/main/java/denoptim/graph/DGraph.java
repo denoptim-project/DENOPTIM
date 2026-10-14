@@ -592,7 +592,7 @@ public class DGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public void setVertexList(ArrayList<Vertex> vertices)
+    public void setVertexList(List<Vertex> vertices)
     {
         gVertices = vertices;
         jGraph = null;
@@ -601,7 +601,7 @@ public class DGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public void setEdgeList(ArrayList<Edge> edges)
+    public void setEdgeList(List<Edge> edges)
     {
         gEdges = edges;
         jGraph = null;
@@ -610,7 +610,7 @@ public class DGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public void setRings(ArrayList<Ring> rings)
+    public void setRings(List<Ring> rings)
     {
         gRings = rings;
         jGraph = null;
@@ -619,7 +619,7 @@ public class DGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public void setCandidateClosableChains(ArrayList<ClosableChain> closableChains)
+    public void setCandidateClosableChains(List<ClosableChain> closableChains)
     {
         this.closableChains = closableChains;
     }
@@ -694,7 +694,7 @@ public class DGraph implements Cloneable
         {
             if (e.getTrgAP().getOwner() == v0)
             {
-                ArrayList<Vertex> parentTree = new ArrayList<>();
+                List<Vertex> parentTree = new ArrayList<>();
                 getParentTree(v0,parentTree);
                 return parentTree.get(parentTree.size()-1);
             }
@@ -766,9 +766,9 @@ public class DGraph implements Cloneable
      * @param v the vertex to search for.
      * @return the list of rings of an empty list.
      */
-    public ArrayList<Ring> getRingsInvolvingVertex(Vertex v)
+    public List<Ring> getRingsInvolvingVertex(Vertex v)
     {
-        ArrayList<Ring> rings = new ArrayList<Ring>();
+        List<Ring> rings = new ArrayList<Ring>();
         for (Ring r : gRings)
         {
             if (r.contains(v))
@@ -787,9 +787,9 @@ public class DGraph implements Cloneable
      * @param vs the collection of vertices to search for. The order is irrelevant.
      * @return the list of rings of an empty list.
      */
-    public ArrayList<Ring> getRingsInvolvingVertex(Vertex[] vs)
+    public List<Ring> getRingsInvolvingVertex(Vertex[] vs)
     {
-        ArrayList<Ring> rings = new ArrayList<Ring>();
+        List<Ring> rings = new ArrayList<Ring>();
         for (Ring r : gRings)
         {
             boolean matchesAll = true;
@@ -811,9 +811,9 @@ public class DGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public ArrayList<Ring> getRingsInvolvingVertexID(int vid)
+    public List<Ring> getRingsInvolvingVertexID(int vid)
     {
-        ArrayList<Ring> rings = new ArrayList<Ring>();
+        List<Ring> rings = new ArrayList<Ring>();
         for (Ring r : gRings)
         {
             if (r.containsID(vid))
@@ -920,9 +920,9 @@ public class DGraph implements Cloneable
      * @return the list of ring closing vertices
      */
 
-    public ArrayList<Vertex> getRCVertices()
+    public List<Vertex> getRCVertices()
     {
-        ArrayList<Vertex> rcvLst = new ArrayList<Vertex>();
+        List<Vertex> rcvLst = new ArrayList<Vertex>();
         for (Vertex v : gVertices)
         {
             if (v.isRCV())
@@ -942,10 +942,10 @@ public class DGraph implements Cloneable
      * @return the list of unused ring closing vertices
      */
 
-    public ArrayList<Vertex> getFreeRCVertices()
+    public List<Vertex> getFreeRCVertices()
     {
-        ArrayList<Vertex> rcvLst = getRCVertices();
-        ArrayList<Vertex> free = new ArrayList<Vertex>();
+        List<Vertex> rcvLst = getRCVertices();
+        List<Vertex> free = new ArrayList<Vertex>();
         for (Vertex v : rcvLst)
         {
             if (!isVertexInRing(v))
@@ -965,9 +965,9 @@ public class DGraph implements Cloneable
      * @return the list of ring closing vertices
      */
 
-    public ArrayList<Vertex> getUsedRCVertices()
+    public List<Vertex> getUsedRCVertices()
     {
-        ArrayList<Vertex> used = new ArrayList<Vertex>();
+        List<Vertex> used = new ArrayList<Vertex>();
         used.addAll(getRCVertices());
         used.removeAll(getFreeRCVertices());
         return used;
@@ -1056,7 +1056,7 @@ public class DGraph implements Cloneable
         } catch (DENOPTIMException e) {
             e.printStackTrace();
         }
-        ArrayList<Vertex> arrLst = new ArrayList<Vertex>();
+        List<Vertex> arrLst = new ArrayList<Vertex>();
         arrLst.addAll(path.getVertecesPath());                    
         Ring ring = new Ring(arrLst);
         ring.setBondType(bndTyp);
@@ -1110,7 +1110,7 @@ public class DGraph implements Cloneable
         // delete also any ring involving the removed vertex
         if (isVertexInRing(vertex))
         {
-            ArrayList<Ring> rToRm = getRingsInvolvingVertex(vertex);
+            List<Ring> rToRm = getRingsInvolvingVertex(vertex);
             for (Ring r : rToRm)
             {
                 removeRing(r);
@@ -1118,7 +1118,7 @@ public class DGraph implements Cloneable
         }
 
         // remove edges involving the removed vertex
-        ArrayList<Edge> eToDel = new ArrayList<>();
+        List<Edge> eToDel = new ArrayList<>();
         for (int i=0; i<gEdges.size(); i++)
         {
             Edge edge = gEdges.get(i);
@@ -1260,10 +1260,10 @@ public class DGraph implements Cloneable
         }
         
         // Get all APs that we'll try to weld into the parent
-        ArrayList<AttachmentPoint> needyAPsOnChildren = 
+        List<AttachmentPoint> needyAPsOnChildren = 
                 new ArrayList<AttachmentPoint>();
         // And all APs where we could weld onto
-        ArrayList<AttachmentPoint> freeAPsOnParent = 
+        List<AttachmentPoint> freeAPsOnParent = 
                 new ArrayList<AttachmentPoint>();
         //        vertex.getAPsFromChilddren(); //No, because it enter templates
         Map<AttachmentPoint,AttachmentPoint> apOnOldToNeedyAP = 
@@ -1351,8 +1351,8 @@ public class DGraph implements Cloneable
         }
         
         // Update rings involving vertex directly (i.e., in this graph)
-        ArrayList<Ring> rToEdit = getRingsInvolvingVertex(vertex);
-        ArrayList<Ring> ringsToRemove = new ArrayList<Ring>();
+        List<Ring> rToEdit = getRingsInvolvingVertex(vertex);
+        List<Ring> ringsToRemove = new ArrayList<Ring>();
         for (Ring r : rToEdit)
         {
             r.removeVertex(vertex);
@@ -1834,7 +1834,7 @@ public class DGraph implements Cloneable
         {
             for (Vertex sv : getSymVerticesForVertex(subGrpVrtxs.get(0)))
             {
-                ArrayList<Vertex> lst = new ArrayList<Vertex>();
+                List<Vertex> lst = new ArrayList<Vertex>();
                 lst.add(sv);
                 symSites.add(lst);
             }
@@ -2650,7 +2650,7 @@ public class DGraph implements Cloneable
                     oldLink.getUnfilteredMutationTypes());
             graphAdded.renumberGraphVertices();
             
-            ArrayList<Vertex> oldVertex = new ArrayList<Vertex>();
+            List<Vertex> oldVertex = new ArrayList<Vertex>();
             oldVertex.add(oldLink);
             APMapping apMap = new APMapping();
             for (Map.Entry<Integer,Integer> e : apIdMap.entrySet())
@@ -2810,7 +2810,7 @@ public class DGraph implements Cloneable
         // update any affected ring
         if (isVertexInRing(srcVrtx) && isVertexInRing(trgVrtx))
         {
-            ArrayList<Ring> rToEdit = new ArrayList<Ring>();
+            List<Ring> rToEdit = new ArrayList<Ring>();
             rToEdit.addAll(getRingsInvolvingVertex(srcVrtx));
             rToEdit.retainAll(getRingsInvolvingVertex(trgVrtx));
             for (Ring r : rToEdit)
@@ -3090,7 +3090,7 @@ public class DGraph implements Cloneable
      * @return list of child vertices.
      */
 
-    public ArrayList<Vertex> getChildVertices(Vertex vertex)
+    public List<Vertex> getChildVertices(Vertex vertex)
     {
         return vertex.getChilddren();
     }
@@ -3524,7 +3524,7 @@ public class DGraph implements Cloneable
     {   
         // When cloning, the VertexID remains the same so we'll have two
         // deep-copies of the same vertex having the same VertexID
-        ArrayList<Vertex> cListVrtx = new ArrayList<>();
+        List<Vertex> cListVrtx = new ArrayList<>();
         Map<Long, Vertex> vidsInClone = new HashMap<Long, Vertex>();
         for (Vertex vOrig : gVertices)
         {
@@ -3533,7 +3533,7 @@ public class DGraph implements Cloneable
             vidsInClone.put(vClone.getVertexId(), vClone);
         }
 
-        ArrayList<Edge> cListEdges = new ArrayList<>();
+        List<Edge> cListEdges = new ArrayList<>();
         for (Edge e : gEdges)
         {
             long srcVrtxId = e.getSrcVertex();
@@ -3556,7 +3556,7 @@ public class DGraph implements Cloneable
         DGraph clone = new DGraph(cListVrtx, cListEdges);
 
         // Copy the list but using the references to the cloned vertices
-        ArrayList<Ring> cListRings = new ArrayList<>();
+        List<Ring> cListRings = new ArrayList<>();
         for (Ring ring : gRings)
         {
             Ring cRing = new Ring();
@@ -3572,7 +3572,7 @@ public class DGraph implements Cloneable
         clone.setRings(cListRings);
 
         // The chainLinks are made of primitives, so it's just fine
-        ArrayList<ClosableChain> cListClosableChains =
+        List<ClosableChain> cListClosableChains =
                 new ArrayList<>();
         for (ClosableChain cc : closableChains)
         {
@@ -3625,9 +3625,9 @@ public class DGraph implements Cloneable
      * @return the indices of all edges whose source vertex is same as vid
      */
 
-    public ArrayList<Integer> getIndexOfEdgesWithChild(int vid)
+    public List<Integer> getIndexOfEdgesWithChild(int vid)
     {
-        ArrayList<Integer> lstEdges = new ArrayList<>();
+        List<Integer> lstEdges = new ArrayList<>();
         for (int j=0; j<getEdgeCount(); j++)
         {
             Edge edge = getEdgeAtPosition(j);
@@ -3648,9 +3648,9 @@ public class DGraph implements Cloneable
      * @return the edge whose source vertex is same as vid
      */
 
-    public ArrayList<Edge> getEdgesWithChild(int vid)
+    public List<Edge> getEdgesWithChild(int vid)
     {
-        ArrayList<Edge> lstEdges = new ArrayList<>();
+        List<Edge> lstEdges = new ArrayList<>();
         for (int j=0; j<getEdgeCount(); j++)
         {
             Edge edge = getEdgeAtPosition(j);
@@ -4218,7 +4218,7 @@ public class DGraph implements Cloneable
     	}
 
     	// pairwise correspondence between child vertices
-    	ArrayList<Vertex[]> pairs = new ArrayList<Vertex[]>();
+    	List<Vertex[]> pairs = new ArrayList<Vertex[]>();
 
     	for (Edge et : edgesFromThis)
     	{
@@ -4317,9 +4317,9 @@ public class DGraph implements Cloneable
      * @return list of attachment points.
      */
 
-    public ArrayList<AttachmentPoint> getAttachmentPoints()
+    public List<AttachmentPoint> getAttachmentPoints()
     {
-        ArrayList<AttachmentPoint> lstAPs =
+        List<AttachmentPoint> lstAPs =
                 new ArrayList<AttachmentPoint>();
         for (Vertex v : gVertices)
         {
@@ -4335,9 +4335,9 @@ public class DGraph implements Cloneable
      * @return list of attachment points.
      */
 
-    public ArrayList<AttachmentPoint> getAvailableAPs()
+    public List<AttachmentPoint> getAvailableAPs()
     {
-        ArrayList<AttachmentPoint> lstFreeAPs =
+        List<AttachmentPoint> lstFreeAPs =
                 new ArrayList<AttachmentPoint>();
         for (AttachmentPoint ap : getAttachmentPoints())
         {
@@ -4360,7 +4360,7 @@ public class DGraph implements Cloneable
 
     public List<AttachmentPoint> getAvailableAPsThroughout()
     {
-        ArrayList<AttachmentPoint> lstFreeAPs =
+        List<AttachmentPoint> lstFreeAPs =
                 new ArrayList<AttachmentPoint>();
         for (AttachmentPoint ap : getAttachmentPoints())
         {
@@ -4433,7 +4433,7 @@ public class DGraph implements Cloneable
 
     public void removeCappingGroupsOn(Vertex vertex)
     {
-        ArrayList<Vertex> toDel = new ArrayList<Vertex>();
+        List<Vertex> toDel = new ArrayList<Vertex>();
         for (Vertex vtx : this.getChildVertices(vertex))
         {
             if (vtx instanceof Fragment == false)
@@ -4658,7 +4658,7 @@ public class DGraph implements Cloneable
             throw new DENOPTIMException("Attempt to extract a subgraph giving "
                     + "a seed vertex that is not contained in this graph.");
         }
-        ArrayList<Vertex> members = new ArrayList<Vertex>();
+        List<Vertex> members = new ArrayList<Vertex>();
         members.add(seed);
         getChildrenTree(seed, members, numLayers, stopBeforeRCVs);
         return buildSubgraphFromMembers(members);
@@ -4698,7 +4698,7 @@ public class DGraph implements Cloneable
             return extractSubgraph(seed, stopBeforeRCVs);
         }
         
-        ArrayList<Vertex> members = new ArrayList<Vertex>();
+        List<Vertex> members = new ArrayList<Vertex>();
         members.add(seed);
         getChildTreeLimited(seed, members, limits, stopBeforeRCVs);
         return buildSubgraphFromMembers(members);
@@ -4779,7 +4779,7 @@ public class DGraph implements Cloneable
                     + "a seed vertex that is not contained in this graph.");
         }
         
-        ArrayList<Vertex> members = new ArrayList<Vertex>();
+        List<Vertex> members = new ArrayList<Vertex>();
         members.add(seed);
         getChildTreeLimited(seed, members, stopBeforeRCVs);
         return buildSubgraphFromMembers(members);
@@ -4952,7 +4952,7 @@ public class DGraph implements Cloneable
                 orderedMembers.add(v);
         }
         
-        ArrayList<Vertex> cListVrtx = new ArrayList<Vertex>();
+        List<Vertex> cListVrtx = new ArrayList<Vertex>();
         Map<Long, Vertex> vidsInSub = new HashMap<Long, Vertex>();
         for (Vertex vOrig : orderedMembers)
         {
@@ -4961,7 +4961,7 @@ public class DGraph implements Cloneable
             vidsInSub.put(vClone.getVertexId(), vClone);
         }
         
-        ArrayList<Edge> cListEdges = new ArrayList<Edge>();
+        List<Edge> cListEdges = new ArrayList<Edge>();
         for (Edge e : gEdges)
         {
             if (!vidsInSub.containsKey(e.getSrcVertex())
@@ -4984,7 +4984,7 @@ public class DGraph implements Cloneable
         
         DGraph subGraph = new DGraph(cListVrtx, cListEdges);
         
-        ArrayList<Ring> cListRings = new ArrayList<Ring>();
+        List<Ring> cListRings = new ArrayList<Ring>();
         for (Ring ring : gRings)
         {
             boolean allIn = true;
@@ -5295,7 +5295,7 @@ public class DGraph implements Cloneable
             throws DENOPTIMException
     {
         // now get the vertices attached to v
-        ArrayList<Vertex> children = new ArrayList<Vertex>();
+        List<Vertex> children = new ArrayList<Vertex>();
         getChildrenTree(v, children);
 
         // delete the children vertices and associated edges
@@ -5772,7 +5772,7 @@ public class DGraph implements Cloneable
     
     public int getLevel(Vertex v)
     {
-        ArrayList<Vertex> parentTree = new ArrayList<>();
+        List<Vertex> parentTree = new ArrayList<>();
         getParentTree(v,parentTree);
         return parentTree.size() - 1;
     }
@@ -6053,7 +6053,7 @@ public class DGraph implements Cloneable
      * @return <code>true</code> unless no ring can be set up even if required
      * @throws denoptim.exception.DENOPTIMException
      */
-    public ArrayList<DGraph> makeAllGraphsWithDifferentRingSets(
+    public List<DGraph> makeAllGraphsWithDifferentRingSets(
             RunTimeParameters settings)
             throws DENOPTIMException 
     {
@@ -6069,7 +6069,7 @@ public class DGraph implements Cloneable
             fsSettings = (FragmentSpaceParameters)settings.getParameters(
                     ParametersType.FS_PARAMS);
         }
-        ArrayList<DGraph> lstGraphs = new ArrayList<>();
+        List<DGraph> lstGraphs = new ArrayList<>();
 
         boolean rcnEnabled = fsSettings.getFragmentSpace()
                 .useAPclassBasedApproach();
@@ -6102,13 +6102,13 @@ public class DGraph implements Cloneable
         // get the set of possible RCA combinations = ring closures
         CyclicGraphHandler cgh = new CyclicGraphHandler(rcSettings,
                 fsSettings.getFragmentSpace());
-        ArrayList<List<Ring>> allCombsOfRings =
+        List<List<Ring>> allCombsOfRings =
                 cgh.getPossibleCombinationOfRings(mol, this);
 
         // Keep closable chains that are relevant for chelate formation
         if (rcSettings.buildChelatesMode())
         {
-            ArrayList<List<Ring>> toRemove = new ArrayList<>();
+            List<List<Ring>> toRemove = new ArrayList<>();
             for (List<Ring> setRings : allCombsOfRings)
             {
                 if (!cgh.checkChelatesGraph(this,setRings))
@@ -6633,7 +6633,7 @@ public class DGraph implements Cloneable
      */
     public List<Edge> findEdges(EdgeQuery edgeQuery, Logger logger)
     {
-        ArrayList<Edge> matches = new ArrayList<>(getEdgeList());
+        List<Edge> matches = new ArrayList<>(getEdgeList());
         logger.log(Level.FINE, "Edge candidates: " + matches);
 
         if (edgeQuery == null)
@@ -6641,7 +6641,7 @@ public class DGraph implements Cloneable
             return matches;
         }
 
-        ArrayList<Edge> newLst = new ArrayList<>();
+        List<Edge> newLst = new ArrayList<>();
         for (Edge e : matches)
         {
             if (edgeQuery.matches(e))
@@ -6738,8 +6738,8 @@ public class DGraph implements Cloneable
      * @param list the list of vertex IDs to be purged.
      */
 
-    public void removeSymmetryRedundantIds(ArrayList<Long> list) {
-        ArrayList<Vertex> vList = new ArrayList<>();
+    public void removeSymmetryRedundantIds(List<Long> list) {
+        List<Vertex> vList = new ArrayList<>();
         for (long vid : list) {
             vList.add(getVertexWithId(vid));
         }
@@ -6765,7 +6765,7 @@ public class DGraph implements Cloneable
      * @return the modified graph.
      */
 
-    public DGraph editGraph(ArrayList<GraphEdit> edits,
+    public DGraph editGraph(List<GraphEdit> edits,
             boolean symmetry, FragmentSpace fragSpace, Logger logger) 
                     throws DENOPTIMException
     {
@@ -6824,7 +6824,7 @@ public class DGraph implements Cloneable
                         idAPOnInGraph = ap.getIndexInOwner();
                         rootOfInGraph = ap.getOwner();
                     } else {
-                        ArrayList<AttachmentPoint> freeAPs = 
+                        List<AttachmentPoint> freeAPs = 
                                 inGraph.getAvailableAPs();
                         if (freeAPs.size()==1)
                         {
@@ -7340,7 +7340,7 @@ public class DGraph implements Cloneable
      * @param v vertex to set as scaffold
      */
     public static void setScaffold(Vertex v) {
-        ArrayList<Vertex> newVertexList = new ArrayList<>();
+        List<Vertex> newVertexList = new ArrayList<>();
 
         Set<Long> visited = new HashSet<>();
         Queue<Vertex> currLevel = new ArrayDeque<>();

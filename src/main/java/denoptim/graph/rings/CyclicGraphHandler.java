@@ -135,22 +135,22 @@ public class CyclicGraphHandler
 
     //TODO: this should use most of the same code of RandomCombOfRingsIterator
     
-    public ArrayList<List<Ring>> getPossibleCombinationOfRings(
+    public List<List<Ring>> getPossibleCombinationOfRings(
             IAtomContainer mol, DGraph molGraph)
                     throws DENOPTIMException
     {
         // All the candidate paths 
         Map<ObjectPair,PathSubGraph> allGoodPaths = 
                 new HashMap<ObjectPair,PathSubGraph>();
-        ArrayList<Vertex> rcaVertLst = molGraph.getFreeRCVertices();
+        List<Vertex> rcaVertLst = molGraph.getFreeRCVertices();
         
         // Get manager of ring size problems
         RingSizeManager rsm = new RingSizeManager(fragSpace, settings);
         rsm.initialize(mol, molGraph);
 
         // identify compatible pairs of RCA vertices
-        Map<Vertex,ArrayList<Vertex>> compatMap =
-                       new HashMap<Vertex,ArrayList<Vertex>>();
+        Map<Vertex,List<Vertex>> compatMap =
+                       new HashMap<Vertex,List<Vertex>>();
         for (int i=0; i<rcaVertLst.size(); i++)
         {
             Vertex vI = rcaVertLst.get(i);
@@ -188,7 +188,7 @@ public class CyclicGraphHandler
                 }
                 else
                 {
-                    ArrayList<Vertex> lst =
+                    List<Vertex> lst =
                                             new ArrayList<Vertex>();
                     lst.add(vJ);
                     compatMap.put(vI,lst);
@@ -199,7 +199,7 @@ public class CyclicGraphHandler
                 }
                 else
                 {
-                    ArrayList<Vertex> lst =
+                    List<Vertex> lst =
                                             new ArrayList<Vertex>();
                     lst.add(vI);
                     compatMap.put(vJ,lst);
@@ -291,16 +291,16 @@ public class CyclicGraphHandler
         }
 
         // Generate all combinations of compatible, closable paths
-        ArrayList<ObjectPair> lstPairs = new ArrayList<ObjectPair>();
-        ArrayList<Long> usedId = new ArrayList<Long>();
-        ArrayList<Vertex> sortedKeys = new ArrayList<Vertex>();
+        List<ObjectPair> lstPairs = new ArrayList<ObjectPair>();
+        List<Long> usedId = new ArrayList<Long>();
+        List<Vertex> sortedKeys = new ArrayList<Vertex>();
         for (Vertex keyVert : compatMap.keySet())
         {
             sortedKeys.add(keyVert);
         }
 
         // All possible ring closing paths will be stored here
-        ArrayList<List<Ring>> allCombsOfRings =
+        List<List<Ring>> allCombsOfRings =
                                      new ArrayList<List<Ring>>();
         combineCompatPathSubGraphs(0,
                 sortedKeys,
@@ -322,13 +322,13 @@ public class CyclicGraphHandler
      */
 
     private boolean combineCompatPathSubGraphs(int ii0,
-                       ArrayList<Vertex> sortedKeys,
-                       Map<Vertex,ArrayList<Vertex>> compatMap,
-                       ArrayList<ObjectPair> lstPairs,
-                       ArrayList<Long> usedId,
+                       List<Vertex> sortedKeys,
+                       Map<Vertex,List<Vertex>> compatMap,
+                       List<ObjectPair> lstPairs,
+                       List<Long> usedId,
                        Map<ObjectPair,PathSubGraph> allGoodPaths,
                        Map<IBond,List<PathSubGraph>> interdepPaths,
-                       ArrayList<List<Ring>> allCombsOfRings)
+                       List<List<Ring>> allCombsOfRings)
                                                       throws DENOPTIMException
     {
         int objId = this.hashCode();
@@ -425,7 +425,7 @@ public class CyclicGraphHandler
                         for (ObjectPair opFinal : lstPairs)
                         {
                             PathSubGraph path = allGoodPaths.get(opFinal);
-                            ArrayList<Vertex> arrLst = 
+                            List<Vertex> arrLst = 
                                                new ArrayList<Vertex>();
                             arrLst.addAll(path.getVertecesPath());
 
@@ -486,7 +486,7 @@ public class CyclicGraphHandler
                 {
                     logger.log(Level.FINEST, objId+"-"+recLab+"> in C");
 
-                    ArrayList<ObjectPair> toDel = new ArrayList<ObjectPair>();
+                    List<ObjectPair> toDel = new ArrayList<ObjectPair>();
                     for (int ir = recCount; ir<lstPairs.size(); ir++)
                     {
                         ObjectPair opToRemove = lstPairs.get(ir);
@@ -532,7 +532,7 @@ public class CyclicGraphHandler
      * paths, that is, paths that share one or more bonds. 
      */
 
-    private boolean hasInterdependentPaths(ArrayList<ObjectPair> lstPairs,
+    private boolean hasInterdependentPaths(List<ObjectPair> lstPairs,
                                     Map<IBond,List<PathSubGraph>> interdepPaths)
     {
         boolean result = false;
@@ -575,16 +575,16 @@ public class CyclicGraphHandler
      */
 
     private boolean checkClosabilityOfInterdependentPaths(
-                                ArrayList<ObjectPair> lstPairs,
+                                List<ObjectPair> lstPairs,
                                 Map<IBond,List<PathSubGraph>> interdepPaths,
                                 Map<ObjectPair,PathSubGraph> allGoodPaths)
     {
         // Identify the interdependent sets of paths
-        List<ArrayList<ObjectPair>> listOfIntrDepPaths = 
-                new ArrayList<ArrayList<ObjectPair>>();
+        List<List<ObjectPair>> listOfIntrDepPaths = 
+                new ArrayList<List<ObjectPair>>();
         for (IBond bnd : interdepPaths.keySet())
         {
-            ArrayList<ObjectPair> locSop = new ArrayList<ObjectPair>();
+            List<ObjectPair> locSop = new ArrayList<ObjectPair>();
             List<PathSubGraph> psgSet = interdepPaths.get(bnd);
             for (PathSubGraph psg : psgSet)
             {
@@ -611,7 +611,7 @@ public class CyclicGraphHandler
 
         // Verify simultaneous closeness of each group of interdependent paths
         boolean closable = true;
-        for (ArrayList<ObjectPair> grpIntrdepPaths : listOfIntrDepPaths)
+        for (List<ObjectPair> grpIntrdepPaths : listOfIntrDepPaths)
         {
             // Per each closable conf. of the first path stores the paths 
             // that have a simultaneously closable conf.
@@ -628,7 +628,7 @@ public class CyclicGraphHandler
             PathSubGraph firstPsg = allGoodPaths.get(firstOp);
             RingClosingConformations firstRcc = firstPsg.getRCC();
 
-            for (ArrayList<Double> ccAngls : firstRcc.getListOfConformations())
+            for (List<Double> ccAngls : firstRcc.getListOfConformations())
             {
                 ClosableConf cc = new ClosableConf(firstPsg.getBondPath(), 
                                                    ccAngls);
@@ -650,7 +650,7 @@ public class CyclicGraphHandler
                 RingClosingConformations rccOfLocPath = locPath.getRCC();
 
                 // try with each closable conf of the local path
-                for (ArrayList<Double> ccAngles : 
+                for (List<Double> ccAngles : 
                                          rccOfLocPath.getListOfConformations())
                 {
                     ClosableConf locCC = new ClosableConf(
@@ -751,11 +751,11 @@ public class CyclicGraphHandler
     private class ClosableConf
     {
         private List<IBond> bonds;
-        private ArrayList<Double> angs;
+        private List<Double> angs;
 
         //---------------------------------------------------------------------
         
-        public ClosableConf(List<IBond> bonds, ArrayList<Double> dihedrals)
+        public ClosableConf(List<IBond> bonds, List<Double> dihedrals)
         {
             this.bonds = bonds;
             this.angs = dihedrals;
@@ -886,8 +886,8 @@ public class CyclicGraphHandler
 //TODO: make the full-denticity requirement optional for same/all APclasses
             if (levelOfVert > 0)
             {
-                Map<String,ArrayList<Vertex>> rcasOnThisVertex =
-                               new HashMap<String,ArrayList<Vertex>>();
+                Map<String,List<Vertex>> rcasOnThisVertex =
+                               new HashMap<String,List<Vertex>>();
                 for (Vertex cVrtx : vert.getChilddren())
                 {
                     if (cVrtx.isRCV())
@@ -901,7 +901,7 @@ public class CyclicGraphHandler
                         }
                         else
                         {
-                            ArrayList<Vertex> sameClsRCA =
+                            List<Vertex> sameClsRCA =
                                                new ArrayList<Vertex>();
                             sameClsRCA.add(cVrtx);
                             rcasOnThisVertex.put(apCls,sameClsRCA);

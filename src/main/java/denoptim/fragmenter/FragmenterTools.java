@@ -100,7 +100,7 @@ public class FragmenterTools
 
         int index = -1;
         int maxBufferSize = 2000;
-        ArrayList<IAtomContainer> buffer = new ArrayList<IAtomContainer>(500);
+        List<IAtomContainer> buffer = new ArrayList<IAtomContainer>(500);
         try {
             while (reader.hasNext())
             {
@@ -259,7 +259,7 @@ public class FragmenterTools
         
         int index = -1;
         int maxBufferSize = 2000;
-        ArrayList<IAtomContainer> buffer = new ArrayList<IAtomContainer>(500);
+        List<IAtomContainer> buffer = new ArrayList<IAtomContainer>(500);
         try {
             while (reader.hasNext())
             {
@@ -1236,7 +1236,7 @@ public class FragmenterTools
 
                     // Get list of candidates for hapto-system: 
                     // they have same cutting Rule and central metal
-                    ArrayList<IAtom> candidatesForHapto = new ArrayList<IAtom>();
+                    List<IAtom> candidatesForHapto = new ArrayList<IAtom>();
                     for (MatchedBond tbForHapto : matchingbonds.get(ruleName))
                     {
                         //Consider only bond involving same central atom
@@ -1519,16 +1519,16 @@ public class FragmenterTools
      */
 
     static Set<IAtom> exploreHapticity(IAtom seed, IAtom centralAtom, 
-            ArrayList<IAtom> candidates, IAtomContainer mol)
+            List<IAtom> candidates, IAtomContainer mol)
     {
         Set<IAtom> atmsInHapto = new HashSet<IAtom>();
         atmsInHapto.add(seed);
-        ArrayList<IAtom> toVisitAtoms = new ArrayList<IAtom>();
+        List<IAtom> toVisitAtoms = new ArrayList<IAtom>();
         toVisitAtoms.add(seed);
-        ArrayList<IAtom> visitedAtoms = new ArrayList<IAtom>();
+        List<IAtom> visitedAtoms = new ArrayList<IAtom>();
         while (toVisitAtoms.size()>0)
         {
-            ArrayList<IAtom> toVisitLater = new ArrayList<IAtom>();
+            List<IAtom> toVisitLater = new ArrayList<IAtom>();
             for (IAtom atomInFocus : toVisitAtoms)
             {
                 if (visitedAtoms.contains(atomInFocus) 
@@ -1561,12 +1561,12 @@ public class FragmenterTools
     static Set<IAtom> exploreConnectivity(IAtom seed, IAtomContainer mol)
     {
         Set<IAtom> atmsReachableFromSeed = new HashSet<IAtom>();
-        ArrayList<IAtom> toVisitAtoms = new ArrayList<IAtom>();
+        List<IAtom> toVisitAtoms = new ArrayList<IAtom>();
         toVisitAtoms.add(seed);
-        ArrayList<IAtom> visitedAtoms = new ArrayList<IAtom>();
+        List<IAtom> visitedAtoms = new ArrayList<IAtom>();
         while (toVisitAtoms.size()>0)
         {
-            ArrayList<IAtom> toVisitLater = new ArrayList<IAtom>();
+            List<IAtom> toVisitLater = new ArrayList<IAtom>();
             for (IAtom atomInFocus : toVisitAtoms)
             {
                 if (visitedAtoms.contains(atomInFocus))
@@ -1632,7 +1632,7 @@ public class FragmenterTools
             Mappings purgedPairs = msq.getMatchesOfSMARTS(ruleName);
             
             // Evaluate subclass membership and eventually store target bonds
-            ArrayList<MatchedBond> bondsMatched = new ArrayList<MatchedBond>();
+            List<MatchedBond> bondsMatched = new ArrayList<MatchedBond>();
             for (int[] pair : purgedPairs) 
             {
                 if (pair.length!=2)
@@ -1675,7 +1675,7 @@ public class FragmenterTools
 
         int index = -1;
         int maxBufferSize = 2000;
-        ArrayList<Vertex> buffer = new ArrayList<Vertex>(500);
+        List<Vertex> buffer = new ArrayList<Vertex>(500);
         try {
             while (reader.hasNext())
             {
@@ -1798,7 +1798,7 @@ public class FragmenterTools
                 Vertex unqVersion = null;
                 if (mwFileUnq.exists())
                 {
-                    ArrayList<Vertex> knownFrags = 
+                    List<Vertex> knownFrags = 
                             DenoptimIO.readVertexes(mwFileUnq,BBType.UNDEFINED);
                     unqVersion = knownFrags.stream()
                         .filter(knownFrag -> 

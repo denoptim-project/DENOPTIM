@@ -21,6 +21,7 @@ package denoptim.programs.graphlisthandler;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.List;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
@@ -47,13 +48,13 @@ public class GraphListsHandlerParameters extends RunTimeParameters
     /**
      * Input graphs: first list
      */
-    protected ArrayList<DGraph> inGraphsA =
+    protected List<DGraph> inGraphsA =
                              new ArrayList<DGraph>();
     
     /**
      * Input graphs: second list
      */
-    protected ArrayList<DGraph> inGraphsB =
+    protected List<DGraph> inGraphsB =
                              new ArrayList<DGraph>();
 
     /**

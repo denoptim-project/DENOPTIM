@@ -284,10 +284,10 @@ public class RingSizeManagerTest
                 new ArrayList<Vertex>(),
                 new ArrayList<Vertex>(),
                 new ArrayList<Vertex>(), 
-                new HashMap<APClass,ArrayList<APClass>>(),
+                new HashMap<APClass,List<APClass>>(),
                 new HashMap<APClass,APClass>(), 
                 new HashSet<APClass>(), 
-                new HashMap<APClass,ArrayList<APClass>>());
+                new HashMap<APClass,List<APClass>>());
         fs.setAPclassBasedApproach(true);
         
         RingClosureParameters rcParams = new RingClosureParameters();
@@ -316,9 +316,9 @@ public class RingSizeManagerTest
         //
         
         APClass apcA = APClass.make("A",0);
-        HashMap<APClass,ArrayList<APClass>> cpMap = 
-                new HashMap<APClass,ArrayList<APClass>>();
-        ArrayList<APClass> lstA = new ArrayList<APClass>();
+        HashMap<APClass,List<APClass>> cpMap = 
+                new HashMap<APClass,List<APClass>>();
+        List<APClass> lstA = new ArrayList<APClass>();
         lstA.add(apcA);
         cpMap.put(apcA, lstA);
         fs = new FragmentSpace(fsp,

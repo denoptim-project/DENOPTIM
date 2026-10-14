@@ -189,7 +189,7 @@ public class GraphOperations
         // The crossover sites are the combination of the above compatible
         // vertexes that define subgraphs respecting the requirements for 
         // being swapped between the two graphs.
-        ArrayList<XoverSite> sites = new ArrayList<XoverSite>();
+        List<XoverSite> sites = new ArrayList<XoverSite>();
         for (Vertex[] pair : compatibleVrtxPairs)
         {
             Vertex vA = pair[0];
@@ -299,7 +299,7 @@ public class GraphOperations
                 {
                     sitesByBranchIdA.get(branchIdA).add(pp);
                 } else {
-                    ArrayList<Vertex[]> lst = new ArrayList<Vertex[]>();
+                    List<Vertex[]> lst = new ArrayList<Vertex[]>();
                     lst.add(pp);
                     sitesByBranchIdA.put(branchIdA, lst);
                 }
@@ -307,7 +307,7 @@ public class GraphOperations
                 {
                     sitesByBranchIdB.get(branchIdB).add(pp);
                 } else {
-                    ArrayList<Vertex[]> lst = new ArrayList<Vertex[]>();
+                    List<Vertex[]> lst = new ArrayList<Vertex[]>();
                     lst.add(pp);
                     sitesByBranchIdB.put(branchIdB, lst);
                 }
@@ -534,12 +534,12 @@ public class GraphOperations
             alreadyIncludedFromA.addAll(pathA.getVertecesPath());
             alreadyIncludedFromB.addAll(pathB.getVertecesPath());
         }
-        ArrayList<Vertex> subGraphA = new ArrayList<Vertex>();
+        List<Vertex> subGraphA = new ArrayList<Vertex>();
         subGraphA.add(vA);
         if (!subGraphEndInA.contains(vA))
             gA.getChildTreeLimited(vA, subGraphA, subGraphEndInA, true);
 
-        ArrayList<Vertex> subGraphB = new ArrayList<Vertex>();
+        List<Vertex> subGraphB = new ArrayList<Vertex>();
         subGraphB.add(vB);
         if (!subGraphEndInB.contains(vB))
             gB.getChildTreeLimited(vB, subGraphB, subGraphEndInB, true);
@@ -1621,7 +1621,7 @@ public class GraphOperations
         DGraph molGraph = curVrtx.getGraphOwner();
         int lvl = molGraph.getLevel(curVrtx);
 
-        ArrayList<Long> addedVertices = new ArrayList<>();
+        List<Long> addedVertices = new ArrayList<>();
 
         List<AttachmentPoint> lstDaps = curVrtx.getAttachmentPoints();
         List<AttachmentPoint> toDoAPs = new ArrayList<AttachmentPoint>();
@@ -1996,7 +1996,7 @@ public class GraphOperations
 
     protected static boolean attachFragmentInClosableChain(
             Vertex curVertex, int dapidx, DGraph molGraph,
-            ArrayList<Long> addedVertices, GAParameters settings)
+            List<Long> addedVertices, GAParameters settings)
                     throws DENOPTIMException
     {
         boolean res = false;
@@ -2008,7 +2008,7 @@ public class GraphOperations
         }
 
         // Get candidate fragments
-        ArrayList<FragForClosabChains> lscFfCc = getFragmentForClosableChain(
+        List<FragForClosabChains> lscFfCc = getFragmentForClosableChain(
                 curVertex, dapidx, molGraph);
 
         // Here we can get:
@@ -2025,7 +2025,7 @@ public class GraphOperations
         {
             int chosenId = settings.getRandomizer().nextInt(numCands);
             FragForClosabChains chosenFfCc = lscFfCc.get(chosenId);
-            ArrayList<Integer> newFragIds = chosenFfCc.getFragIDs();
+            List<Integer> newFragIds = chosenFfCc.getFragIDs();
             int molIdNewFrag = newFragIds.get(0);
             BBType typeNewFrag = BBType.parseInt(newFragIds.get(1));
             int dapNewFrag = newFragIds.get(2);
@@ -2075,15 +2075,15 @@ public class GraphOperations
 
     private static class FragForClosabChains
     {
-        private ArrayList<ClosableChain> compatChains;
-        private ArrayList<ClosableChain> incompatChains;
-        private ArrayList<Integer> fragIds;
+        private List<ClosableChain> compatChains;
+        private List<ClosableChain> incompatChains;
+        private List<Integer> fragIds;
 
         //----------------------------------------------------------------------
 
-        public FragForClosabChains(ArrayList<ClosableChain> compatChains,
-                                   ArrayList<ClosableChain> incompatChains,
-                                   ArrayList<Integer> fragIds)
+        public FragForClosabChains(List<ClosableChain> compatChains,
+                                   List<ClosableChain> incompatChains,
+                                   List<Integer> fragIds)
         {
             this.compatChains = compatChains;
             this.incompatChains = incompatChains;
@@ -2099,21 +2099,21 @@ public class GraphOperations
 
         //----------------------------------------------------------------------
 
-        public ArrayList<ClosableChain> getCompatibleCC()
+        public List<ClosableChain> getCompatibleCC()
         {
             return compatChains;
         }
 
         //----------------------------------------------------------------------
 
-        public ArrayList<ClosableChain> getIncompatibleCC()
+        public List<ClosableChain> getIncompatibleCC()
         {
             return incompatChains;
         }
 
         //----------------------------------------------------------------------
 
-        public ArrayList<Integer> getFragIDs()
+        public List<Integer> getFragIDs()
         {
             return fragIds;
         }
@@ -2128,14 +2128,14 @@ public class GraphOperations
      * closable chains. Only works for scaffold.
      */
 
-    protected static ArrayList<FragForClosabChains> getFragmentForClosableChain(
+    protected static List<FragForClosabChains> getFragmentForClosableChain(
                                                        Vertex curVertex,
                                                        int dapidx,
                                                        DGraph molGraph)
                                                        throws DENOPTIMException
     {
         // Select candidate fragments respecting the closability conditions
-        ArrayList<FragForClosabChains> lstChosenFfCc = 
+        List<FragForClosabChains> lstChosenFfCc = 
                                         new ArrayList<FragForClosabChains>();
 
         if (molGraph.getClosableChains().size() == 0)
@@ -2193,7 +2193,7 @@ public class GraphOperations
                     }
                 }
 
-                ArrayList<Integer> eligibleFrgId = new ArrayList<Integer>();
+                List<Integer> eligibleFrgId = new ArrayList<Integer>();
                 eligibleFrgId.add(nfid);
                 eligibleFrgId.add(nfty.toOldInt());
                 eligibleFrgId.add(nfap);
@@ -2215,9 +2215,9 @@ public class GraphOperations
                 }
                 if (!found)
                 {
-                    ArrayList<ClosableChain> compatChains =
+                    List<ClosableChain> compatChains =
                                                 new ArrayList<ClosableChain>();
-                    ArrayList<ClosableChain> incompatChains =
+                    List<ClosableChain> incompatChains =
                                                 new ArrayList<ClosableChain>();
                     for (FragForClosabChains otherFfCc : lstChosenFfCc)
                     {
@@ -2301,7 +2301,7 @@ public class GraphOperations
                     }
                 }
 
-                ArrayList<Integer> eligibleFrgId = new ArrayList<Integer>();
+                List<Integer> eligibleFrgId = new ArrayList<Integer>();
                 eligibleFrgId.add(nfid);
                 eligibleFrgId.add(nfty.toOldInt());
                 eligibleFrgId.add(nfap);
@@ -2323,9 +2323,9 @@ public class GraphOperations
                 }
                 if (!found)
                 {
-                    ArrayList<ClosableChain> compatChains =
+                    List<ClosableChain> compatChains =
                                                 new ArrayList<ClosableChain>();
-                    ArrayList<ClosableChain> incompatChains =
+                    List<ClosableChain> incompatChains =
                                                 new ArrayList<ClosableChain>();
                     for (FragForClosabChains otherFfCc : lstChosenFfCc)
                     {

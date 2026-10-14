@@ -551,8 +551,8 @@ public class DummyAtomHandler
         vNorm.normalize();
 
         // Rotate the normal vector to check different angles
-        ArrayList<Vector3d> allAttempts = new ArrayList<Vector3d>();
-        ArrayList<Double> allAttemptsMinVal = new ArrayList<Double>();
+        List<Vector3d> allAttempts = new ArrayList<Vector3d>();
+        List<Double> allAttemptsMinVal = new ArrayList<Double>();
         double angStep = 22.0;
         double maxStepD =  360.0 / angStep;
         int maxStep = (int) maxStepD;

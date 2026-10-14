@@ -81,7 +81,7 @@ public class FormulaUtilsTest
     public void testParsingOfCSDFormula() throws Exception
     {
         String formula = "H2 O";
-        Map<String, ArrayList<Double>> elCounts = FormulaUtils.parseCSDFormula(formula);
+        Map<String, List<Double>> elCounts = FormulaUtils.parseCSDFormula(formula);
         assertEquals("H 2.0 2.0 O 1.0 1.0",convertToString(elCounts));
         
         formula = "H2 O1";
@@ -162,7 +162,7 @@ public class FormulaUtilsTest
     
 //------------------------------------------------------------------------------
     
-    private String convertToString(Map<String, ArrayList<Double>> elCounts)
+    private String convertToString(Map<String, List<Double>> elCounts)
     {
         List<String> els = new ArrayList<String>();
         els.addAll(elCounts.keySet());

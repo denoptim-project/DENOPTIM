@@ -20,6 +20,7 @@ package denoptim.fitness;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.openscience.cdk.qsar.IDescriptor;
 
@@ -54,7 +55,7 @@ public class Variable
     /**
      * SMARTS strings used to select atom/bond specific values.
      */
-    protected ArrayList<String> smarts;
+    protected List<String> smarts;
     
     /**
      * Definition of custom parameters for the configuration of the descriptor
@@ -91,7 +92,7 @@ public class Variable
     public static Variable atomSpecific(String varName, String descName, 
             String smartsIdentifier)
     {
-        ArrayList<String> smarts = new ArrayList<String>(Arrays.asList(
+        List<String> smarts = new ArrayList<String>(Arrays.asList(
                 smartsIdentifier.split("\\s+")));
         Variable v = new Variable(varName);
         v.setDescriptorName(descName);
@@ -162,7 +163,7 @@ public class Variable
      * Set the list of smarts used to identify atom/bond-specific values.
      * @param smarts the list of SMARTS string
      */
-    public void setSMARTS(ArrayList<String> smarts)
+    public void setSMARTS(List<String> smarts)
     {
         this.smarts = smarts;
     }

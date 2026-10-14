@@ -1,6 +1,6 @@
 package stringconverter;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 
@@ -58,7 +58,7 @@ public class StringConverter
                 input = DenoptimIO.readSDFFile(inpFileName).get(0).getProperty(
                         inpFormat.toString()).toString();
             } else if (inpFileName.endsWith(".txt")) {
-                ArrayList<String> lines = DenoptimIO.readList(inpFileName);
+                List<String> lines = DenoptimIO.readList(inpFileName);
                 switch (inpFormat) 
                 {
                     case GRAPHENC:

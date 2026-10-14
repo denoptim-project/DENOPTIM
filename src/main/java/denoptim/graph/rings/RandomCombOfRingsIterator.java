@@ -121,7 +121,7 @@ public class RandomCombOfRingsIterator implements Iterator<List<Ring>>
                 // NB: closability is evaluated on the original
                 if (PathClosabilityTools.isCloseable(path, originalMol, settings))
                 {
-                    ArrayList<Vertex> arrLst = new ArrayList<Vertex>();
+                    List<Vertex> arrLst = new ArrayList<Vertex>();
                     arrLst.addAll(path.getVertecesPath());                    
                     Ring ring = new Ring(arrLst);
 

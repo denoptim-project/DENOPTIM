@@ -236,7 +236,7 @@ public class FragmentClustererTest
         
         if (manualDebug)
         {
-            ArrayList<IAtomContainer> mols = new ArrayList<IAtomContainer>();
+            List<IAtomContainer> mols = new ArrayList<IAtomContainer>();
             for (int i=0; i<sample.size(); i++)
             {
                 mols.add(getMol(sample.get(i).getOriginalFragment()));
@@ -258,14 +258,14 @@ public class FragmentClustererTest
         
         if (manualDebug)
         {
-            ArrayList<IAtomContainer> mols = new ArrayList<IAtomContainer>();
+            List<IAtomContainer> mols = new ArrayList<IAtomContainer>();
             for (int i=0; i<fc.getTransformedClusters().get(0).size(); i++)
             {
                 mols.add(getMol(fc.getTransformedClusters().get(0).get(i)));
             }
             DenoptimIO.writeSDFFile("/tmp/transformed.sdf", mols);
             
-            ArrayList<IAtomContainer> mols2 = new ArrayList<IAtomContainer>();
+            List<IAtomContainer> mols2 = new ArrayList<IAtomContainer>();
             for (int i=0; i<sample.size(); i++)
             {
                 mols2.add(getMol(sample.get(i).getOriginalFragment()));
@@ -469,7 +469,7 @@ public class FragmentClustererTest
         
         if (manualDebug)
         {
-            ArrayList<Vertex> lstVrtx = new ArrayList<Vertex>();
+            List<Vertex> lstVrtx = new ArrayList<Vertex>();
             for (ClusterableFragment cf : sample)
                 lstVrtx.add(cf.getOriginalFragment());
             DenoptimIO.writeVertexesToFile(new File("/tmp/vertexes.sdf"), 
@@ -477,7 +477,7 @@ public class FragmentClustererTest
             
             for (int i=0; i<fc.getClusters().size(); i++)
             {
-                ArrayList<IAtomContainer> mols = new ArrayList<IAtomContainer>();
+                List<IAtomContainer> mols = new ArrayList<IAtomContainer>();
                 for (ClusterableFragment cf : fc.getClusters().get(i).getPoints())
                 {
                     mols.add(getMol(cf.getTransformedCopy()));
@@ -485,7 +485,7 @@ public class FragmentClustererTest
                 DenoptimIO.writeSDFFile("/tmp/cluster_"+i+".sdf", mols);
                 
                 
-                ArrayList<IAtomContainer> molsTrs = new ArrayList<IAtomContainer>();
+                List<IAtomContainer> molsTrs = new ArrayList<IAtomContainer>();
                 for (Fragment f : fc.getTransformedClusters().get(i))
                 {
                     molsTrs.add(getMol(f));
@@ -589,7 +589,7 @@ public class FragmentClustererTest
         
         // Keep this code: it might be useful to look at the geometries.
         /*
-        ArrayList<Vertex> lstVrtx = new ArrayList<Vertex>();
+        List<Vertex> lstVrtx = new ArrayList<Vertex>();
         for (ClusterableFragment cf : sample)
             lstVrtx.add(cf.getOriginalFragment());
         DenoptimIO.writeVertexesToFile(new File("/tmp/cf.sdf"), 

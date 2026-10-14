@@ -108,8 +108,8 @@ public class CompatibilityMatrixForm extends JPanel {
      * Data structure that stored the true entries of the 
      * attachment point classes compatibility matrix
      */
-    private HashMap<APClass, ArrayList<APClass>> compatMap = 
-    			new HashMap<APClass, ArrayList<APClass>>();
+    private HashMap<APClass, List<APClass>> compatMap = 
+    			new HashMap<APClass, List<APClass>>();
 
     /**
      * Data structure that stores the AP-classes to be used to cap unused
@@ -308,7 +308,7 @@ public class CompatibilityMatrixForm extends JPanel {
                         }
                 	}
 
-	                ArrayList<APClass> trgCPClasses = new ArrayList<APClass>();
+	                List<APClass> trgCPClasses = new ArrayList<APClass>();
 	                for (Integer id : trgClsList.getSelectedIndices())
 	                {
 	                	if (id.intValue() == (trgAPCs.size()-1))
@@ -370,7 +370,7 @@ public class CompatibilityMatrixForm extends JPanel {
         		300));
         btnCopyCompRul.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-            	ArrayList<String> selected = new ArrayList<String>();
+            	List<String> selected = new ArrayList<String>();
             	for (Component lineComponent : panelCPRules.getComponents())
             	{
             		if (lineComponent instanceof CompatibilityRuleLine)
@@ -425,7 +425,7 @@ public class CompatibilityMatrixForm extends JPanel {
                                 //should never happen
                                 e1.printStackTrace();
                             }
-                    		ArrayList<APClass> newTrg = 
+                    		List<APClass> newTrg = 
                     		        new ArrayList<APClass>();
                     		try
                             {
@@ -1139,7 +1139,7 @@ public class CompatibilityMatrixForm extends JPanel {
 	protected void importCPMapFromFile(JComponent parent, File inFile)
 	{	
 		//Read data from file
-        compatMap = new HashMap<APClass,ArrayList<APClass>>();
+        compatMap = new HashMap<APClass,List<APClass>>();
         cappingMap = new HashMap<APClass,APClass>();
         forbiddenEndList = new HashSet<APClass>();
         try {
@@ -1230,7 +1230,7 @@ public class CompatibilityMatrixForm extends JPanel {
         }
         
         // Get sorted list of table rows
-		ArrayList<APClass> sortedCappings = new ArrayList<APClass>();
+		List<APClass> sortedCappings = new ArrayList<APClass>();
 	    sortedCappings.addAll(cappingMap.keySet());
 	    Collections.sort(sortedCappings);
 	    
@@ -1255,7 +1255,7 @@ public class CompatibilityMatrixForm extends JPanel {
         }
 		
         // Get sorted list of table rows
-        ArrayList<APClass> sortedFrbEnds = new ArrayList<APClass>();
+        List<APClass> sortedFrbEnds = new ArrayList<APClass>();
         sortedFrbEnds.addAll(forbiddenEndList);
         Collections.sort(sortedFrbEnds);
         
@@ -1284,7 +1284,7 @@ public class CompatibilityMatrixForm extends JPanel {
 		
 		allAPClasses.addAll(compatMap.keySet());
 		
-		for (ArrayList<APClass> apcs : compatMap.values())
+		for (List<APClass> apcs : compatMap.values())
 		{
 			allAPClasses.addAll(apcs);
 		}
@@ -1492,7 +1492,7 @@ public class CompatibilityMatrixForm extends JPanel {
 
 	                if (trgClsList.getSelectedIndices().length > 0)
 	                {
-		                ArrayList<APClass> trgCPClasses = 
+		                List<APClass> trgCPClasses = 
 		                        new ArrayList<APClass>();
 		                for (Integer id : trgClsList.getSelectedIndices())
 		                {

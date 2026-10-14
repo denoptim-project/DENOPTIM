@@ -73,7 +73,7 @@ public class FragmentSpace
      * meaningful value for the two indexes representing the type of building
      * block and the position of the list of all building blocks of that type.
      */
-    private ArrayList<Vertex> scaffoldLib = null;
+    private List<Vertex> scaffoldLib = null;
 
     /**
      * Data structure containing the molecular representation of building
@@ -82,7 +82,7 @@ public class FragmentSpace
      * indexes representing the type of building block and the position of the
      * list of all building blocks of that type.
      */
-    private ArrayList<Vertex> fragmentLib = null;
+    private List<Vertex> fragmentLib = null;
 
     /**
      * Data structure containing the molecular representation of building
@@ -92,25 +92,25 @@ public class FragmentSpace
      * indexes representing the type of building block and the position of the
      * list of all building blocks of that type.
      */
-    private ArrayList<Vertex> cappingLib = null;
+    private List<Vertex> cappingLib = null;
 
     /**
      * Data structure that stored the true entries of the attachment point
      * classes compatibility matrix
      */
-    private HashMap<APClass, ArrayList<APClass>> apClassCompatibilityMatrix;
+    private HashMap<APClass, List<APClass>> apClassCompatibilityMatrix;
 
     /**
      * Store references to the Ring-Closing Vertexes found in the library of 
      * fragments.
      */
-    private ArrayList<Vertex> rcvs = new ArrayList<Vertex>();
+    private List<Vertex> rcvs = new ArrayList<Vertex>();
     
     /**
      * Data structure that stores compatible APclasses for joining APs in
      * ring-closing bonds. Symmetric, purpose specific compatibility matrix.
      */
-    private HashMap<APClass, ArrayList<APClass>> rcCompatMap;
+    private HashMap<APClass, List<APClass>> rcCompatMap;
 
     /**
      * Data structure that stores the AP-classes to be used to cap unused APS on
@@ -126,22 +126,22 @@ public class FragmentSpace
     /**
      * Clusters of fragments based on the number of APs
      */
-    private HashMap<Integer, ArrayList<Integer>> fragPoolPerNumAP = 
-            new HashMap<Integer,ArrayList<Integer>>();
+    private HashMap<Integer, List<Integer>> fragPoolPerNumAP = 
+            new HashMap<Integer,List<Integer>>();
 
     /**
      * List of APClasses per each fragment
      */
-    private HashMap<Integer, ArrayList<APClass>> apClassesPerFrag =
-            new HashMap<Integer,ArrayList<APClass>>();
+    private HashMap<Integer, List<APClass>> apClassesPerFrag =
+            new HashMap<Integer,List<APClass>>();
 
     /**
      * Clusters of fragments'AP based on AP classes. The inner list of indexes
      * is a ordered pair defining at position 0 the index of the vertex, and  
      * the index of the AP at position 1.
      */
-    private HashMap<APClass, ArrayList<ArrayList<Integer>>> fragsApsPerApClass =
-            new HashMap<APClass,ArrayList<ArrayList<Integer>>>();
+    private HashMap<APClass, List<List<Integer>>> fragsApsPerApClass =
+            new HashMap<APClass,List<List<Integer>>>();
     
     /**
      * Lock for synchronizing tasks
@@ -234,13 +234,13 @@ public class FragmentSpace
      * @throws DENOPTIMException
      */
     public FragmentSpace(FragmentSpaceParameters settings,
-            ArrayList<Vertex> scaffLib,
-            ArrayList<Vertex> fragLib,
-            ArrayList<Vertex> cappLib,
-            HashMap<APClass, ArrayList<APClass>> cpMap,
+            List<Vertex> scaffLib,
+            List<Vertex> fragLib,
+            List<Vertex> cappLib,
+            HashMap<APClass, List<APClass>> cpMap,
             HashMap<APClass, APClass> capMap,
             HashSet<APClass> forbEnds,
-            HashMap<APClass, ArrayList<APClass>> rcCpMap)
+            HashMap<APClass, List<APClass>> rcCpMap)
             throws DENOPTIMException
     {
         define(settings, scaffLib, fragLib, cappLib, cpMap, capMap, forbEnds, 
@@ -272,13 +272,13 @@ public class FragmentSpace
      * @throws DENOPTIMException
      */
     public FragmentSpace(FragmentSpaceParameters settings,
-            ArrayList<Vertex> scaffLib,
-            ArrayList<Vertex> fragLib,
-            ArrayList<Vertex> cappLib,
-            HashMap<APClass, ArrayList<APClass>> cpMap,
+            List<Vertex> scaffLib,
+            List<Vertex> fragLib,
+            List<Vertex> cappLib,
+            HashMap<APClass, List<APClass>> cpMap,
             HashMap<APClass, APClass> capMap,
             HashSet<APClass> forbEnds,
-            HashMap<APClass, ArrayList<APClass>> rcCpMap,
+            HashMap<APClass, List<APClass>> rcCpMap,
             HashMap<APClass, Double> symCntrMap)
             throws DENOPTIMException
     {
@@ -311,8 +311,8 @@ public class FragmentSpace
             String fragFile, String capFile, String cpmFile, String rcpmFile,
             HashMap<APClass, Double> symCntrMap) throws DENOPTIMException
     {   
-        HashMap<APClass, ArrayList<APClass>> cpMap = 
-                new HashMap<APClass, ArrayList<APClass>>();
+        HashMap<APClass, List<APClass>> cpMap = 
+                new HashMap<APClass, List<APClass>>();
         HashMap<APClass, APClass> capMap = new HashMap<APClass, APClass>();
         HashSet<APClass> forbEnds = new HashSet<APClass>();
         if (cpmFile.length() > 0)
@@ -321,14 +321,14 @@ public class FragmentSpace
                     forbEnds);
         }
 
-        HashMap<APClass, ArrayList<APClass>> rcCpMap = 
-                new HashMap<APClass, ArrayList<APClass>>();
+        HashMap<APClass, List<APClass>> rcCpMap = 
+                new HashMap<APClass, List<APClass>>();
         if (rcpmFile != null && rcpmFile.length() > 0)
         {
             DenoptimIO.readRCCompatibilityMatrix(rcpmFile, rcCpMap);
         }
         
-        ArrayList<Vertex> cappLib = new ArrayList<Vertex>();
+        List<Vertex> cappLib = new ArrayList<Vertex>();
         if (capFile.length() > 0)
         {
             try
@@ -347,7 +347,7 @@ public class FragmentSpace
             }
         }
         
-        ArrayList<Vertex> fragLib = new ArrayList<Vertex>();
+        List<Vertex> fragLib = new ArrayList<Vertex>();
         if (fragFile != null && fragFile.length() > 0)
         {
             try
@@ -366,7 +366,7 @@ public class FragmentSpace
             }
         }
         
-        ArrayList<Vertex> scaffLib = new ArrayList<Vertex>();
+        List<Vertex> scaffLib = new ArrayList<Vertex>();
         if (scaffFile != null && scaffFile.length() > 0)
         {
             try
@@ -413,13 +413,13 @@ public class FragmentSpace
      * @throws DENOPTIMException
      */
     private void define(FragmentSpaceParameters settings,
-            ArrayList<Vertex> scaffLib,
-            ArrayList<Vertex> fragLib,
-            ArrayList<Vertex> cappLib,
-            HashMap<APClass, ArrayList<APClass>> cpMap,
+            List<Vertex> scaffLib,
+            List<Vertex> fragLib,
+            List<Vertex> cappLib,
+            HashMap<APClass, List<APClass>> cpMap,
             HashMap<APClass, APClass> capMap,
             HashSet<APClass> forbEnds,
-            HashMap<APClass, ArrayList<APClass>> rcCpMap,
+            HashMap<APClass, List<APClass>> rcCpMap,
             HashMap<APClass, Double> symCntrMap)
             throws DENOPTIMException
     {
@@ -683,7 +683,7 @@ public class FragmentSpace
         if (rcnCap == null)
             return -1;
 
-        ArrayList<Integer> reacFrags = getCompatibleCappingFragments(rcnCap);
+        List<Integer> reacFrags = getCompatibleCappingFragments(rcnCap);
 
         int fapidx = -1;
         if (reacFrags.size() > 0)
@@ -702,14 +702,14 @@ public class FragmentSpace
      * @return a list of compatible capping groups
      */
 
-    public ArrayList<Integer> getCompatibleCappingFragments(
+    public List<Integer> getCompatibleCappingFragments(
             APClass cmpReac)
     {
-        ArrayList<Integer> lstFragIdx = new ArrayList<>();
+        List<Integer> lstFragIdx = new ArrayList<>();
         for (int i=0; i<cappingLib.size(); i++)
         {
                 Vertex mol = getCappingLibrary().get(i);
-            ArrayList<APClass> lstRcn = mol.getAllAPClasses();
+            List<APClass> lstRcn = mol.getAllAPClasses();
             if (lstRcn.contains(cmpReac))
                 lstFragIdx.add(i);
         }
@@ -741,21 +741,21 @@ public class FragmentSpace
 
 //------------------------------------------------------------------------------
 
-    public ArrayList<Vertex> getScaffoldLibrary()
+    public List<Vertex> getScaffoldLibrary()
     {
         return scaffoldLib;
     }
 
 //------------------------------------------------------------------------------
 
-    public ArrayList<Vertex> getFragmentLibrary()
+    public List<Vertex> getFragmentLibrary()
     {
         return fragmentLib;
     }
 
 //------------------------------------------------------------------------------
 
-    public ArrayList<Vertex> getCappingLibrary()
+    public List<Vertex> getCappingLibrary()
     {
         return cappingLib;
     }
@@ -767,9 +767,9 @@ public class FragmentSpace
      * @return all the capping groups which have the given {@link APClass}.
      */
 
-    public ArrayList<Integer> getCappingGroupsWithAPClass(APClass capApCls)
+    public List<Integer> getCappingGroupsWithAPClass(APClass capApCls)
     {
-        ArrayList<Integer> selected = new ArrayList<>();
+        List<Integer> selected = new ArrayList<>();
         for (int i = 0; i < cappingLib.size(); i++)
         {
             APClass apc = cappingLib.get(i).getAP(0).getAPClass();
@@ -824,7 +824,7 @@ public class FragmentSpace
     public void importCompatibilityMatrixFromFile(String inFile)
             throws DENOPTIMException
     {
-        setCompatibilityMatrix(new HashMap<APClass, ArrayList<APClass>>());
+        setCompatibilityMatrix(new HashMap<APClass, List<APClass>>());
         setCappingMap(new HashMap<APClass, APClass>());
         setForbiddenEndList(new HashSet<APClass>());
         DenoptimIO.readCompatibilityMatrix(inFile, apClassCompatibilityMatrix,
@@ -843,13 +843,13 @@ public class FragmentSpace
     public void importRCCompatibilityMatrixFromFile(String inFile)
             throws DENOPTIMException
     {
-        setRCCompatibilityMatrix(new HashMap<APClass, ArrayList<APClass>>());
+        setRCCompatibilityMatrix(new HashMap<APClass, List<APClass>>());
         DenoptimIO.readRCCompatibilityMatrix(inFile, rcCompatMap);
     }
 
 //------------------------------------------------------------------------------
 
-    public HashMap<APClass, ArrayList<APClass>> getCompatibilityMatrix()
+    public HashMap<APClass, List<APClass>> getCompatibilityMatrix()
     {
         return apClassCompatibilityMatrix;
     }
@@ -862,7 +862,7 @@ public class FragmentSpace
      * @param apc
      * @return the list of compatible APClasses. Can be empty but not null.
      */
-    public ArrayList<APClass> getCompatibleAPClasses(APClass apc)
+    public List<APClass> getCompatibleAPClasses(APClass apc)
     {   
         if (apClassCompatibilityMatrix!= null && apClassCompatibilityMatrix.containsKey(apc))
         {
@@ -880,7 +880,7 @@ public class FragmentSpace
      * @return
      */
 
-    public HashMap<APClass, ArrayList<APClass>> getRCCompatibilityMatrix()
+    public HashMap<APClass, List<APClass>> getRCCompatibilityMatrix()
     {
         return rcCompatMap;
     }
@@ -930,7 +930,7 @@ public class FragmentSpace
 
 //------------------------------------------------------------------------------
 
-    public HashMap<Integer, ArrayList<Integer>> getMapOfFragsPerNumAps()
+    public HashMap<Integer, List<Integer>> getMapOfFragsPerNumAps()
     {
         return fragPoolPerNumAP;
     }
@@ -944,9 +944,9 @@ public class FragmentSpace
      * @return the list of fragments as indexes in the library of fragments.
      */
 
-    public ArrayList<Integer> getFragsWithNumAps(int nAps)
+    public List<Integer> getFragsWithNumAps(int nAps)
     {
-        ArrayList<Integer> lst = new ArrayList<>();
+        List<Integer> lst = new ArrayList<>();
         if (fragPoolPerNumAP.containsKey(nAps))
         {
             lst = fragPoolPerNumAP.get(nAps);
@@ -963,7 +963,7 @@ public class FragmentSpace
      * @return the list of APclasses found of the fragment
      */
 
-    public ArrayList<APClass> getAPClassesPerFragment(int fragId)
+    public List<APClass> getAPClassesPerFragment(int fragId)
     {
         synchronized (LOCK)
         {
@@ -983,15 +983,15 @@ public class FragmentSpace
      * @return the list of AP identifiers.
      */
 
-    public ArrayList<IdFragmentAndAP> getFragsWithAPClass(APClass apc)
+    public List<IdFragmentAndAP> getFragsWithAPClass(APClass apc)
     {
-        ArrayList<IdFragmentAndAP> lst = new ArrayList<IdFragmentAndAP>();
+        List<IdFragmentAndAP> lst = new ArrayList<IdFragmentAndAP>();
 
         synchronized (LOCK)
         {
             if (fragsApsPerApClass.containsKey(apc))
             {
-                for (ArrayList<Integer> idxs : fragsApsPerApClass.get(apc))
+                for (List<Integer> idxs : fragsApsPerApClass.get(apc))
                 {
                     IdFragmentAndAP apId = new IdFragmentAndAP(-1, // vertexId
                             idxs.get(0), // MolId,
@@ -1013,9 +1013,9 @@ public class FragmentSpace
      * @return the list of matching vertexes from the library.
      */
 
-    public ArrayList<Vertex> getVerticesWithAPClass(APClass apc)
+    public List<Vertex> getVerticesWithAPClass(APClass apc)
     {
-        ArrayList<Vertex> lst = new ArrayList<Vertex>();
+        List<Vertex> lst = new ArrayList<Vertex>();
         
         synchronized (LOCK)
         {
@@ -1141,11 +1141,11 @@ public class FragmentSpace
      * fragments.
      * @return a list of fragments.
      */
-    public ArrayList<Vertex> getFragmentsCompatibleWithTheseAPs(
-            ArrayList<IdFragmentAndAP> srcAPs)
+    public List<Vertex> getFragmentsCompatibleWithTheseAPs(
+            List<IdFragmentAndAP> srcAPs)
     {
         // First we get all possible APs on any fragment
-        ArrayList<IdFragmentAndAP> compatFragAps = 
+        List<IdFragmentAndAP> compatFragAps = 
                 getFragAPsCompatibleWithTheseAPs(srcAPs);
 
         // then keep unique fragment identifiers, and store unique
@@ -1156,7 +1156,7 @@ public class FragmentSpace
         }
 
         // Then we pack-up the selected list of fragments
-        ArrayList<Vertex> compatFrags = new ArrayList<Vertex>();
+        List<Vertex> compatFrags = new ArrayList<Vertex>();
         for (Integer fid : compatFragIds)
         {
             try {
@@ -1255,15 +1255,15 @@ public class FragmentSpace
      * @return a list of compatible attachment points found in the library of
      * fragments.
      */
-    public ArrayList<AttachmentPoint> getAPsCompatibleWithThese(
-                    ArrayList<AttachmentPoint> srcAPs)
+    public List<AttachmentPoint> getAPsCompatibleWithThese(
+                    List<AttachmentPoint> srcAPs)
     {
-        ArrayList<AttachmentPoint> compAps = 
+        List<AttachmentPoint> compAps = 
                 new ArrayList<AttachmentPoint>();
         boolean first = true;
         for (AttachmentPoint ap : srcAPs)
         { 
-            ArrayList<AttachmentPoint> compForOne = 
+            List<AttachmentPoint> compForOne = 
                     getAPsCompatibleWithClass(ap.getAPClass());
 
             if (first)
@@ -1273,7 +1273,7 @@ public class FragmentSpace
                 continue;
             }
             
-            ArrayList<AttachmentPoint> toKeep = 
+            List<AttachmentPoint> toKeep = 
                     new ArrayList<AttachmentPoint>();
             for (AttachmentPoint candAp : compAps)
             {
@@ -1306,15 +1306,15 @@ public class FragmentSpace
      * fragments.
      * @return a list of identifiers for APs on fragments in the library.
      */
-    public ArrayList<IdFragmentAndAP> getFragAPsCompatibleWithTheseAPs(
-            ArrayList<IdFragmentAndAP> srcAPs)
+    public List<IdFragmentAndAP> getFragAPsCompatibleWithTheseAPs(
+            List<IdFragmentAndAP> srcAPs)
     {
-        ArrayList<IdFragmentAndAP> compFrAps = new ArrayList<IdFragmentAndAP>();
+        List<IdFragmentAndAP> compFrAps = new ArrayList<IdFragmentAndAP>();
         boolean first = true;
         for (IdFragmentAndAP apId : srcAPs)
         {
             APClass srcApCls = getAPClassForFragment(apId);
-            ArrayList<IdFragmentAndAP> compForOne = 
+            List<IdFragmentAndAP> compForOne = 
                     getFragAPsCompatibleWithClass(srcApCls);
 
             if (first)
@@ -1324,7 +1324,7 @@ public class FragmentSpace
                 continue;
             }
 
-            ArrayList<IdFragmentAndAP> toKeep = 
+            List<IdFragmentAndAP> toKeep = 
                     new ArrayList<IdFragmentAndAP>();
             for (IdFragmentAndAP candAp : compFrAps)
             {
@@ -1359,21 +1359,21 @@ public class FragmentSpace
      * @param aPC1 the AP class for which we want compatible APs.
      */
     
-    public ArrayList<AttachmentPoint> getAPsCompatibleWithClass(
+    public List<AttachmentPoint> getAPsCompatibleWithClass(
                     APClass aPC1)
     {
-        ArrayList<AttachmentPoint> compatAps = 
+        List<AttachmentPoint> compatAps = 
                 new ArrayList<AttachmentPoint>();
         
         // Take the compatible AP classes
-        ArrayList<APClass> compatApClasses = getCompatibleAPClasses(aPC1);
+        List<APClass> compatApClasses = getCompatibleAPClasses(aPC1);
         
         // Find all APs with a compatible class
         if (compatApClasses != null)
         {
             for (APClass klass : compatApClasses)
             {
-                ArrayList<Vertex> vrtxs = getVerticesWithAPClass(klass);
+                List<Vertex> vrtxs = getVerticesWithAPClass(klass);
                 for (Vertex v : vrtxs)
                 {
                     for (AttachmentPoint ap : v.getAttachmentPoints())
@@ -1406,14 +1406,14 @@ public class FragmentSpace
      * @param aPC1 the AP class for which we want compatible APs.
      */
 
-    public ArrayList<IdFragmentAndAP> getFragAPsCompatibleWithClass(
+    public List<IdFragmentAndAP> getFragAPsCompatibleWithClass(
             APClass aPC1)
     {
-        ArrayList<IdFragmentAndAP> compatFragAps = 
+        List<IdFragmentAndAP> compatFragAps = 
                 new ArrayList<IdFragmentAndAP>();
 
         // Take the compatible AP classes
-        ArrayList<APClass> compatApClasses = getCompatibleAPClasses(aPC1);
+        List<APClass> compatApClasses = getCompatibleAPClasses(aPC1);
 
         // Find all APs with any compatible class
         if (compatApClasses != null)
@@ -1496,13 +1496,13 @@ public class FragmentSpace
 
 //------------------------------------------------------------------------------
 
-    public void setScaffoldLibrary(ArrayList<Vertex> lib)
+    public void setScaffoldLibrary(List<Vertex> lib)
     {
         scaffoldLib = new ArrayList<Vertex>();
         appendVerticesToLibrary(lib, BBType.SCAFFOLD, scaffoldLib);
     }
 
-    public void setFragmentLibrary(ArrayList<Vertex> lib)
+    public void setFragmentLibrary(List<Vertex> lib)
     {
         fragmentLib = new ArrayList<Vertex>();
         appendVerticesToLibrary(lib, BBType.FRAGMENT, fragmentLib);
@@ -1510,7 +1510,7 @@ public class FragmentSpace
 
 //------------------------------------------------------------------------------
 
-    public void setCappingLibrary(ArrayList<Vertex> lib)
+    public void setCappingLibrary(List<Vertex> lib)
     {
         cappingLib = new ArrayList<Vertex>();
         appendVerticesToLibrary(lib, BBType.CAP, cappingLib);
@@ -1518,7 +1518,7 @@ public class FragmentSpace
 
 //------------------------------------------------------------------------------
 
-    public void setCompatibilityMatrix(HashMap<APClass, ArrayList<APClass>> map)
+    public void setCompatibilityMatrix(HashMap<APClass, List<APClass>> map)
     {
         apClassCompatibilityMatrix = map;
     }
@@ -1526,7 +1526,7 @@ public class FragmentSpace
 //------------------------------------------------------------------------------
 
     public void setRCCompatibilityMatrix(HashMap<APClass, 
-            ArrayList<APClass>> map)
+            List<APClass>> map)
     {
         rcCompatMap = map;
     }
@@ -1567,9 +1567,9 @@ public class FragmentSpace
         rcCompatMap = null;
         cappingMap = null;
         forbiddenEndList = null;
-        fragPoolPerNumAP = new HashMap<Integer,ArrayList<Integer>>();
-        apClassesPerFrag = new HashMap<Integer,ArrayList<APClass>>();
-        fragsApsPerApClass = new HashMap<APClass,ArrayList<ArrayList<Integer>>>();
+        fragPoolPerNumAP = new HashMap<Integer,List<Integer>>();
+        apClassesPerFrag = new HashMap<Integer,List<APClass>>();
+        fragsApsPerApClass = new HashMap<APClass,List<List<Integer>>>();
         symmConstraints = null;
         isValid = false;
     }
@@ -1585,8 +1585,8 @@ public class FragmentSpace
      * @param library where to import the vertices to.
      */
     
-    public void appendVerticesToLibrary(ArrayList<Vertex> list, 
-            Vertex.BBType bbt, ArrayList<Vertex> library)
+    public void appendVerticesToLibrary(List<Vertex> list, 
+            Vertex.BBType bbt, List<Vertex> library)
     {
         for (Vertex v : list)
         {
@@ -1606,7 +1606,7 @@ public class FragmentSpace
      */
     
     public void appendVertexToLibrary(Vertex v, 
-            Vertex.BBType bbt, ArrayList<Vertex> library)
+            Vertex.BBType bbt, List<Vertex> library)
     {
         v.setBuildingBlockId(library.size());
         v.setBuildingBlockType(bbt);
@@ -1719,7 +1719,7 @@ public class FragmentSpace
                 continue;
             }
 
-            ArrayList<Vertex> library = type == BBType.FRAGMENT ?
+            List<Vertex> library = type == BBType.FRAGMENT ?
                     fragmentLib : scaffoldLib;
             
             synchronized (LOCK)
@@ -1748,7 +1748,7 @@ public class FragmentSpace
                         } catch (DENOPTIMException e1)
                         {
                             e1.printStackTrace();
-                            ArrayList<DGraph> lst = new ArrayList<>();
+                            List<DGraph> lst = new ArrayList<>();
                             lst.add(graph);
                             lst.add(g);
                             String forDebugFile = "failedExtractIAC_" 
@@ -1852,7 +1852,7 @@ public class FragmentSpace
      * Returns the list of registered ring-closing vertexes (RCVs).
      * @return the list of registered ring-closing vertexes (RCVs).
      */
-    public ArrayList<Vertex> getRCVs()
+    public List<Vertex> getRCVs()
     {
         return rcvs;
     }
@@ -1947,7 +1947,7 @@ public class FragmentSpace
             }
             else
             {
-                ArrayList<Integer> lst = new ArrayList<>();
+                List<Integer> lst = new ArrayList<>();
                 lst.add(fragId);
                 getMapOfFragsPerNumAps().put(nAps,lst);
             }
@@ -1956,7 +1956,7 @@ public class FragmentSpace
     	if (useAPclassBasedApproach())
     	{
     	    // Collect classes per fragment
-    	    ArrayList<APClass> lstAPC = frg.getAllAPClasses();
+    	    List<APClass> lstAPC = frg.getAllAPClasses();
     	    synchronized (LOCK)
             {
     	        apClassesPerFrag.put(fragId,lstAPC);
@@ -1968,7 +1968,7 @@ public class FragmentSpace
     	    for (int j=0; j<lstAPs.size(); j++)
     	    {
     	        AttachmentPoint ap = lstAPs.get(j);
-    			ArrayList<Integer> apId = new ArrayList<Integer>();
+    			List<Integer> apId = new ArrayList<Integer>();
     			apId.add(fragId);
     			apId.add(j);
     			APClass cls = ap.getAPClass();
@@ -1984,8 +1984,8 @@ public class FragmentSpace
         			{
         		        fragsApsPerApClass.get(cls).add(apId);
         			} else {
-        			    ArrayList<ArrayList<Integer>> outLst = 
-        						    new ArrayList<ArrayList<Integer>>();
+        			    List<List<Integer>> outLst = 
+        						    new ArrayList<List<Integer>>();
         			    outLst.add(apId);
         			    fragsApsPerApClass.put(cls,outLst);
         			}

@@ -78,14 +78,14 @@ public class FormulaUtils
      * n-th entry of all other elements.
      * @throws DENOPTIMException
      */
-    public static Map<String, ArrayList<Double>> parseCSDFormula(String formula) 
+    public static Map<String, List<Double>> parseCSDFormula(String formula) 
             throws DENOPTIMException
     {
         //Parameter: maximum number of variable molecules
         int limSF = 6;
         
         //Element counts over the list of molecules in the formula
-        ArrayList<Map<String,Integer>> allAtmCounts = 
+        List<Map<String,Integer>> allAtmCounts = 
                 new ArrayList<Map<String,Integer>>();
 
         String[] mols = formula.split(",");
@@ -247,8 +247,8 @@ public class FormulaUtils
                 allEl.add(el);
 
         //report counting for all SINGLE molecules
-        Map<String,ArrayList<Double>> elemAnalFormula = 
-                new HashMap<String,ArrayList<Double>>();
+        Map<String,List<Double>> elemAnalFormula = 
+                new HashMap<String,List<Double>>();
         for (int i = 0; i < mols.length; i++)
         {
             for (String el : allEl)
@@ -386,7 +386,7 @@ public class FormulaUtils
             IAtomContainer mol, Logger logger) throws DENOPTIMException
     {
         // Elemental analysis of molecular formula (with possible variations)
-        Map<String,ArrayList<Double>> elemAnalFormula = 
+        Map<String,List<Double>> elemAnalFormula = 
                 FormulaUtils.parseCSDFormula(formula);
         if (logger!=null && logger.getLevel() == Level.FINEST)
         {

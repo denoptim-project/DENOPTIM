@@ -28,9 +28,9 @@ import java.nio.file.Path;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -152,7 +152,7 @@ public class ExternalCmdsListener implements Runnable
     
 	private void processExternalCmdFile(File file) 
 	{
-		ArrayList<String> lines = null;
+		List<String> lines = null;
 		try {
 			lines = DenoptimIO.readList(file.getAbsolutePath(), true);
 		} catch (DENOPTIMException e) {

@@ -465,7 +465,7 @@ public class FitnessParametersForm extends ParametersForm
 				Object[] params = iDesc.getParameters();
 				//NB: some classes return null to avoid adding a way to alter
 				// the default parameters.
-				ArrayList<Object> paramsTypes = new ArrayList<Object>();
+				List<Object> paramsTypes = new ArrayList<Object>();
 				if (params == null)
 				{
 					parStr = "Undeclared parameters. See source code.";

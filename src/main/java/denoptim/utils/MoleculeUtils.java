@@ -231,16 +231,16 @@ public class MoleculeUtils
             Logger logger) throws DENOPTIMException {
 
         // add ring-closing bonds
-        ArrayList<Vertex> usedRcvs = graph.getUsedRCVertices();
-        Map<Vertex,ArrayList<Integer>> vIdToAtmId =
+        List<Vertex> usedRcvs = graph.getUsedRCVertices();
+        Map<Vertex,List<Integer>> vIdToAtmId =
                 MoleculeUtils.getVertexToAtomIdMap(usedRcvs,mol);
         if (vIdToAtmId.size() == 0)
         {
             // No used RCV to remove.
             return;
         }
-        ArrayList<IAtom> atmsToRemove = new ArrayList<>();
-        ArrayList<Boolean> doneVertices =
+        List<IAtom> atmsToRemove = new ArrayList<>();
+        List<Boolean> doneVertices =
                 new ArrayList<>(Collections.nCopies(usedRcvs.size(),false));
 
         for (Vertex v : usedRcvs)
@@ -249,7 +249,7 @@ public class MoleculeUtils
             {
                 continue;
             }
-            ArrayList<Ring> rings = graph.getRingsInvolvingVertex(v);
+            List<Ring> rings = graph.getRingsInvolvingVertex(v);
             if (rings.size() != 1)
             {
                 String s = "Unexpected inconsistency between used RCV list "
@@ -289,7 +289,7 @@ public class MoleculeUtils
 	    }
         
         // Adapt atom indexes in APs to the upcoming change of atom list
-        ArrayList<Integer> removedIds = new ArrayList<Integer>();
+        List<Integer> removedIds = new ArrayList<Integer>();
         for (IAtom a : atmsToRemove)
         {
             removedIds.add(mol.indexOf(a));
@@ -598,17 +598,17 @@ public class MoleculeUtils
      * @return the map of atom indexes per each <code>DENOPTIMVertex</code> ID
      */
 
-    public static Map<Vertex,ArrayList<Integer>> getVertexToAtomIdMap(
+    public static Map<Vertex,List<Integer>> getVertexToAtomIdMap(
             List<Vertex> vertLst,
             IAtomContainer mol
     ) {
 
-        ArrayList<Long> vertIDs = new ArrayList<>();
+        List<Long> vertIDs = new ArrayList<>();
         for (Vertex v : vertLst) {
             vertIDs.add(v.getVertexId());
         }
 
-        Map<Vertex,ArrayList<Integer>> map = new HashMap<>();
+        Map<Vertex,List<Integer>> map = new HashMap<>();
         for (IAtom atm : mol.atoms())
         {
             long vID = Long.parseLong(atm.getProperty(
@@ -623,7 +623,7 @@ public class MoleculeUtils
                 }
                 else
                 {
-                    ArrayList<Integer> atmLst = new ArrayList<>();
+                    List<Integer> atmLst = new ArrayList<>();
                     atmLst.add(atmID);
                     map.put(v, atmLst);
                 }
@@ -1263,7 +1263,7 @@ public class MoleculeUtils
                     return not2or3D;
                 }
             }
-            ArrayList<Double> pointer = new ArrayList<Double>();
+            List<Double> pointer = new ArrayList<Double>();
             try {
                 if (have2D)
                 {

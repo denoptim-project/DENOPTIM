@@ -408,9 +408,9 @@ public abstract class Vertex implements Cloneable
      * the graph owning this vertex (if any) or within a graph owning the
      * template embedding the graph that owns this vertex.
      */
-    public ArrayList<AttachmentPoint> getFreeAPThroughout()
+    public List<AttachmentPoint> getFreeAPThroughout()
     {
-        ArrayList<AttachmentPoint> lst = 
+        List<AttachmentPoint> lst = 
                 new ArrayList<AttachmentPoint>();
         for (AttachmentPoint ap : getAttachmentPoints()) 
         {
@@ -454,9 +454,9 @@ public abstract class Vertex implements Cloneable
      * @return the APs of this vertex that are used to bind a {@link BBType#CAP} 
      * vertex.
      */
-    public ArrayList<AttachmentPoint> getCappedAPs()
+    public List<AttachmentPoint> getCappedAPs()
     {
-        ArrayList<AttachmentPoint> lst = 
+        List<AttachmentPoint> lst = 
                 new ArrayList<AttachmentPoint>();
         for (AttachmentPoint ap : getAttachmentPoints()) 
         {
@@ -488,9 +488,9 @@ public abstract class Vertex implements Cloneable
      * or within a graph owning the
      * template embedding the graph that owns this vertex.
      */
-    public ArrayList<AttachmentPoint> getCappedAPsThroughout()
+    public List<AttachmentPoint> getCappedAPsThroughout()
     {
-        ArrayList<AttachmentPoint> lst = 
+        List<AttachmentPoint> lst = 
                 new ArrayList<AttachmentPoint>();
         for (AttachmentPoint ap : getAttachmentPoints()) 
         {
@@ -821,9 +821,9 @@ public abstract class Vertex implements Cloneable
      * @return the list of APClassess
      */
     
-    public ArrayList<APClass> getAllAPClasses()
+    public List<APClass> getAllAPClasses()
     {
-        ArrayList<APClass> lst = new ArrayList<APClass>();
+        List<APClass> lst = new ArrayList<APClass>();
         for (AttachmentPoint ap : getAttachmentPoints())
         {
             APClass apCls = ap.getAPClass();
@@ -843,9 +843,9 @@ public abstract class Vertex implements Cloneable
      * @return the list of APClassess
      */
     
-    public ArrayList<APClass> getAllAvailableAPClasses()
+    public List<APClass> getAllAvailableAPClasses()
     {
-        ArrayList<APClass> lst = new ArrayList<APClass>();
+        List<APClass> lst = new ArrayList<APClass>();
         for (AttachmentPoint ap : getAttachmentPoints())
         {
             if (!ap.isAvailable())
@@ -1142,9 +1142,9 @@ public abstract class Vertex implements Cloneable
      * (can be empty list, but not null)
      */
 
-    public ArrayList<AttachmentPoint> getAPsFromChildren() 
+    public List<AttachmentPoint> getAPsFromChildren() 
     {
-        ArrayList<AttachmentPoint> apsOnChildren = 
+        List<AttachmentPoint> apsOnChildren = 
                 new ArrayList<AttachmentPoint>();
         for (AttachmentPoint ap : getAttachmentPoints())
         {
@@ -1173,9 +1173,9 @@ public abstract class Vertex implements Cloneable
      * @return the list of child vertices (can be empty list, but not null)
      */
 
-    public ArrayList<Vertex> getChildrenThroughout() 
+    public List<Vertex> getChildrenThroughout() 
     {
-        ArrayList<Vertex> children = new ArrayList<Vertex>();
+        List<Vertex> children = new ArrayList<Vertex>();
         for (AttachmentPoint ap : getAttachmentPoints())
         {
             Edge user = ap.getEdgeUserThroughout();
@@ -1201,9 +1201,9 @@ public abstract class Vertex implements Cloneable
      * @return the list of child vertices (can be empty list, but not null)
      */
 
-    public ArrayList<Vertex> getChilddren() 
+    public List<Vertex> getChilddren() 
     {
-        ArrayList<Vertex> children = new ArrayList<Vertex>();
+        List<Vertex> children = new ArrayList<Vertex>();
         for (AttachmentPoint ap : getAttachmentPoints())
         {
             // NB: this is meant to NOT cross template boundaries, so that all

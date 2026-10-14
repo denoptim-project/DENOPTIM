@@ -21,6 +21,7 @@ package denoptim.programs.grapheditor;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -51,12 +52,12 @@ public class GraphEdParameters extends RunTimeParameters
     /**
      * Input graphs
      */
-    private ArrayList<DGraph> inGraphs = new ArrayList<DGraph>();
+    private List<DGraph> inGraphs = new ArrayList<DGraph>();
 
     /**
      * Input molecular objects
      */
-    private ArrayList<IAtomContainer> inMols;
+    private List<IAtomContainer> inMols;
 
     /**
      * File with list of edit tasks
@@ -66,7 +67,7 @@ public class GraphEdParameters extends RunTimeParameters
     /**
      * Graph's editing tasks
      */
-    private ArrayList<GraphEdit> graphEdits;
+    private List<GraphEdit> graphEdits;
 
     /**
      * File with output graphs
@@ -91,14 +92,14 @@ public class GraphEdParameters extends RunTimeParameters
 
 //-----------------------------------------------------------------------------
 
-    public ArrayList<GraphEdit> getGraphEditTasks()
+    public List<GraphEdit> getGraphEditTasks()
     {
         return graphEdits;
     }
     
 //-----------------------------------------------------------------------------
 
-    public ArrayList<DGraph> getInputGraphs()
+    public List<DGraph> getInputGraphs()
     {
         return inGraphs;
     }

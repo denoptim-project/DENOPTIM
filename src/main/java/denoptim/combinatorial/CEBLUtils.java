@@ -20,6 +20,7 @@ package denoptim.combinatorial;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
@@ -154,7 +155,7 @@ public class CEBLUtils
      */
 
     protected static void storeAllGraphsOfLevel(CEBLParameters settings, 
-            ArrayList<DGraph> lstGraphs, int level) throws DENOPTIMException
+            List<DGraph> lstGraphs, int level) throws DENOPTIMException
     {
         for (DGraph g : lstGraphs)
         {
@@ -186,7 +187,7 @@ public class CEBLUtils
 
     protected static void storeGraphOfLevel(CEBLParameters settings, 
             DGraph graph, int level, int rootId, 
-            ArrayList<Integer> nextIds) throws DENOPTIMException
+            List<Integer> nextIds) throws DENOPTIMException
     {
         String outDir = getNameOfStorageDir(settings, level);
         if (!denoptim.files.FileUtils.checkExists(outDir))

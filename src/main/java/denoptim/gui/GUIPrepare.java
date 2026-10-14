@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
@@ -64,7 +65,7 @@ public class GUIPrepare extends GUICardPanel
 	/**
 	 * Storage of parameters
 	 */
-	public ArrayList<IParametersForm> allParams;
+	public List<IParametersForm> allParams;
 
 	/**
 	 * Constructor

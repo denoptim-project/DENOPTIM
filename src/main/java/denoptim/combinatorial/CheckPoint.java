@@ -20,6 +20,7 @@ package denoptim.combinatorial;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -71,7 +72,7 @@ public class CheckPoint
     /**
      * Set of indexes for the next iteration in combination of building blocks.
      */
-    protected ArrayList<Integer> nextIds;
+    protected List<Integer> nextIds;
 
 
 //-----------------------------------------------------------------------------
@@ -111,7 +112,7 @@ public class CheckPoint
 
 //-----------------------------------------------------------------------------
 
-    public ArrayList<Integer> getNextIds()
+    public List<Integer> getNextIds()
     {
         return nextIds;
     }
@@ -158,7 +159,7 @@ public class CheckPoint
      * latest one that has been properly processed.
      */
 
-    public void setNextIds(ArrayList<Integer> nextIds)
+    public void setNextIds(List<Integer> nextIds)
     {
         this.nextIds = nextIds;
     }

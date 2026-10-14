@@ -84,20 +84,20 @@ public class DGraphTest
         APCD = APClass.make(d, 99);
         CAPP = APClass.make(cap, 1);
         
-        HashMap<APClass,ArrayList<APClass>> cpMap = 
-                new HashMap<APClass,ArrayList<APClass>>();
-        ArrayList<APClass> lstA = new ArrayList<APClass>();
+        HashMap<APClass,List<APClass>> cpMap = 
+                new HashMap<APClass,List<APClass>>();
+        List<APClass> lstA = new ArrayList<APClass>();
         lstA.add(APCA);
         cpMap.put(APCA, lstA);
-        ArrayList<APClass> lstB = new ArrayList<APClass>();
+        List<APClass> lstB = new ArrayList<APClass>();
         lstB.add(APCB);
         lstB.add(APCC);
         cpMap.put(APCB, lstB);
-        ArrayList<APClass> lstC = new ArrayList<APClass>();
+        List<APClass> lstC = new ArrayList<APClass>();
         lstC.add(APCB);
         lstC.add(APCC);
         cpMap.put(APCC, lstC);
-        ArrayList<APClass> lstD = new ArrayList<APClass>();
+        List<APClass> lstD = new ArrayList<APClass>();
         lstD.add(APCD);
         cpMap.put(APCD, lstD);
         
@@ -1346,8 +1346,8 @@ public class DGraphTest
         APClass ap0 = APClass.RCACLASSPLUS;
         APClass am0 = APClass.RCACLASSMINUS;
         
-        HashMap<APClass,ArrayList<APClass>> cpMap = 
-                new HashMap<APClass,ArrayList<APClass>>();
+        HashMap<APClass,List<APClass>> cpMap = 
+                new HashMap<APClass,List<APClass>>();
         cpMap.put(a0, new ArrayList<APClass>(Arrays.asList(a0, b0)));
         HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
         capMap.put(a0, h0);
@@ -1391,13 +1391,13 @@ public class DGraphTest
         cap.addAP(0, h0, new Point3d(new double[]{0.0, 1.0, 1.0}));
         cap.projectAPsToProperties(); 
         
-        ArrayList<Vertex> scaff = new ArrayList<Vertex>();
+        List<Vertex> scaff = new ArrayList<Vertex>();
         scaff.add(frg1);
-        ArrayList<Vertex> frags = new ArrayList<Vertex>();
+        List<Vertex> frags = new ArrayList<Vertex>();
         frags.add(frg2);
         frags.add(rca1);
         frags.add(rca2);
-        ArrayList<Vertex> caps = new ArrayList<Vertex>();
+        List<Vertex> caps = new ArrayList<Vertex>();
         caps.add(cap);
         
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
@@ -2334,13 +2334,13 @@ public class DGraphTest
         buildVertexAndConnectToGraph(v4, 2, graphA);
         graphA.addEdge(new Edge(v0.getAP(3), v4.getAP(0)));
 
-        ArrayList<Vertex> vrA = new ArrayList<Vertex>();
+        List<Vertex> vrA = new ArrayList<Vertex>();
         vrA.add(v1);
         vrA.add(v0);
         vrA.add(v2);
         Ring rA = new Ring(vrA);
         graphA.addRing(rA);
-        ArrayList<Vertex> vrA2 = new ArrayList<Vertex>();
+        List<Vertex> vrA2 = new ArrayList<Vertex>();
         vrA2.add(v3);
         vrA2.add(v0);
         vrA2.add(v4);
@@ -2369,13 +2369,13 @@ public class DGraphTest
         buildVertexAndConnectToGraph(v94, 2, graphB);
         graphB.addEdge(new Edge(v90.getAP(3), v94.getAP(0)));
 
-        ArrayList<Vertex> vrB = new ArrayList<Vertex>();
+        List<Vertex> vrB = new ArrayList<Vertex>();
         vrB.add(v91);
         vrB.add(v90);
         vrB.add(v92);
         Ring rB = new Ring(vrB);
         graphB.addRing(rB);
-        ArrayList<Vertex> vrB2 = new ArrayList<Vertex>();
+        List<Vertex> vrB2 = new ArrayList<Vertex>();
         vrB2.add(v93);
         vrB2.add(v90);
         vrB2.add(v94);
@@ -2411,13 +2411,13 @@ public class DGraphTest
         buildVertexAndConnectToGraph(v4, 2, graphA);
         graphA.addEdge(new Edge(v0.getAP(3), v4.getAP(0)));
 
-        ArrayList<Vertex> vrA = new ArrayList<>();
+        List<Vertex> vrA = new ArrayList<>();
         vrA.add(v1);
         vrA.add(v0);
         vrA.add(v2);
         Ring rA = new Ring(vrA);
         graphA.addRing(rA);
-        ArrayList<Vertex> vrA2 = new ArrayList<>();
+        List<Vertex> vrA2 = new ArrayList<>();
         vrA2.add(v3);
         vrA2.add(v0);
         vrA2.add(v4);
@@ -2446,13 +2446,13 @@ public class DGraphTest
         buildVertexAndConnectToGraph(v94, 2, graphB);
         graphB.addEdge(new Edge(v90.getAP(3), v94.getAP(0)));
 
-        ArrayList<Vertex> vrB = new ArrayList<>();
+        List<Vertex> vrB = new ArrayList<>();
         vrB.add(v91);
         vrB.add(v90);
         vrB.add(v92);
         Ring rB = new Ring(vrB);
         graphB.addRing(rB);
-        ArrayList<Vertex> vrB2 = new ArrayList<>();
+        List<Vertex> vrB2 = new ArrayList<>();
         vrB2.add(v94);
         vrB2.add(v90);
         vrB2.add(v93);
@@ -2488,13 +2488,13 @@ public class DGraphTest
         buildVertexAndConnectToGraph(v4, 2, graphA);
         graphA.addEdge(new Edge(v0.getAP(3), v4.getAP(0)));
 
-        ArrayList<Vertex> vrA = new ArrayList<>();
+        List<Vertex> vrA = new ArrayList<>();
         vrA.add(v1);
         vrA.add(v0);
         vrA.add(v2);
         Ring rA = new Ring(vrA);
         graphA.addRing(rA);
-        ArrayList<Vertex> vrA2 = new ArrayList<>();
+        List<Vertex> vrA2 = new ArrayList<>();
         vrA2.add(v3);
         vrA2.add(v0);
         vrA2.add(v4);
@@ -2522,13 +2522,13 @@ public class DGraphTest
         buildVertexAndConnectToGraph(v94, 2, graphB);
         graphB.addEdge(new Edge(v90.getAP(3), v94.getAP(0)));
 
-        ArrayList<Vertex> vrB = new ArrayList<>();
+        List<Vertex> vrB = new ArrayList<>();
         vrB.add(v91);
         vrB.add(v90);
         vrB.add(v94);
         Ring rB = new Ring(vrB);
         graphB.addRing(rB);
-        ArrayList<Vertex> vrB2 = new ArrayList<>();
+        List<Vertex> vrB2 = new ArrayList<>();
         vrB2.add(v92);
         vrB2.add(v90);
         vrB2.add(v93);

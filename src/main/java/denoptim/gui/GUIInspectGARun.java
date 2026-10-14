@@ -125,7 +125,7 @@ public class GUIInspectGARun extends GUICardPanel
 	
 	private File srcFolder;
 	
-	private ArrayList<CandidateLW> allIndividuals;
+	private List<CandidateLW> allIndividuals;
 	private int molsWithFitness = 0;
 	private boolean warnedAboutMissingCandFiles = false;
 	private JLabel lblTotItems;
@@ -1253,7 +1253,7 @@ public class GUIInspectGARun extends GUICardPanel
 	                + "not found."));
 	        return;
 	    }
-	    ArrayList<String> lines = null;
+	    List<String> lines = null;
 	    try
         {
             lines = DenoptimIO.readList(eaMonitorDumps.getAbsolutePath());

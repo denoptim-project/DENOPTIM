@@ -97,7 +97,7 @@ public class FragmenterToolsTest
         mol.addBond(5, 11, IBond.Order.SINGLE);
         mol.addBond(5, 12, IBond.Order.SINGLE);
         
-        ArrayList<String> empty = new ArrayList<String>();
+        List<String> empty = new ArrayList<String>();
         List<CuttingRule> rules = new ArrayList<CuttingRule>();
         rules.add(new CuttingRule("RuleC","[#6]","[#8]","-",-1,empty));
         rules.add(new CuttingRule("RuleA","[#6]","[#6]","#",0,empty));
@@ -193,7 +193,7 @@ public class FragmenterToolsTest
         mol.addBond(15, 18, IBond.Order.SINGLE);
         mol.addBond(18, 19, IBond.Order.SINGLE);
         
-        ArrayList<IAtom> candidates = new ArrayList<IAtom>();
+        List<IAtom> candidates = new ArrayList<IAtom>();
         candidates.add(mol.getAtom(2));
         candidates.add(mol.getAtom(3));
         candidates.add(mol.getAtom(4));
@@ -1111,7 +1111,7 @@ public class FragmenterToolsTest
         capH.addAtom(new Atom("H", new Point3d()));
         capH.addAP(0, hyd1, new Point3d(1.0,0,0));
         
-        ArrayList<Vertex> cappingGroups = new ArrayList<Vertex>();
+        List<Vertex> cappingGroups = new ArrayList<Vertex>();
         cappingGroups.add(capH);
         
         HashMap<APClass, APClass> capMap = new HashMap<APClass, APClass>();
@@ -1123,10 +1123,10 @@ public class FragmenterToolsTest
                 new ArrayList<Vertex>(), //no scaffolds
                 new ArrayList<Vertex>(), //no fragments
                 cappingGroups, //H as capping
-                new HashMap<APClass,ArrayList<APClass>>(), 
+                new HashMap<APClass,List<APClass>>(), 
                 capMap, 
                 new HashSet<APClass>(), 
-                new HashMap<APClass,ArrayList<APClass>>());
+                new HashMap<APClass,List<APClass>>());
         fragSpace.setAPclassBasedApproach(true);
         
         settings.setParameters(fsp);

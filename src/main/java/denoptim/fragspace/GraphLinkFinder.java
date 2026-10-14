@@ -144,7 +144,7 @@ public class GraphLinkFinder
     {   
         this.fragmentSpace = fragSpace;
         
-        ArrayList<Vertex> candidates = getCandidateBBs(
+        List<Vertex> candidates = getCandidateBBs(
                 originalLink.getBuildingBlockType(), newBuildingBlockID);
         
         int candidatesOrigSize = candidates.size();
@@ -203,10 +203,10 @@ public class GraphLinkFinder
     
 //------------------------------------------------------------------------------
     
-    private ArrayList<Vertex> getCandidateBBs(BBType bbt, int bbId) 
+    private List<Vertex> getCandidateBBs(BBType bbt, int bbId) 
             throws DENOPTIMException 
     {
-        ArrayList<Vertex> candidates = new ArrayList<Vertex>();
+        List<Vertex> candidates = new ArrayList<Vertex>();
         if (bbId<0)
         {
             switch (bbt)
@@ -290,7 +290,7 @@ public class GraphLinkFinder
             boolean screenAll) throws DENOPTIMException 
     {
         this.fragmentSpace = fragSpace;
-        ArrayList<Vertex> candidates = getCandidateBBs(
+        List<Vertex> candidates = getCandidateBBs(
                 originalEdge.getTrgAP().getOwner().getBuildingBlockType(), 
                 newBuildingBlockID);
 

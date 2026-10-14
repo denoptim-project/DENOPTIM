@@ -606,7 +606,7 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
                             values[iCol] = chosenTab.getValueAt(iRow,iCol)
                                     .toString().trim();
                         }
-                        ArrayList<String> opts = new ArrayList<String>();
+                        List<String> opts = new ArrayList<String>();
                         if (!chosenTab.getValueAt(iRow,5).toString().trim().isBlank())
                             opts.addAll(Arrays.asList(chosenTab.getValueAt(iRow,5)
                                         .toString().trim().split("\\s+")));

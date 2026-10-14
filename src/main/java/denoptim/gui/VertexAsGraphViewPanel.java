@@ -308,9 +308,9 @@ public class VertexAsGraphViewPanel extends JSplitPane implements IVertexAPSelec
 	 * Identifies which attachment points are selected in the visualized table
 	 * @return the list of attachment points
 	 */
-	public ArrayList<AttachmentPoint> getSelectedAPs()
+	public List<AttachmentPoint> getSelectedAPs()
 	{
-		ArrayList<AttachmentPoint> selected = 
+		List<AttachmentPoint> selected = 
 				new ArrayList<AttachmentPoint>();
 		
 		for (int rowId : apTable.getSelectedRows())
@@ -326,9 +326,9 @@ public class VertexAsGraphViewPanel extends JSplitPane implements IVertexAPSelec
 	 * Identifies which attachment points are selected in the visualized table
 	 * @return the list of attachment points indexes
 	 */
-	public ArrayList<Integer> getSelectedAPIDs()
+	public List<Integer> getSelectedAPIDs()
 	{
-		ArrayList<Integer> selected = new ArrayList<Integer>();
+		List<Integer> selected = new ArrayList<Integer>();
 		for (int rowId : apTable.getSelectedRows())
 		{
 			selected.add(rowId);

@@ -67,20 +67,20 @@ public class PopulationTest
         APCC = APClass.make("C", 0, BondType.SINGLE);
         APCD = APClass.make("D", 99, BondType.DOUBLE);
         
-        HashMap<APClass,ArrayList<APClass>> cpMap = 
-                new HashMap<APClass,ArrayList<APClass>>();
-        ArrayList<APClass> lstA = new ArrayList<APClass>();
+        HashMap<APClass,List<APClass>> cpMap = 
+                new HashMap<APClass,List<APClass>>();
+        List<APClass> lstA = new ArrayList<APClass>();
         lstA.add(APCA);
         cpMap.put(APCA, lstA);
-        ArrayList<APClass> lstB = new ArrayList<APClass>();
+        List<APClass> lstB = new ArrayList<APClass>();
         lstB.add(APCB);
         lstB.add(APCC);
         cpMap.put(APCB, lstB);
-        ArrayList<APClass> lstC = new ArrayList<APClass>();
+        List<APClass> lstC = new ArrayList<APClass>();
         lstC.add(APCC);
         lstC.add(APCB);
         cpMap.put(APCC, lstC);
-        ArrayList<APClass> lstD = new ArrayList<APClass>();
+        List<APClass> lstD = new ArrayList<APClass>();
         lstD.add(APCD);
         cpMap.put(APCD, lstD);
         

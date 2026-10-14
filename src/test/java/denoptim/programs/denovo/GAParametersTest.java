@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.condition.OS.WINDOWS;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 
 import org.junit.jupiter.api.Test;
@@ -130,7 +130,7 @@ public class GAParametersTest
             assertTrue(FileUtils.checkExists(logFileString));
             String dataFolder = gaParams.getDataDirectory();
             assertTrue(FileUtils.checkExists(dataFolder));
-            ArrayList<String> lines = DenoptimIO.readList(logFileString, true);
+            List<String> lines = DenoptimIO.readList(logFileString, true);
             int counter = 0;
             for (String line : lines)
             {

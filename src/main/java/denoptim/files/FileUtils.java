@@ -203,7 +203,7 @@ public class FileUtils
      */
     public static String getTempFolder() {
     
-        ArrayList<String> tmpFolders = new ArrayList<String>();
+        List<String> tmpFolders = new ArrayList<String>();
         tmpFolders.add(System.getProperty("file.separator") + "tmp");
         tmpFolders.add(System.getProperty("file.separator") + "scratch");
         tmpFolders.add(System.getProperty("java.io.tmpdir"));
@@ -500,7 +500,7 @@ public class FileUtils
             Object oneObj = null;
             if (o instanceof ArrayList)
             {
-                oneObj = ((ArrayList) o).get(0);
+                oneObj = ((List) o).get(0);
             } else {
                 oneObj = o;
             }

@@ -825,19 +825,19 @@ public class GraphOperationsTest {
         APCC = APClass.make("C", 0);
         APCD = APClass.make("D", 0);
         
-        HashMap<APClass,ArrayList<APClass>> cpMap = 
-                new HashMap<APClass,ArrayList<APClass>>();
-        ArrayList<APClass> lstA = new ArrayList<APClass>();
+        HashMap<APClass,List<APClass>> cpMap = 
+                new HashMap<APClass,List<APClass>>();
+        List<APClass> lstA = new ArrayList<APClass>();
         lstA.add(APCA);
         cpMap.put(APCA, lstA);
-        ArrayList<APClass> lstB = new ArrayList<APClass>();
+        List<APClass> lstB = new ArrayList<APClass>();
         lstB.add(APCB);
         lstB.add(APCC);
         cpMap.put(APCB, lstB);
-        ArrayList<APClass> lstC = new ArrayList<APClass>();
+        List<APClass> lstC = new ArrayList<APClass>();
         lstC.add(APCC);
         cpMap.put(APCC, lstC);
-        ArrayList<APClass> lstD = new ArrayList<APClass>();
+        List<APClass> lstD = new ArrayList<APClass>();
         lstD.add(APCD);
         cpMap.put(APCD, lstD);
         
@@ -948,9 +948,9 @@ public class GraphOperationsTest {
         Monitor mnt = new Monitor();
         
         // Then, a fragment space that allows ring closures
-        HashMap<APClass,ArrayList<APClass>> cpMap = 
-                new HashMap<APClass,ArrayList<APClass>>();
-        ArrayList<APClass> lstA = new ArrayList<APClass>();
+        HashMap<APClass,List<APClass>> cpMap = 
+                new HashMap<APClass,List<APClass>>();
+        List<APClass> lstA = new ArrayList<APClass>();
         lstA.add(apc);
         cpMap.put(apc, lstA);
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
@@ -995,7 +995,7 @@ public class GraphOperationsTest {
         // Prepare environment to run graph operation. First, a monitor of events
         Monitor mnt = new Monitor();
         
-        ArrayList<Vertex> libFrags = new ArrayList<Vertex>();
+        List<Vertex> libFrags = new ArrayList<Vertex>();
         
         APClass APC4EL = APClass.make("4el:0");
         Fragment bridge4el = new Fragment(4);
@@ -1044,14 +1044,14 @@ public class GraphOperationsTest {
         HashMap<APClass,APClass> cappingRules = new HashMap<APClass,APClass>();
         cappingRules.put(apcA, hyd);
         
-        ArrayList<Vertex> cappingGroups = new ArrayList<Vertex>();
+        List<Vertex> cappingGroups = new ArrayList<Vertex>();
         Fragment capH = new Fragment();
         capH.addAtom(new Atom("H", new Point3d()));
         capH.addAP(0, new Point3d(1.0, 0, 0), hyd);
         cappingGroups.add(capH);
         
-        HashMap<APClass,ArrayList<APClass>> rcCpMap = 
-                new HashMap<APClass,ArrayList<APClass>>();
+        HashMap<APClass,List<APClass>> rcCpMap = 
+                new HashMap<APClass,List<APClass>>();
         rcCpMap.put(apcA, new ArrayList<APClass>(Arrays.asList(APC4EL)));
         
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
@@ -1059,7 +1059,7 @@ public class GraphOperationsTest {
                 new ArrayList<Vertex>(),
                 libFrags,
                 cappingGroups, 
-                new HashMap<APClass,ArrayList<APClass>>(), 
+                new HashMap<APClass,List<APClass>>(), 
                 cappingRules, 
                 new HashSet<APClass>(),
                 rcCpMap); 
@@ -1211,7 +1211,7 @@ public class GraphOperationsTest {
         vN.addAP(0, APCA, new Point3d(1.1, 1.0, 0.0));
         vN.addAP(0, APCB, new Point3d(1.1, 1.0, 2.0));
         
-        ArrayList<Vertex> fragments = new ArrayList<Vertex>();
+        List<Vertex> fragments = new ArrayList<Vertex>();
         fragments.add(vC1);
         fragments.add(vC3);
         fragments.add(vCl);
@@ -1264,12 +1264,12 @@ public class GraphOperationsTest {
         //Randomizer rng = new Randomizer();
         //DenoptimIO.writeGraphToSDF(new File("/tmp/graph.sdf"), graph, false, logger, rng);
         
-        HashMap<APClass,ArrayList<APClass>> cpMap = 
-                new HashMap<APClass,ArrayList<APClass>>();
-        ArrayList<APClass> lstA = new ArrayList<APClass>();
+        HashMap<APClass,List<APClass>> cpMap = 
+                new HashMap<APClass,List<APClass>>();
+        List<APClass> lstA = new ArrayList<APClass>();
         lstA.add(APCB);
         cpMap.put(APCA, lstA);
-        ArrayList<APClass> lstB = new ArrayList<APClass>();
+        List<APClass> lstB = new ArrayList<APClass>();
         lstA.add(APCA);
         cpMap.put(APCB, lstB);
         
@@ -1281,7 +1281,7 @@ public class GraphOperationsTest {
                 cpMap, 
                 new HashMap<APClass,APClass>(),
                 new HashSet<APClass>(),
-                new HashMap<APClass,ArrayList<APClass>>());
+                new HashMap<APClass,List<APClass>>());
         fs.setAPclassBasedApproach(true);
         
         GAParameters gaParams = new GAParameters();

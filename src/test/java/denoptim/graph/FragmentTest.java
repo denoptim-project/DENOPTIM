@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.vecmath.Point3d;
 
@@ -174,7 +175,7 @@ public class FragmentTest
         v.addAPOnAtom(a1, APClass.make(APCLASS),
                 new Point3d(new double[]{3.0, 0.0, 3.3}));
         
-        ArrayList<SymmetricAPs> ssaps = new ArrayList<SymmetricAPs>();
+        List<SymmetricAPs> ssaps = new ArrayList<SymmetricAPs>();
         SymmetricAPs ss = new SymmetricAPs();
         ss.add(v.getAP(0));
         ss.add(v.getAP(1));

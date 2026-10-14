@@ -19,6 +19,7 @@
 package denoptim.graph.rings;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import denoptim.graph.Fragment;
 import denoptim.graph.Vertex;
@@ -36,7 +37,7 @@ public class ClosableChain implements Cloneable
     /**
      * List of <code>ChainLink</code>s in this chain
      */
-    private ArrayList<ChainLink> links;
+    private List<ChainLink> links;
 
     /**
      * The position of the scaffold vertex: 
@@ -111,7 +112,7 @@ public class ClosableChain implements Cloneable
      * Get the list of <code>ChainLink</code>s
      */
 
-    public ArrayList<ChainLink> getLinks()
+    public List<ChainLink> getLinks()
     {
         return links;
     }

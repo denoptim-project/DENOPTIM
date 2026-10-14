@@ -19,6 +19,7 @@
 package denoptim.graph.rings;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -151,7 +152,7 @@ public class RingClosure
      * closability condition
      */
 
-    public boolean isClosable(ArrayList<Double> clsablConds,Logger logger)
+    public boolean isClosable(List<Double> clsablConds,Logger logger)
     {
         return isClosable(clsablConds.get(0), 
                           clsablConds.get(1),
@@ -313,9 +314,9 @@ public class RingClosure
      * </ol>
      */
 
-    public ArrayList<Double> getClosabilityConditions(double etrxTol)
+    public List<Double> getClosabilityConditions(double etrxTol)
     {
-        ArrayList<Double> clsablConds = new ArrayList<Double>();
+        List<Double> clsablConds = new ArrayList<Double>();
 
         //Define conditions based on SrcAtom-to-RCA bonds and RC-strategy
         double lenH = h1.distance(h2);

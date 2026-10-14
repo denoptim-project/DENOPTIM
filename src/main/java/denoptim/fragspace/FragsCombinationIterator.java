@@ -21,6 +21,7 @@ package denoptim.fragspace;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
@@ -60,7 +61,7 @@ public class FragsCombinationIterator
     /**
      * List of all attachment points on the root graph (source APs)
      */
-    private ArrayList<IdFragmentAndAP> allSrcAps =
+    private List<IdFragmentAndAP> allSrcAps =
                                                new ArrayList<IdFragmentAndAP>();
 
     /**
@@ -68,24 +69,24 @@ public class FragsCombinationIterator
      * are one or more candidate destinies (i.e., append a frag, cap, or leave 
      * empty).
      */
-    private ArrayList<IdFragmentAndAP> actvSrcAps =
+    private List<IdFragmentAndAP> actvSrcAps =
                                                new ArrayList<IdFragmentAndAP>();
 
     /**
      * Map of all possible matches for each source AP 
      */
-    private Map<IdFragmentAndAP,ArrayList<IdFragmentAndAP>> candFragsPerAP =
-                      new HashMap<IdFragmentAndAP,ArrayList<IdFragmentAndAP>>();
+    private Map<IdFragmentAndAP,List<IdFragmentAndAP>> candFragsPerAP =
+                      new HashMap<IdFragmentAndAP,List<IdFragmentAndAP>>();
 
     /**
      * Set of indeces for the next iteration
      */
-    private ArrayList<Integer> nextIds = new ArrayList<Integer>();
+    private List<Integer> nextIds = new ArrayList<Integer>();
 
     /**
      * Sizes of the candidates set for each source AP
      */
-    private ArrayList<Integer> totCandsPerAP = new ArrayList<Integer>();
+    private List<Integer> totCandsPerAP = new ArrayList<Integer>();
 
     /**
      * Total number of combinations
@@ -227,11 +228,11 @@ public class FragsCombinationIterator
             APClass srcApCls = frag.getAttachmentPoints().get(apId).getAPClass();
 
             // Create data structure for candidates 
-            ArrayList<IdFragmentAndAP> candsForThisSrc = 
+            List<IdFragmentAndAP> candsForThisSrc = 
                     new ArrayList<IdFragmentAndAP>();
 
             // Get all compatible fragments
-            ArrayList<IdFragmentAndAP> compatFragAps = 
+            List<IdFragmentAndAP> compatFragAps = 
                     settings.getFragmentSpace().getFragAPsCompatibleWithClass(
                             srcApCls);
             
@@ -259,7 +260,7 @@ public class FragsCombinationIterator
                 // NOTE: in principle there should be only ONE capping group,
                 //       but this is made to work also in case of more than 
                 //       one group.
-                ArrayList<Integer> capGrpIds = settings.getFragmentSpace()
+                List<Integer> capGrpIds = settings.getFragmentSpace()
                             .getCappingGroupsWithAPClass(capApCls);
                 for (Integer i : capGrpIds)
                 {
@@ -356,7 +357,7 @@ public class FragsCombinationIterator
      * @param nextIds the set of indeces for the next iteration. 
      */
 
-    public void setStartingPoint(ArrayList<Integer> nextIds)
+    public void setStartingPoint(List<Integer> nextIds)
     {
         this.nextIds = nextIds;
 
@@ -378,7 +379,7 @@ public class FragsCombinationIterator
      * Returns the list of indeces used to calculate the next iteration
      */
 
-    public ArrayList<Integer> getNextIds()
+    public List<Integer> getNextIds()
     {
         return nextIds;
     }
@@ -407,13 +408,13 @@ public class FragsCombinationIterator
 		// an easy update of the graph's SymmetricSet list
         
         FragsCombination currentComb = new FragsCombination();
-        ArrayList<Integer> currentIds = new ArrayList<Integer>();
+        List<Integer> currentIds = new ArrayList<Integer>();
         String msg = "";
         for (int curSrcApIdx=0; curSrcApIdx<actvSrcAps.size(); curSrcApIdx++)
         {
             IdFragmentAndAP src = actvSrcAps.get(curSrcApIdx);
             src.setVrtSymSetId(curSrcApIdx);
-            ArrayList<IdFragmentAndAP> locCandsList = candFragsPerAP.get(src);
+            List<IdFragmentAndAP> locCandsList = candFragsPerAP.get(src);
 		    for (IdFragmentAndAP fap : locCandsList)
 		    {
 		    	fap.setVrtSymSetId(curSrcApIdx);
@@ -719,7 +720,7 @@ public class FragsCombinationIterator
      * usable attachment point on the root system.
      */
 
-    public Map<IdFragmentAndAP,ArrayList<IdFragmentAndAP>> getCandidatesMap()
+    public Map<IdFragmentAndAP,List<IdFragmentAndAP>> getCandidatesMap()
     {
         return candFragsPerAP;
     }
@@ -731,7 +732,7 @@ public class FragsCombinationIterator
      * usable attachment point
      */
 
-    public ArrayList<Integer> getSizesOfCandidateSets()
+    public List<Integer> getSizesOfCandidateSets()
     {
         return totCandsPerAP;
     }

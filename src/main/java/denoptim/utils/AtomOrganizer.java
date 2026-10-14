@@ -51,10 +51,10 @@ public class AtomOrganizer
 //indexes of atoms bearing  AP
 
     //Flags per atoms
-    private ArrayList<ArrayList<Boolean>> flags;
+    private List<List<Boolean>> flags;
     //Alternative atom order
-    private Map<Integer, ArrayList<Integer>> atomOrders;
-    private Map<Integer, ArrayList<Integer>> oldToNewOrder;
+    private Map<Integer, List<Integer>> atomOrders;
+    private Map<Integer, List<Integer>> oldToNewOrder;
     //layers
     private Map<Integer, Map<Integer, Set<Integer>>> layers;
     //layer index
@@ -94,9 +94,9 @@ public class AtomOrganizer
      * @return the atom ordering list. 
      */
     
-    public ArrayList<Integer> getNewToOldOrder(int seed)
+    public List<Integer> getNewToOldOrder(int seed)
     {
-        ArrayList<Integer> lst = new ArrayList<Integer>();
+        List<Integer> lst = new ArrayList<Integer>();
         for (Integer i : atomOrders.get(seed))
         {
             lst.add(i.intValue());
@@ -116,9 +116,9 @@ public class AtomOrganizer
      * @return the atom ordering list. 
      */
     
-    public ArrayList<Integer> getOldToNewOrder(int seed)
+    public List<Integer> getOldToNewOrder(int seed)
     {
-        ArrayList<Integer> lst = new ArrayList<Integer>();
+        List<Integer> lst = new ArrayList<Integer>();
         for (Integer i : oldToNewOrder.get(seed))
         {
             lst.add(i.intValue());
@@ -144,9 +144,9 @@ public class AtomOrganizer
         //find new order of atoms using starting from 'seed'
         if (!atomOrders.containsKey(seed)) {
             //create all empty vectors of proper size
-            ArrayList<Integer> reorderedAtms = new ArrayList<>(mol.getAtomCount());
+            List<Integer> reorderedAtms = new ArrayList<>(mol.getAtomCount());
             atomOrders.put(seed, reorderedAtms);
-            ArrayList<Integer> pointer = new ArrayList<>(mol.getAtomCount());
+            List<Integer> pointer = new ArrayList<>(mol.getAtomCount());
             oldToNewOrder.put(seed, pointer);
             for (int i = 0; i < mol.getAtomCount(); i++) {
                 oldToNewOrder.get(seed).add(i, -1);
@@ -570,7 +570,7 @@ public class AtomOrganizer
         int freeFlag = -1;
         //create a vector with false entries
         int atoms = mol.getAtomCount();
-        ArrayList<Boolean> flg = new ArrayList<>();
+        List<Boolean> flg = new ArrayList<>();
         for (int i = 0; i < atoms; i++)
         {
             flg.add(false);

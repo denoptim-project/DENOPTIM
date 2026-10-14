@@ -587,7 +587,7 @@ public class CombinatorialExplorerByLayer
         // The very first level only has the scaffold or the user defined roots
         if (level == -1)
         {
-            ArrayList<DGraph> scafLevel = new ArrayList<DGraph>();
+            List<DGraph> scafLevel = new ArrayList<DGraph>();
             if (settings.useGivenRoots())
             {
                 // User defined root graphs
@@ -644,7 +644,7 @@ public class CombinatorialExplorerByLayer
         }
         Collection<File> files = FileUtils.listFiles(new File(prevLevDirName),
                        new String[] {DENOPTIMConstants.SERGFILENAMEEXT}, false);
-        ArrayList<File> lstFiles = new ArrayList<File>(files);
+        List<File> lstFiles = new ArrayList<File>(files);
         Collections.sort(lstFiles);
         for (File file : lstFiles) 
         {
@@ -684,7 +684,7 @@ public class CombinatorialExplorerByLayer
                 sb.append(DENOPTIMConstants.EOL);
                 sb.append(" - Details for root APs:");
                 sb.append(DENOPTIMConstants.EOL);
-                Map<IdFragmentAndAP, ArrayList<IdFragmentAndAP>> m = 
+                Map<IdFragmentAndAP, List<IdFragmentAndAP>> m = 
                         fcf.getCandidatesMap();
                 for (IdFragmentAndAP srcAP : m.keySet())
                 {
@@ -721,7 +721,7 @@ public class CombinatorialExplorerByLayer
                     		settings.getWorkDirectory(),
                     		settings.getVerbosity());
 
-                    ArrayList<Integer> nextIds = fcf.getNextIds();
+                    List<Integer> nextIds = fcf.getNextIds();
                     task.setNextIds(nextIds);
 
                     submittedAndFutures.put(task, tpe.submit(task));
@@ -751,8 +751,8 @@ public class CombinatorialExplorerByLayer
                                  + " for checkpoint file to mature");
                             int iWait=0;
                             int nEqual = 0;
-                            ArrayList<Integer> oldIds =new ArrayList<Integer>();
-                            ArrayList<Integer> nowIds =new ArrayList<Integer>();
+                            List<Integer> oldIds =new ArrayList<Integer>();
+                            List<Integer> nowIds =new ArrayList<Integer>();
                             makeCheckPoint();
                             oldIds.addAll(settings.getCheckPoint().getNextIds());
                             while (true)

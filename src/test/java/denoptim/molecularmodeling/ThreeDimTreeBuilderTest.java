@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.vecmath.Point3d;
@@ -71,8 +72,8 @@ public class ThreeDimTreeBuilderTest
         APClass ap0 = APClass.RCACLASSPLUS;
         APClass am0 = APClass.RCACLASSMINUS;
         
-        HashMap<APClass,ArrayList<APClass>> cpMap = 
-                new HashMap<APClass,ArrayList<APClass>>();
+        HashMap<APClass,List<APClass>> cpMap = 
+                new HashMap<APClass,List<APClass>>();
         cpMap.put(a0, new ArrayList<APClass>(Arrays.asList(a0, b0)));
         HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
         capMap.put(a0, h0);
@@ -128,14 +129,14 @@ public class ThreeDimTreeBuilderTest
     	cap.addAP(0, h0, new Point3d(new double[]{0.0, 1.0, 1.0}));
     	cap.projectAPsToProperties(); 
     	
-    	ArrayList<Vertex> scaff = new ArrayList<Vertex>();
+    	List<Vertex> scaff = new ArrayList<Vertex>();
     	scaff.add(frg1);
-    	ArrayList<Vertex> frags = new ArrayList<Vertex>();
+    	List<Vertex> frags = new ArrayList<Vertex>();
     	frags.add(frg2);
     	frags.add(rca1);
     	frags.add(rca2);
     	frags.add(frg3);
-    	ArrayList<Vertex> caps = new ArrayList<Vertex>();
+    	List<Vertex> caps = new ArrayList<Vertex>();
     	caps.add(cap);
     	
     	FragmentSpaceParameters fsp = new FragmentSpaceParameters();

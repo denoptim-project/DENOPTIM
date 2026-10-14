@@ -110,8 +110,8 @@ public class EmptyVertex extends Vertex
      * @param isRCV set <code>true</code> to mark this vertex as a 
      * ring-closing vertex.
      */
-    public EmptyVertex(long id, ArrayList<AttachmentPoint> lstAPs,
-            ArrayList<SymmetricAPs> lstSymAPs, boolean isRCV)
+    public EmptyVertex(long id, List<AttachmentPoint> lstAPs,
+            List<SymmetricAPs> lstSymAPs, boolean isRCV)
     {
         super(VertexType.EmptyVertex, id);
         this.lstAPs = lstAPs;
@@ -178,9 +178,9 @@ public class EmptyVertex extends Vertex
      * @return list of attachment points that have free valences
      */
 
-    public ArrayList<Integer> getFreeAPList()
+    public List<Integer> getFreeAPList()
     {
-        ArrayList<Integer> lstAvailableAP = new ArrayList<>();
+        List<Integer> lstAvailableAP = new ArrayList<>();
         for (int i=0; i<lstAPs.size(); i++)
         {
             if (lstAPs.get(i).isAvailable())
@@ -434,9 +434,9 @@ public class EmptyVertex extends Vertex
      * @return the list of APClassess
      */
 
-    public ArrayList<APClass> getAllAPClasses()
+    public List<APClass> getAllAPClasses()
     {
-        ArrayList<APClass> lst = new ArrayList<APClass>();
+        List<APClass> lst = new ArrayList<APClass>();
         for (AttachmentPoint ap : lstAPs)
         {
             APClass apCls = ap.getAPClass();

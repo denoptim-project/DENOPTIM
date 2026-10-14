@@ -126,7 +126,7 @@ public class TasksBatchManager
         Runtime.getRuntime().addShutdownHook(shutDownHook);
 
         // Waits for completion of tasks
-        ArrayList<Candidate> results = new ArrayList<>();
+        List<Candidate> results = new ArrayList<>();
         try
         {
             for (int i=0; i<syncronisedTasks.size(); i++)

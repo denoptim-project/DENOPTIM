@@ -21,8 +21,8 @@ package denoptim.programs.combinatorial;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 
 import denoptim.combinatorial.CEBLUtils;
@@ -61,7 +61,7 @@ public class CEBLParameters extends RunTimeParameters
     /**
      * User defined list of root graphs
      */
-    private ArrayList<DGraph> rootGraphs;
+    private List<DGraph> rootGraphs;
 
     /**
      * Unique identifier file
@@ -142,7 +142,7 @@ public class CEBLParameters extends RunTimeParameters
 
 //-----------------------------------------------------------------------------
 
-    public ArrayList<DGraph> getRootGraphs()
+    public List<DGraph> getRootGraphs()
     {
         return rootGraphs;
     }

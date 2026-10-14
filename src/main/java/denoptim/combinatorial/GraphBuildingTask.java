@@ -21,6 +21,7 @@ package denoptim.combinatorial;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -86,7 +87,7 @@ public class GraphBuildingTask extends FitnessTask
      * Vector of indexes identifying the next combination of fragments.
      * This is used only to store info needed to make checkpoint files.
      */
-    private ArrayList<Integer> nextIds;
+    private List<Integer> nextIds;
     
     /**
      * Tool for generating 3D models assembling 3D building blocks.
@@ -163,7 +164,7 @@ public class GraphBuildingTask extends FitnessTask
      * the (next) combination of fragment in the space of combinations.
      */
 
-    public ArrayList<Integer> getNextIds()
+    public List<Integer> getNextIds()
     {
         return nextIds;
     }
@@ -198,7 +199,7 @@ public class GraphBuildingTask extends FitnessTask
      * the (next) combination of fragment in the space of combinations.
      */
 
-    public void setNextIds(ArrayList<Integer> nextIds) throws DENOPTIMException
+    public void setNextIds(List<Integer> nextIds) throws DENOPTIMException
     {
         this.nextIds = new ArrayList<Integer>();
         for (Integer i : nextIds)
@@ -306,7 +307,7 @@ public class GraphBuildingTask extends FitnessTask
                     needsCaps = dGraph.graphNeedsCappingGroups(fragSpace);
                 }
 
-                ArrayList<DGraph> altCyclicGraphs = new ArrayList<DGraph>();
+                List<DGraph> altCyclicGraphs = new ArrayList<DGraph>();
                 if (!needsCaps)
                 {
                     altCyclicGraphs = dGraph.makeAllGraphsWithDifferentRingSets(

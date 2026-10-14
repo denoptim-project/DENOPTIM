@@ -24,6 +24,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -83,11 +84,11 @@ public class RotationalSpaceUtils
      * @throws DENOPTIMException
      */
 
-    public static ArrayList<ObjectPair> defineRotatableBonds(IAtomContainer mol,
+    public static List<ObjectPair> defineRotatableBonds(IAtomContainer mol,
           String defRotBndsFile, boolean addIterfragBonds, boolean excludeRings,
           Logger logger) throws DENOPTIMException
     {
-        ArrayList<ObjectPair> rotatableBonds = new ArrayList<ObjectPair>();
+        List<ObjectPair> rotatableBonds = new ArrayList<ObjectPair>();
 
     	// Set all bond flags
     	for (IBond b : mol.bonds())
@@ -196,7 +197,7 @@ public class RotationalSpaceUtils
         }
 
         // Purge list and store information as bond property
-        ArrayList<ObjectPair> toRemove = new ArrayList<ObjectPair>();
+        List<ObjectPair> toRemove = new ArrayList<ObjectPair>();
         for (ObjectPair op : rotatableBonds)
         {
             int a1 = ((Integer)op.getFirst()).intValue();
@@ -238,10 +239,10 @@ public class RotationalSpaceUtils
      * @param mol the molecule as IAtomContainer
      * @throws DENOPTIMException
      */
-    public static ArrayList<ObjectPair> getInterVertexBonds(IAtomContainer mol) 
+    public static List<ObjectPair> getInterVertexBonds(IAtomContainer mol) 
                                                         throws DENOPTIMException
     {
-        ArrayList<ObjectPair> interfragBonds = new ArrayList<ObjectPair>();
+        List<ObjectPair> interfragBonds = new ArrayList<ObjectPair>();
 
         String p = DENOPTIMConstants.ATMPROPVERTEXPATH;
         for (IBond bnd : mol.bonds())
@@ -385,7 +386,7 @@ public class RotationalSpaceUtils
      * attempt to match the constrained rotatable bonds returns an error
      */
     public static void processConstrainedRotatableBonds(
-        IAtomContainer mol, ArrayList<ObjectPair> rotatableBonds, 
+        IAtomContainer mol, List<ObjectPair> rotatableBonds, 
         String defRotBndContrFile, Logger logger) throws DENOPTIMException
     {
         // We'll use SMARTS so get rid of pseudoatoms that can create problems

@@ -18,7 +18,7 @@
 
 package denoptim.gui;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.table.DefaultTableModel;
@@ -33,7 +33,7 @@ public interface IVertexAPSelection
 {
     public final String APDATACHANGEEVENT = "APDATA";
     
-    public ArrayList<Integer> getSelectedAPIDs();
+    public List<Integer> getSelectedAPIDs();
 
     public Map<Integer,AttachmentPoint> getMapOfAPsInTable();
 
