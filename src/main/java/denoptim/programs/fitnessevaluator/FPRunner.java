@@ -36,6 +36,8 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileFormat;
+import denoptim.graph.Candidate;
 import denoptim.graph.DGraph;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.StaticLogger;
@@ -174,27 +176,40 @@ public class FPRunner
         StopWatch watch = new StopWatch();
         watch.start();
         
-        List<DGraph> graphs = DenoptimIO.readDENOPTIMGraphsFromFile(
-                settings.getInputFile());
+        List<Candidate> candidates = new ArrayList<>();
+        FileFormat ff = denoptim.files.FileUtils.detectFileFormat(settings.getInputFile());
+        switch (ff) {
+            case CANDIDATESDF:
+                candidates = DenoptimIO.readCandidates(settings.getInputFile());
+                break;
+            default:
+                List<DGraph> graphs = DenoptimIO.readDENOPTIMGraphsFromFile(settings.getInputFile());
+                for (DGraph graph : graphs)
+                {
+                    candidates.add(new Candidate(graph));
+                }
+                break;
+        }
+                
         List<IAtomContainer> iacs = DenoptimIO.readSDFFile(
                 settings.getInputFile().getAbsolutePath());
-        if (graphs.size() != iacs.size())
+        if (candidates.size() != iacs.size())
         {
-            throw new DENOPTIMException("Found " + graphs.size() + " and " 
+            throw new DENOPTIMException("Found " + candidates.size() + " and " 
                     + iacs.size() + " in " + settings.getInputFile());
         }
         
         tpe.prestartAllCoreThreads();
         
         int evaluationCount = 0;
-        for (int i=0; i<graphs.size(); i++)
+        for (int i=0; i<candidates.size(); i++)
         {
-            DGraph graph = graphs.get(i);
+            Candidate candidate = candidates.get(i);
             IAtomContainer iac = iacs.get(i);
   
             FitnessEvaluationTask task = new FitnessEvaluationTask(settings,
-                    graph, iac, settings.getWorkDirectory(), 
-                    settings.getOutputFile().getAbsolutePath()+"_"+i);
+                candidate, iac, settings.getWorkDirectory(), 
+                settings.getOutputFile().getAbsolutePath()+"_"+i);
 
             submitted.add(task);
             futures.put(task,tpe.submit(task));
@@ -209,7 +224,7 @@ public class FPRunner
         tpe.shutdown();
         tpe.awaitTermination(settings.getWallTime(), TimeUnit.SECONDS);
         String collectiveOutput = settings.getOutputFile().getAbsolutePath();
-        for (int i=0; i<graphs.size(); i++)
+        for (int i=0; i<candidates.size(); i++)
         {
             String tmpFileFromProvider = collectiveOutput + "_" + i;
             File tmpFile = new File(tmpFileFromProvider);

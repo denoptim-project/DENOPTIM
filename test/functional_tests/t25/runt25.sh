@@ -61,5 +61,12 @@ then
     exit 1
 fi
 
+if ! grep -A 1 '<UID>' "$wrkDir"/t25_out.sdf | grep -q 'MyCustomUID with funny characters @ \*% &(]}'
+then
+    echo " "
+    echo "Test 't25' NOT PASSED (symptom: bad UID)"
+    exit 1
+fi
+
 echo "Test 't25' PASSED"
 exit 0

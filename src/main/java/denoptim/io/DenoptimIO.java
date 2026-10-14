@@ -1437,8 +1437,9 @@ public class DenoptimIO
      * @throws DENOPTIMException is something goes wrong while reading the file
      *                           or interpreting its content
      */
-    public static ArrayList<Candidate> readCandidates(File file) 
-            throws DENOPTIMException {
+    public static List<Candidate> readCandidates(File file) 
+            throws DENOPTIMException 
+    {
         return readCandidates(file,false);
     }
 
@@ -1456,8 +1457,9 @@ public class DenoptimIO
      *                           or interpreting its content
      */
     
-    public static ArrayList<Candidate> readCandidates(File file, 
-            boolean allowNoUID) throws DENOPTIMException {
+    public static List<Candidate> readCandidates(File file, 
+            boolean allowNoUID) throws DENOPTIMException 
+    {
         String filename = file.getAbsolutePath();
         ArrayList<Candidate> candidates = new ArrayList<>();
         ArrayList<IAtomContainer> iacs = readSDFFile(file.getAbsolutePath());
@@ -1473,7 +1475,8 @@ public class DenoptimIO
                     DENOPTIMConstants.GAGENDIRNAMEROOT.length()));
         }
         
-        for (IAtomContainer iac : iacs) {
+        for (IAtomContainer iac : iacs) 
+        {
             Candidate cand = new Candidate(iac, false, allowNoUID);
             cand.setSDFFile(filename);
             if (genID!=-1)

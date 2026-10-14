@@ -48,8 +48,8 @@ public class FitnessEvaluationTask extends FitnessTask
      * Fragment space in use.
      */
     private FragmentSpace fragSpace;
-    
-//------------------------------------------------------------------------------
+
+    //------------------------------------------------------------------------------
     
     /**
      * @param molGraph the DENOPTIM representation of the entity to evaluate
@@ -57,12 +57,26 @@ public class FitnessEvaluationTask extends FitnessTask
      * @param workDir where files will be placed.
      * @param outFileName filename of the output file.
      */
-    public FitnessEvaluationTask(FRParameters settings, 
-            DGraph molGraph, IAtomContainer iac, 
-            String workDir, String outFileName)
+    public FitnessEvaluationTask(FRParameters settings, DGraph molGraph, 
+        IAtomContainer iac, String workDir, String outFileName)
+    {
+        this(settings, new Candidate(molGraph), iac, workDir, outFileName);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * @param settings the settings for the fitness evaluation
+     * @param candidate the candidate to evaluate
+     * @param iac the molecular representation of the entity to evaluate
+     * @param workDir where files will be placed.
+     * @param outFileName filename of the output file.
+     */
+    public FitnessEvaluationTask(FRParameters settings, Candidate candidate, 
+        IAtomContainer iac, String workDir, String outFileName)
     {
     	super((FitnessParameters) settings.getParameters(
-                ParametersType.FIT_PARAMS), new Candidate(molGraph));
+                ParametersType.FIT_PARAMS), candidate);
     	FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
         if (settings.containsParameters(ParametersType.FS_PARAMS))
         {

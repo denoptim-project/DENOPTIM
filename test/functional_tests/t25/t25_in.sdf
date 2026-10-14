@@ -102,4 +102,11 @@ M  END
   "symVertices": []
 }
 
+> <UID>
+MyCustomUID with funny characters @ *% &(]}
+
+> <SMILES>
+mySMILES
+
+
 $$$$
