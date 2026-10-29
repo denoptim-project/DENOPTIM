@@ -472,6 +472,33 @@ public class GAParameters extends RunTimeParameters
      */
     protected boolean writePopOnDisk = false;
 
+    /**
+     * Hostname of the AI Engine Server
+     */
+    protected String aiEngineServerHostname = "localhost";
+
+    /**
+     * Port of the AI Engine Server
+     */
+    protected Integer aiEngineServerPort = 5973;
+
+    /**
+     * Pathname to file where to record requests sent to the AI Engine Server.
+     * If <code>null</code>, no file is written.
+     */
+    protected String aiEngineServerRequestsFileName = null;
+
+    /**
+     * Flag requesting to use the AI engine for generating the initial population.
+     */
+    protected boolean useAIEngineForInitialPopulation = false;
+
+    /**
+     * Pathname to file where to store the configuration for the Reinvent de novo
+     * engine.
+     */
+    protected String reinventDeNovoConfigFileName = null;
+
 //------------------------------------------------------------------------------
     
     /**
@@ -909,6 +936,64 @@ public class GAParameters extends RunTimeParameters
     {
         return coupleMutationAndCrossover;
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * @return <code>true</code> if we are configures to save all population
+     * members each time we report the population details on file.
+     */
+    public boolean savePopFile()
+    {
+        return writePopOnDisk;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Return the value of the number of rings that we are allowed to add in a 
+     * single {@link MutationType#ADDRING} mutation.
+     * @return the maximum number of rings added in a single mutation.
+     */
+    public int getMaxRingsAddedByMutation()
+    {
+        return maxRingsAddedByMutation;
+    }
+
+//------------------------------------------------------------------------------
+
+    public String getAIEngineServerHostname() 
+    {
+        return aiEngineServerHostname;
+    }
+
+//------------------------------------------------------------------------------
+
+    public Integer getAIEngineServerPort() 
+    {
+        return aiEngineServerPort;
+    }
+
+//------------------------------------------------------------------------------
+
+    public String getPathnameForRecordingAIEngineRequests() 
+    {
+        return aiEngineServerRequestsFileName;
+    } 
+
+//------------------------------------------------------------------------------
+
+    public boolean useAIEngineForInitialPopulation() 
+    {
+        return useAIEngineForInitialPopulation;
+    }
+
+//------------------------------------------------------------------------------
+
+    public String getPathnameReinventDeNovoConfig() 
+    {
+        return reinventDeNovoConfigFileName;
+    } 
 
 //------------------------------------------------------------------------------
 
@@ -919,8 +1004,7 @@ public class GAParameters extends RunTimeParameters
      * @throws DENOPTIMException
      */
 
-    public void interpretKeyword(String key, String value)
-                                                      throws DENOPTIMException
+    public void interpretKeyword(String key, String value) throws DENOPTIMException
     {
         String msg = "";
         switch (key.toUpperCase())
@@ -1483,7 +1567,49 @@ public class GAParameters extends RunTimeParameters
                 }
                 break;
             }
+
+            case "AIENGINEHOSTNAME=":
+            {
+                if (value.length() > 0)
+                {
+                    aiEngineServerHostname = value;
+                }
+                break;
+            }
             
+            case "AIENGINEPORT=":
+            {
+                if (value.length() > 0)
+                {
+                    aiEngineServerPort = Integer.parseInt(value);
+                }
+                break;
+            }
+            
+            case "RECORDAIENGINEREQUESTSTOFILE=":
+            {
+                if (value.length() > 0)
+                {
+                    aiEngineServerRequestsFileName = value;
+                }
+                break;
+            }
+
+            case "USEAIENGINEFORINITIALPOPULATION=":
+            {
+                useAIEngineForInitialPopulation = readYesNoTrueFalse(value);
+                break;
+            }
+
+            case "REINVENTDENOVOCONFIGFILE=":
+            {
+                if (value.length() > 0)
+                {
+                    reinventDeNovoConfigFileName = value;
+                }
+                break;
+            }
+
             case "WRITEPOPULATIONTOFILE":
             {
                 writePopOnDisk = true;
@@ -1720,29 +1846,6 @@ public class GAParameters extends RunTimeParameters
             sb.append(otherCollector.getPrintedList());
         }
         return sb.toString();
-    }
-    
-//------------------------------------------------------------------------------
-    
-    /**
-     * @return <code>true</code> if we are configures to save all population
-     * members each time we report the population details on file.
-     */
-    public boolean savePopFile()
-    {
-        return writePopOnDisk;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Return the value of the number of rings that we are allowed to add in a 
-     * single {@link MutationType#ADDRING} mutation.
-     * @return the maximum number of rings added in a single mutation.
-     */
-    public int getMaxRingsAddedByMutation()
-    {
-        return maxRingsAddedByMutation;
     }
 
 //------------------------------------------------------------------------------

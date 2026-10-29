@@ -202,7 +202,6 @@ public class MultiMolecularModelBuilder
                         logger.log(Level.SEVERE, msg);
                         throw new DENOPTIMException(msg, e);
                     }
-                    
                 }
             }
             logger.log(Level.FINE, "TIME (conf. search): "+time/1000000+" ms"

@@ -71,6 +71,7 @@ import denoptim.graph.Vertex.BBType;
 import denoptim.graph.rings.CyclicGraphHandler;
 import denoptim.graph.rings.RingClosureParameters;
 import denoptim.graph.rings.RingClosuresArchive;
+import denoptim.integration.molgenerators.ReinventServerClient;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.CounterID;
 import denoptim.logging.Monitor;
@@ -828,6 +829,37 @@ public class EAUtils
         settings.getLogger().log(Level.INFO, msg);
         
         return candidate;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Uses an external microservice for unbiased generation of candidates.
+     * @param mnt
+     * @param settings
+     * @param nextBatchSize
+     * @return
+     * @throws DENOPTIMException
+     */
+    public static List<Candidate> buildCandidateFromAIEngine(Monitor mnt,
+        GAParameters settings, int nextBatchSize) throws DENOPTIMException
+    {
+        mnt.increase(CounterID.BUILDANEWATTEMPTS);
+        mnt.increase(CounterID.NEWCANDIDATEATTEMPTS);
+        ReinventServerClient reinventClient = ReinventServerClient.getInstance(
+            settings,
+            mnt);
+        reinventClient.setRecordRequestsFileName(
+            settings.getPathnameForRecordingAIEngineRequests());
+        List<Candidate> candidates;
+        try {
+            candidates = reinventClient.generateCandidates(null,
+                nextBatchSize, settings.getLogger());
+        } catch (IOException e) {
+            mnt.increase(CounterID.FAILEDBUILDATTEMPTS);
+            throw new DENOPTIMException("Error generating candidates from Reinvent service", e);
+        }
+        return candidates;
     }
     
 //------------------------------------------------------------------------------

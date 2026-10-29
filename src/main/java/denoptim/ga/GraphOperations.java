@@ -2717,6 +2717,7 @@ public class GraphOperations
         switch (mType) 
         {
             case CHANGEBRANCH:
+                //TODO-ai: add AI analogue
                 done = rebuildBranch(vertex, force, chosenVrtxIdx, chosenApId, 
                         settings);
                 if (!done)
@@ -2725,6 +2726,7 @@ public class GraphOperations
                 break;
                 
             case CHANGELINK:
+                //TODO-ai: add AI analogue
                 done = substituteLink(vertex, chosenVrtxIdx, mnt, 
                         fsParams.getFragmentSpace());
                 if (!done)
@@ -2748,6 +2750,7 @@ public class GraphOperations
                 break;
                 
             case ADDLINK:
+                //TODO-ai: add AI analogue
                 if (chosenApId < 0)
                 {
                     List<Integer> candidates = new ArrayList<Integer>();
@@ -2787,6 +2790,7 @@ public class GraphOperations
                 break;
                 
             case EXTEND:
+                //TODO-ai: add AI analogue
                 vertex.getGraphOwner().removeCappingGroupsOn(vertex);
                 done = extendGraph(vertex, false, false, force, chosenVrtxIdx, 
                         chosenApId, settings);

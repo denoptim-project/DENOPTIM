@@ -418,6 +418,7 @@ public class EvolutionaryAlgorithm
                 population.trim(settings.getPopulationSize());
             }
         }
+
         // NB: pop size cannot be > because it has been just trimmed
         if (population.size() == settings.getPopulationSize())
         {
@@ -520,34 +521,59 @@ public class EvolutionaryAlgorithm
         List<Task> tasks = new ArrayList<>();
         try 
         {
-            while (i < settings.getPopulationSize() *
-                    settings.getMaxTriesFactor()) 
+            if (settings.useAIEngineForInitialPopulation()) 
             {
-                i++;
-                
-                if (stopped)
+                while (i < settings.getPopulationSize() * settings.getMaxTriesFactor()) 
                 {
-                    break;
-                }
-                
-                if (checkForException())
-                {
-                    stopRun();
-                    throw new DENOPTIMException("Errors found during sub tasks "
-                            + "execution.", ex);
-                }
-                
-                synchronized (population)
-                {
-                    if (population.size() >= settings.getPopulationSize())
+                    i++;
+                    
+                    if (stopped)
+                    {
                         break;
+                    }
+                    
+                    int nextBatchSize = settings.getPopulationSize() - population.size();
+                    if (nextBatchSize <= 0)
+                        break;
+
+                    List<Candidate> candidates = EAUtils.buildCandidateFromAIEngine(mnt, 
+                        settings, nextBatchSize);
+                    for (Candidate candidate : candidates)
+                    {
+                        i = processInitialPopCandidate(candidate, population, mnt, 
+                            tasks, i, false, false);
+                    }
                 }
-                
-                Candidate candidate = EAUtils.buildCandidateFromScratch(mnt,
-                        settings);
-                
-                i = processInitialPopCandidate(candidate, population, mnt, 
-                        tasks, i, false, false);
+            } else {
+                // Fragment-based generation of candidates
+                while (i < settings.getPopulationSize() * settings.getMaxTriesFactor()) 
+                {
+                    i++;
+                    
+                    if (stopped)
+                    {
+                        break;
+                    }
+                    
+                    if (checkForException())
+                    {
+                        stopRun();
+                        throw new DENOPTIMException("Errors found during sub tasks "
+                                + "execution.", ex);
+                    }
+                    
+                    synchronized (population)
+                    {
+                        if (population.size() >= settings.getPopulationSize())
+                            break;
+                    }
+                    
+                    Candidate candidate = EAUtils.buildCandidateFromScratch(mnt,
+                            settings);
+                    
+                    i = processInitialPopCandidate(candidate, population, mnt, 
+                            tasks, i, false, false);
+                }
             }
         } catch (DENOPTIMException dex)
         {

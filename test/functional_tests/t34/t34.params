@@ -1,0 +1,30 @@
+#
+# This is the parameter file for test t34
+#
+
+# Definition of the Fragment Space
+FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf
+FS-cappingFragmentLibFile=OTF_WDIR/lib_cap.sdf
+FS-compMatrixFile=OTF_WDIR/CPMap.par
+
+# Genetic Algorithm parameters
+GA-randomSeed=8572368003836
+GA-Parallelization=synchronous
+GA-numParallelTasks=1
+GA-populationSize=20
+GA-numChildren=10
+GA-numGenerations=4
+
+# Interface with Reinvent
+GA-UseAIEngineForInitialPopulation=true
+GA-ReinventDeNovoConfigFile=OTF_WDIR/reinvent_config_denovo.json
+
+# These caps are used to ensure consistency with the pre-computed expected results in case default values change
+GA-MaxXoverCompatVrtxPairs=500
+GA-MaxXoverEndPointsCombinations=50
+GA-MaxXoverEndPointsPermutations=10
+GA-MaxAPMappingCombinations=250
+
+# fitness provider
+FP-EQUATION=${3*Zagreb - 0.2*nAtom}
+FP-CheckUidBeforeFitness=yes

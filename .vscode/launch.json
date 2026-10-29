@@ -104,6 +104,18 @@
             ],
             "cwd": "/tmp/polycycle/run_1",
             "console": "integratedTerminal"
-        }
+        },
+        {
+            "type": "java",
+            "name": "Run test t34 REINVENT4",
+            "projectName": "denoptim",
+            "request": "launch",
+            "mainClass": "denoptim.main.Main",
+            "args": [
+                "-r", "GA", "t34.params"
+            ],
+            "cwd": "/tmp/denoptim_test/t34",
+            "console": "integratedTerminal"
+        },
     ]
 }
