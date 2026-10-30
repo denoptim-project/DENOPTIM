@@ -7,6 +7,9 @@ FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf
 FS-cappingFragmentLibFile=OTF_WDIR/lib_cap.sdf
 FS-compMatrixFile=OTF_WDIR/CPMap.par
 
+# Used by mol-to-graph (TODO: make it use default rules)
+FRG-CuttingrulesFile=OTF_WDIR/cutting_rules
+
 # Genetic Algorithm parameters
 GA-randomSeed=8572368003836
 GA-Parallelization=synchronous

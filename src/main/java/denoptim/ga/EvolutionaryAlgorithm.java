@@ -526,11 +526,8 @@ public class EvolutionaryAlgorithm
                 while (i < settings.getPopulationSize() * settings.getMaxTriesFactor()) 
                 {
                     i++;
-                    
                     if (stopped)
-                    {
                         break;
-                    }
                     
                     int nextBatchSize = settings.getPopulationSize() - population.size();
                     if (nextBatchSize <= 0)
@@ -549,11 +546,8 @@ public class EvolutionaryAlgorithm
                 while (i < settings.getPopulationSize() * settings.getMaxTriesFactor()) 
                 {
                     i++;
-                    
                     if (stopped)
-                    {
                         break;
-                    }
                     
                     if (checkForException())
                     {

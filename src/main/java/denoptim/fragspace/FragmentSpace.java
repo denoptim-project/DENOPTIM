@@ -715,6 +715,29 @@ public class FragmentSpace
         }
         return lstFragIdx;
     }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Make a vertex from the library of the given type and index.
+     * @param type the type of the vertex.
+     * @param idx the index of the vertex in the library.
+     * @return the vertex.
+     */
+    public Vertex makeVertexFromLLibrary(BBType type, int chosenIdx)
+    {
+        Vertex vertex = null;
+        try
+        {
+            vertex = Vertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(), chosenIdx, 
+                    type, this);
+        } catch (DENOPTIMException e)
+        {
+            //This cannot happen!
+        }
+        return vertex;
+    }
     
 //------------------------------------------------------------------------------
 
@@ -730,7 +753,7 @@ public class FragmentSpace
         try
         {
             scaffold = Vertex.newVertexFromLibrary(
-                    GraphUtils.getUniqueVertexIndex(),chosenIdx, 
+                    GraphUtils.getUniqueVertexIndex(), chosenIdx, 
                     BBType.SCAFFOLD, this);
         } catch (DENOPTIMException e)
         {

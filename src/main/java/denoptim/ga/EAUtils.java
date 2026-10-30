@@ -853,7 +853,8 @@ public class EAUtils
             settings.getPathnameForRecordingAIEngineRequests());
         List<Candidate> candidates;
         try {
-            candidates = reinventClient.generateCandidates(null,
+            candidates = reinventClient.generateCandidates(
+                reinventClient.getScaffoldsSMILES(settings),
                 nextBatchSize, settings.getLogger());
         } catch (IOException e) {
             mnt.increase(CounterID.FAILEDBUILDATTEMPTS);

@@ -4526,7 +4526,7 @@ public class DGraph implements Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Add a capping group on the given vertices, if needed. The need for such 
+     * Add capping groups on the given vertices, if needed. The need for such 
      * groups is manifest when an attachment point that is not used in this
      * or any embedding lever (i.e., attachment point is 
      * {@link AttachmentPoint#isAvailableThroughout()}) has and 
@@ -4586,6 +4586,36 @@ public class DGraph implements Cloneable
                             throw new Error(msg);
                         }
                     }
+                }
+            }
+        }
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Add a specific vertex (acting as a capping group) on the given vertices.
+     * This does not care about APClass compatibility, it just adds clones of 
+     * the given vertex as capping groups on the given vertices.
+     * @param vertexAddedToThis list of vertices to operate on. They must belong to this
+     * graph.
+     * @param cappingVertex the vertex to add as a capping group.
+     * @throws DENOPTIMException if the addition of capping groups cannot be 
+     * performed.
+     */
+
+    public void addCapOnAllFreeAPs(List<Vertex> vertexAddedToThis, 
+        Vertex cappingVrtx) throws DENOPTIMException
+    {
+        for (Vertex curVertex : vertexAddedToThis)
+        {
+            for (AttachmentPoint curDap : curVertex.getAttachmentPoints())
+            {
+                if (curDap.isAvailableThroughout())
+                {
+                    Vertex capVrtx = cappingVrtx.clone();
+                    capVrtx.setVertexId(GraphUtils.getUniqueVertexIndex());
+                    appendVertexOnAP(curDap, capVrtx.getAP(0));
                 }
             }
         }
@@ -6085,6 +6115,7 @@ public class DGraph implements Cloneable
         IAtomContainer mol;
         try
         {
+//TODO-gg: remove usage of this flag in the Vertex class.
             Vertex.setEmbedJsonInIAtomContainer(false);
             ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(settings.getLogger(),
                     settings.getRandomizer());

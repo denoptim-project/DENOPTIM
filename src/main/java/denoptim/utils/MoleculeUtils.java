@@ -326,15 +326,36 @@ public class MoleculeUtils
 
     /**
      * Returns the SMILES representation of the molecule. All atoms are expected 
-     * to be explicit, as we set the count of implicit H to zero for all atoms.
+     * to be explicit, as we set the count of implicit H to zero for all atoms. 
+     * The resulting SMILES does not use implicit H.
      * @param mol the molecule
      * @param logger program.specific logger.
      * @return smiles string
      * @throws DENOPTIMException
      */
 
-    public static String getSMILESForMolecule(IAtomContainer mol, Logger logger)
-            throws DENOPTIMException {
+    public static String getSMILESForMolecule(IAtomContainer mol, Logger logger) 
+        throws DENOPTIMException 
+    {
+        return getSMILESForMolecule(mol, false, logger);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the SMILES representation of the molecule. All atoms are expected 
+     * to be explicit, as we set the count of implicit H to zero for all atoms,
+     * but we can decide if we want to rely on implicit H in the resulting SMILES.
+     * @param mol the molecule
+     * @param useImplicitH whether to use implicit H
+     * @param logger program.specific logger.
+     * @return smiles string
+     * @throws DENOPTIMException
+     */
+
+    public static String getSMILESForMolecule(IAtomContainer mol, 
+        boolean useImplicitH, Logger logger) throws DENOPTIMException 
+    {
         IAtomContainer fmol = builder.newAtomContainer();
         try 
         {
@@ -357,6 +378,10 @@ public class MoleculeUtils
         // WARNING: assumptions on implicit H count and bond orders!
         MoleculeUtils.setZeroImplicitHydrogensToAllAtoms(fmol);
         MoleculeUtils.ensureNoUnsetBondOrdersSilent(fmol);
+
+        // Remove H than can be reported as implicit H
+        if (useImplicitH)
+            AtomContainerManipulator.suppressHydrogens(fmol);
 
         String smiles = "";
         try

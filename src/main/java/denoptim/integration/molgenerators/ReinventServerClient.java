@@ -27,14 +27,20 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.vecmath.Point3d;
+
 import org.openscience.cdk.DefaultChemObjectBuilder;
+import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.exception.InvalidSmilesException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.smiles.SmiFlavor;
+import org.openscience.cdk.smiles.SmilesGenerator;
 import org.openscience.cdk.smiles.SmilesParser;
 
 import com.google.gson.Gson;
@@ -47,11 +53,23 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.ga.EAUtils;
+import denoptim.graph.APClass;
+import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Candidate;
+import denoptim.graph.DGraph;
+import denoptim.graph.Fragment;
+import denoptim.graph.Vertex;
+import denoptim.graph.Vertex.BBType;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.Monitor;
+import denoptim.molecularmodeling.ThreeDimTreeBuilder;
+import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
+import denoptim.utils.DummyAtomHandler;
+import denoptim.utils.MoleculeUtils;
 import denoptim.utils.Randomizer;
 
 
@@ -334,6 +352,9 @@ public class ReinventServerClient
      */
     private Candidate parseSmilesToCandidate(String smiles, int index) 
     {
+        //TODO-gg del
+        System.out.println("Smiles From Reinvent: " + smiles);
+
         IAtomContainer iac = null;
         try {
             iac = smilesParser.parseSmiles(smiles);
@@ -348,6 +369,7 @@ public class ReinventServerClient
 
         //TODO-ai consider counting events in monitor
         try {
+            MoleculeUtils.explicitHydrogens(iac);
             Candidate candidate = EAUtils.buildCandidateByFragmentingMolecule(iac, 
                 mnt, gaSettings, index);
             if (candidate != null) {
@@ -371,6 +393,10 @@ public class ReinventServerClient
     public String formulateRequest(List<String> inputs, 
         int n) throws IOException
     {    
+        // compute the number of molecules to generate so that they are almost equally 
+        // distributed among the scaffolds.
+        int totalNumMols = calculateNumMoleculesRequested(inputs, n);
+
         JsonObject jsonObj = deNovoConfig == null
                 ? new JsonObject()
                 : deNovoConfig.deepCopy();
@@ -381,7 +407,7 @@ public class ReinventServerClient
 
         // The number of new molecules to generate. This replaces parameters.num_smiles
         // when that element is already present and leaves the other parameters in place.
-        overwriteProperty(jsonObj, new JsonPrimitive(n), "parameters", "num_smiles");
+        overwriteProperty(jsonObj, new JsonPrimitive(totalNumMols), "parameters", "num_smiles");
         
         if (inputs != null)
         {
@@ -393,6 +419,27 @@ public class ReinventServerClient
             jsonObj.add("input_strings", inputsArray);
         }
         return jsonConverter.toJson(jsonObj);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Calculates the number of molecules to request from the Reinvent socket server.
+     * Since Reinvent generates a number of molecules per each input, we want to 
+     * adjust the request to the number of inputs to avoid generating too many
+     * molecules just to trash them.
+     * @param inputs the input strings based on SMILES with attachment points
+     * @param n the number of candidates to generate.
+     * @return the number of molecules to request.
+     */
+    static int calculateNumMoleculesRequested(List<String> inputs, int n)
+    {
+        if (inputs == null || inputs.isEmpty())
+        {
+            return n;
+        }
+        int numInputs = inputs.size();
+        return (int) (((long) n + numInputs - 1) / numInputs);
     }
 
 //------------------------------------------------------------------------------
@@ -537,11 +584,90 @@ public class ReinventServerClient
         try
         {
             socket.close();
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return answer;
+    }
+
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Gets the scaffolds SMILES strings from the GA settings.
+     * @param settings the GA settings.
+     * @return the scaffolds SMILES strings or null if no scaffolds are available.
+     */
+    public List<String> getScaffoldsSMILES(GAParameters settings)
+    {
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        if (settings.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsParams = (FragmentSpaceParameters)settings.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
+        FragmentSpace fragSpace = fsParams.getFragmentSpace();
+
+        List<String> smilesList = new ArrayList<>();
+        if (fragSpace != null && fragSpace.getScaffoldLibrary() != null 
+                && !fragSpace.getScaffoldLibrary().isEmpty()) 
+        {
+            List<Vertex> scaffolds = fragSpace.getScaffoldLibrary();
+            for (int i = 0; i < scaffolds.size(); i++)
+            {
+                Vertex scafVertex = fragSpace.makeVertexFromLLibrary( 
+                        BBType.SCAFFOLD, i);
+
+                if (!scafVertex.containsAtoms())
+                    continue;
+
+                // Make a graph where all APs on the scaffold are saturated with
+                // attachment point placeholder pseudoatom R.
+                DGraph graph = new DGraph();
+                String smiles = null;
+                try {
+                    graph.addVertex(scafVertex);
+                    graph.addCapOnAllFreeAPs(Arrays.asList(scafVertex), getAPPlaceHolder());
+
+                    ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(settings.getLogger(),
+                        settings.getRandomizer());
+                    t3d.setAlignBBsIn3D(false);
+                    IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(graph,true);
+                    
+                   smiles= MoleculeUtils.getSMILESForMolecule(mol, true, settings.getLogger());
+                } catch (Exception e) {
+                    settings.getLogger().log(Level.WARNING, 
+                        "Scaffold decorated with AP placeholders "
+                        + "could not be converted to SMILES. Skipping scaffold "
+                        + "for de novo generation with Reinvent.");
+                    continue;
+                }
+                smilesList.add(smiles);
+            }
+        }
+
+        if (smilesList.size() > 0) {
+            return smilesList;
+        }
+        return null;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Gets a placeholder vertex for attachment points.
+     * @return the placeholder vertex.
+     * @throws DENOPTIMException 
+     */
+    private Vertex getAPPlaceHolder() throws DENOPTIMException
+    {
+        Fragment apPlaceHolder = new Fragment();
+        PseudoAtom atm = new PseudoAtom("R", 
+            new Point3d(new double[]{0.0, 0.0, 0.0}));
+    	apPlaceHolder.addAtom(atm);
+    	apPlaceHolder.addAPOnAtom(atm, APClass.make("APPlaceholder:0"), 
+            new Point3d(new double[]{0.0, 0.0, 1.0}));
+        return apPlaceHolder;
     }
 
 //------------------------------------------------------------------------------
