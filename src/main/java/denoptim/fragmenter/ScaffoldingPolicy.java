@@ -5,7 +5,8 @@ package denoptim.fragmenter;
  */
 public enum ScaffoldingPolicy {
     LARGEST_FRAGMENT,
-    ELEMENT;
+    ELEMENT,
+    NONE;
     
     /**
      * Label defining additional details, such as which label to search for in 

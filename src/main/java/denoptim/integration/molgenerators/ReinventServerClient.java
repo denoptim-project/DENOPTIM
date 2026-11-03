@@ -60,6 +60,7 @@ import com.google.gson.JsonSyntaxException;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.fragmenter.FragmenterTools;
+import denoptim.fragmenter.ScaffoldingPolicy;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.ga.EAUtils;
@@ -384,8 +385,6 @@ public class ReinventServerClient
         return candidates;
     }
 
-
-
 //------------------------------------------------------------------------------
 
     /**
@@ -422,7 +421,7 @@ public class ReinventServerClient
      * This is only meant for logging.
      * @return The {@link Candidate} object
      */
-    private Candidate parseSmilesToCandidate(String smiles, DGraph scaffoldGraph, int index) 
+    Candidate parseSmilesToCandidate(String smiles, DGraph scaffoldGraph, int index) 
     {
         //TODO-gg del
         System.out.println("SMILES From Reinvent: " + smiles);
@@ -498,13 +497,6 @@ public class ReinventServerClient
                 }
             }
 
-            // Keep track of the mapping between placeholdingAPs and their users.
-            APMapping placeholderToUserMap = new APMapping();
-            for (int i = 0; i < placeholdingAPs.size(); i++)
-            {
-                placeholderToUserMap.put(placeholdingAPs.get(i), placeholdingAPs.get(i).getLinkedAP());
-            }
-
             // Each placeholdingAPs is on a fragment that we must try to chop further.
             Map<Vertex,DGraph> replacements = new HashMap<>();
             Set<Vertex> visitedFragments = new HashSet<>();
@@ -518,8 +510,11 @@ public class ReinventServerClient
                 IAtomContainer fragIAC = fragToFragment.getIAtomContainer();
                 DGraph fragGraph = null;
                 try {
+                    FragmenterParameters frgParamsNoScaffolding = new FragmenterParameters();
+                    frgParamsNoScaffolding.setCuttingRules(frgParams.getCuttingRules());
+                    frgParamsNoScaffolding.setScaffoldingPolicy(ScaffoldingPolicy.NONE);
                     fragGraph = FragmenterTools.makeGraphFromFragmentationOfMol(
-                        fragIAC, frgParams, fragSpace, false);
+                        fragIAC, frgParamsNoScaffolding, fragSpace, false);
                 } catch (DENOPTIMException e) {
                     // Keep the original un-fragmented fragment, so do nothing.
                 }
@@ -529,7 +524,7 @@ public class ReinventServerClient
                 visitedFragments.add(fragToFragment);
             }
 
-            // Replaced un-fragmenter fragment with its graph version.
+            // Replaced un-fragmented fragment with the graph resulting from fragmentation.
             for (Map.Entry<Vertex,DGraph> e : replacements.entrySet()) 
             {
                 Vertex fragToReplace = e.getKey();
@@ -545,14 +540,14 @@ public class ReinventServerClient
                     }
                 }
 
-                APMapping apMapping = new APMapping();
+                APMapping apMapOldToIncoming = new APMapping();
                 for (AttachmentPoint apOnIncGraph : placeholdingAPsOnIncGraph)
                 {
-                    for (AttachmentPoint placeholderAP : placeholderToUserMap.keySet())
+                    for (AttachmentPoint placeholdingAP : placeholdingAPs)
                     {
-                        if (placeholderAP.getAPClass().equals(apOnIncGraph.getAPClass()))
+                        if (placeholdingAP.getAPClass().equals(apOnIncGraph.getAPClass()))
                         {
-                            apMapping.put(apOnIncGraph, placeholderToUserMap.get(placeholderAP));
+                            apMapOldToIncoming.put(placeholdingAP, apOnIncGraph);
                             break;
                         }
                     }
@@ -560,12 +555,21 @@ public class ReinventServerClient
 
                 try {
                     graph.replaceSubGraph(Arrays.asList(fragToReplace), incomingGraph, 
-                        apMapping, fragSpace);
+                        apMapOldToIncoming, fragSpace);
                 } catch (DENOPTIMException e2) {
                     //TODO-ai consider counting events in monitor
                     return null;
                 }
             }
+        }
+
+        //TODO-gg del
+        try {
+            DenoptimIO.writeGraphToFile(new File("/tmp/graph.json"), 
+                FileFormat.GRAPHJSON, graph);
+        } catch (DENOPTIMException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
 
         Candidate candidate = null;
@@ -895,7 +899,7 @@ public class ReinventServerClient
      * Gets a placeholder vertex for attachment points.
      * @return the placeholder vertex.
      */
-    private Vertex getAPPlaceHolder(int apId)
+    static Vertex getAPPlaceHolder(int apId)
     {
         Fragment placeHolderFrag = new Fragment();
         PseudoAtom atm = new PseudoAtom("R", 

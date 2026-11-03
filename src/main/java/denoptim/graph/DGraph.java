@@ -5191,6 +5191,10 @@ public class DGraph implements Cloneable
        * scaffold.
        * @param g Graph to fix.
        */
+
+      // NB: since the edge direction is an expression of AP-class compatibility,
+      // we should never arbitrarily change the direction of edges.
+
       private static void reorderVertexList(DGraph g) 
       {
           Vertex newScaffold = g.getSourceVertex();
@@ -5207,6 +5211,10 @@ public class DGraph implements Cloneable
      * Flips edges in the graph so that the scaffold is the only source vertex.
      * @param graph to fix edges of.
      */
+
+    // NB: since the edge direction is an expression of AP-class compatibility,
+    // we should never arbitrarily change the direction of edges.
+
     private static void fixEdgeDirections(DGraph graph) 
     {
         Vertex src = graph.getSourceVertex();

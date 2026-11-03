@@ -248,7 +248,7 @@ public class ThreeDimTreeBuilder
         // initialize the atom container to be returned
         IAtomContainer mol = builder.newAtomContainer();
         
-        // We start from the scallof, if any, otherwise we start from the first vertex
+        // We start from the scaffold, if any, otherwise we start from the first vertex
         Vertex rootVrtx = graph.getSourceVertex();
         append3DFragmentsDisconnected(rootVrtx, mol, graph, removeUsedRCAs, rebuild, 
             apsPerVertexId, apsPerEdge, apsPerAtom, apsPerBond);
@@ -530,13 +530,13 @@ public class ThreeDimTreeBuilder
                 append3DFragmentsViaEdges(mol, graph,
                         apSrc.getAtomPositionNumberInMol(),
                         srcPtApSrc,trgPtApSrc,edge,removeUsedRCAs, rebuild,
-                        apsPerVertexId,apsPerEdge,apsPerAtom,apsPerBond);
+                        apsPerVertexId, apsPerEdge, apsPerAtom, apsPerBond);
             } else {
                 // Append next building block - start recursion
                 Point3d pt = getRandomPoint(mol);
                 append3DFragmentsViaEdges(mol, graph, -1, pt, pt, edge, 
                         removeUsedRCAs, rebuild,
-                        apsPerVertexId,apsPerEdge,apsPerAtom,apsPerBond);
+                        apsPerVertexId, apsPerEdge, apsPerAtom, apsPerBond);
             }
         }
     }

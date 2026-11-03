@@ -739,6 +739,7 @@ public class FragmenterTools
         {
             // Consider subgraphs embedding
             Map<Vertex, Vertex> fragsAndReplacingTemplates = new HashMap<>();
+
             for (Vertex fragToReplace : fragments)
             {
                 // Identify the template graph's vertex matched by this new fragment
@@ -871,13 +872,11 @@ public class FragmenterTools
             int srcAtmIdx = (Integer) srcPair.getFirst();
             AttachmentPoint srcAPPossiblyThroughRing = (AttachmentPoint) srcPair.getSecond();
             APClass srcAPClass = srcAPPossiblyThroughRing.getAPClass();
-            BBType srcBBType = srcAPPossiblyThroughRing.getOwner().getBuildingBlockType();
 
             ObjectPair trgPair = getAtomIdxforAP(edge.getTrgAP(), graph, usedRCVs);
             int trgAtmIdx = (Integer) trgPair.getFirst();
             AttachmentPoint trgAPPossiblyThroughRing = (AttachmentPoint) trgPair.getSecond();
             APClass trgAPClass = trgAPPossiblyThroughRing.getAPClass();
-            BBType trgBBType = trgAPPossiblyThroughRing.getOwner().getBuildingBlockType();
 
             IAtom graphAtmSrc = graphIAC.getAtom(srcAtmIdx);
             IAtom graphAtmTrg = graphIAC.getAtom(trgAtmIdx);
@@ -1026,6 +1025,11 @@ public class FragmenterTools
         if (mol.getAtomCount() != masterFragIAC.getAtomCount())
         {
             throw new DENOPTIMException("The number of atoms in the molecule and the master fragment are not the same.");
+        }
+        if (MoleculeUtils.allCoordinatesAreZero(mol)
+                || MoleculeUtils.allCoordinatesAreZero(graphIAC))
+        {
+            return new Point3d(0.0, 0.0, 0.0);
         }
 
         // Work with cloned molecules
@@ -2310,6 +2314,7 @@ public class FragmenterTools
                             if (setAsScaffold)
                             {
                                 firstVertex = v;
+                                firstVertex.setBuildingBlockType(BBType.SCAFFOLD);
                                 break;
                             }
                         }
@@ -2317,7 +2322,6 @@ public class FragmenterTools
                     break;
                 }
 
-                default:
                 case LARGEST_FRAGMENT:
                 {
                     try {
@@ -2330,6 +2334,13 @@ public class FragmenterTools
                         throw new DENOPTIMException("Cannot get largest fragment "
                                 + "among " + fragments.size() + " fragments.", e);
                     }
+                    firstVertex.setBuildingBlockType(BBType.SCAFFOLD);
+                    break;
+                }
+
+                case NONE:
+                {
+                    firstVertex = fragments.get(0);
                     break;
                 }
             }
@@ -2338,8 +2349,6 @@ public class FragmenterTools
                 throw new DENOPTIMException("No fragment matches criteria to be "
                         + "identified as the " 
                         + BBType.SCAFFOLD.toString().toLowerCase() + ".");
-            } else {
-                firstVertex.setBuildingBlockType(BBType.SCAFFOLD);
             }
         }
         

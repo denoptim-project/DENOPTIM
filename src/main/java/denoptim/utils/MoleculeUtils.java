@@ -719,6 +719,33 @@ public class MoleculeUtils
         }
         return p;
     }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * @param mol the molecule to inspect
+     * @return {@code true} when every atom has no coordinates, or coordinates
+     * within {@link DENOPTIMConstants#FLOATCOMPARISONTOLERANCE} of the origin.
+     * A 2D coordinate is read as a 3D point with {@code z = 0}.
+     */
+    public static boolean allCoordinatesAreZero(IAtomContainer mol)
+    {
+        if (mol == null)
+        {
+            return true;
+        }
+        for (IAtom atm : mol.atoms())
+        {
+            Point3d p = getPoint3d(atm);
+            if (Math.abs(p.x) > DENOPTIMConstants.FLOATCOMPARISONTOLERANCE
+                    || Math.abs(p.y) > DENOPTIMConstants.FLOATCOMPARISONTOLERANCE
+                    || Math.abs(p.z) > DENOPTIMConstants.FLOATCOMPARISONTOLERANCE)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
     
 //------------------------------------------------------------------------------
 
@@ -1336,6 +1363,11 @@ public class MoleculeUtils
     public static double[] calculateBondAngleAgreement(IAtomContainer templateMol,
         IAtomContainer mol, Map<IAtom, IAtom> templateToMolMap)
     {
+        if (allCoordinatesAreZero(templateMol) || allCoordinatesAreZero(mol))
+        {
+            return new double[]{0.0, 0.0, 0.0, 0.0};
+        }
+
         double totalAngleDifference = 0.0;
         int angleCount = 0;
         double totalChiralityPenalty = 0.0;
@@ -1596,7 +1628,13 @@ public class MoleculeUtils
 
     /**
      * Substructure placements reduced to one assignment per target-atom set.
-     * The assignment kept for each set is the one with the best bond-angle score.
+     * Every embedding is scored. The assignment kept for each set is the one
+     * with the lowest bond-angle score. Equal scores keep the assignment whose
+     * sorted {@code templateId->targetIndex} pairs come first lexicographically,
+     * so the choice does not follow the query atom order or the order in which
+     * embeddings are visited. {@code templateId} is the atom property
+     * {@code DENOPTIM_ORIGINAL_ATOM_INDEX} when that property is set, and the
+     * container index otherwise.
      */
     private static List<Map<IAtom,IAtom>> collectUniqueAtomMappings(
             IAtomContainer substructure, IAtomContainer mol, Logger logger)
@@ -1633,87 +1671,46 @@ public class MoleculeUtils
                 return new ArrayList<>();
             }
             
-            // Find unique mappings based on which target atoms are mapped to
-            // Use a sorted list of target atom indices as the key to identify unique mappings
-            // This is more reliable than using Set<IAtom> as a HashMap key
+            // One assignment per sorted set of target atom indices. Score every
+            // embedding of that set; do not drop one because an earlier
+            // embedding used a different template atom for the same target.
             Map<String,Map<IAtom,IAtom>> uniqueAtomMappingsByKey = new HashMap<>();
             Map<String,Double> bestScores = new HashMap<>();
-            // Track "bad" atom assignments: when we find a better mapping, we identify
-            // which specific template->target atom assignments were in the worse mapping
-            // and skip future mappings that have those same problematic assignments
-            Map<String,Set<String>> badAssignmentsByKey = new HashMap<>();
+            Map<String,String> bestAssignmentKeys = new HashMap<>();
             for (int[] mapping : mappings)
             {
                 try
                 {
-                    // Build atom mapping for this mapping
                     Map<IAtom, IAtom> templateToMolMap = new HashMap<>();
                     List<Integer> targetIndices = new ArrayList<>();
+                    List<String> assignmentPairs = new ArrayList<>();
                     for (int i = 0; i < mapping.length; i++)
                     {
                         IAtom templateAtom = substructure.getAtom(i);
                         IAtom targetAtom = mol.getAtom(mapping[i]);
                         templateToMolMap.put(templateAtom, targetAtom);
                         targetIndices.add(mapping[i]);
+                        assignmentPairs.add(assignmentAtomId(templateAtom)
+                                + "->" + targetAtom.getIndex());
                     }
-                    // Create a unique key from sorted target atom indices
                     Collections.sort(targetIndices);
+                    Collections.sort(assignmentPairs);
                     String key = targetIndices.toString();
+                    String assignmentKey = assignmentPairs.toString();
                     
-                    // Check if this mapping has any "bad" assignments we've identified
-                    // for this target atom set
-                    if (badAssignmentsByKey.containsKey(key))
-                    {
-                        Set<String> badAssignments = badAssignmentsByKey.get(key);
-                        boolean hasBadAssignment = false;
-                        for (Map.Entry<IAtom, IAtom> entry : templateToMolMap.entrySet())
-                        {
-                            // Create a signature for this template->target assignment
-                            String assignment = entry.getKey().getIndex() + "->" + entry.getValue().getIndex();
-                            if (badAssignments.contains(assignment))
-                            {
-                                hasBadAssignment = true;
-                                break;
-                            }
-                        }
-                        if (hasBadAssignment)
-                        {
-                            // Skip this mapping - it has a known bad assignment
-                            continue;
-                        }
-                    }
-                    
-                    // Calculate bond angle agreement score
-                    double[] rawData = calculateBondAngleAgreement(substructure, mol, templateToMolMap);
+                    double[] rawData = calculateBondAngleAgreement(substructure, mol,
+                            templateToMolMap);
                     double score = normalizeBondAngleScore(rawData);
                     
-                    // Keep the mapping with the best score for each unique set of target atoms
-                    if (!bestScores.containsKey(key) || score < bestScores.get(key))
+                    Double bestScore = bestScores.get(key);
+                    boolean keep = bestScore == null
+                            || score < bestScore
+                            || (score == bestScore && assignmentKey.compareTo(
+                                    bestAssignmentKeys.get(key)) < 0);
+                    if (keep)
                     {
-                        // If we're replacing a previous mapping, identify the bad assignments
-                        if (bestScores.containsKey(key) && uniqueAtomMappingsByKey.containsKey(key))
-                        {
-                            Map<IAtom, IAtom> previousMapping = uniqueAtomMappingsByKey.get(key);
-                            Set<String> badAssignments = badAssignmentsByKey.computeIfAbsent(key, k -> new HashSet<>());
-                            
-                            // Find assignments that were in the previous (worse) mapping but not in the new (better) one
-                            for (Map.Entry<IAtom, IAtom> entry : previousMapping.entrySet())
-                            {
-                                IAtom templateAtom = entry.getKey();
-                                IAtom oldTargetAtom = entry.getValue();
-                                IAtom newTargetAtom = templateToMolMap.get(templateAtom);
-                                
-                                // If this template atom maps to a different target atom in the better mapping,
-                                // the old assignment was a "mistake"
-                                if (!oldTargetAtom.equals(newTargetAtom))
-                                {
-                                    String badAssignment = templateAtom.getIndex() + "->" + oldTargetAtom.getIndex();
-                                    badAssignments.add(badAssignment);
-                                }
-                            }
-                        }
-                        
                         bestScores.put(key, score);
+                        bestAssignmentKeys.put(key, assignmentKey);
                         uniqueAtomMappingsByKey.put(key, templateToMolMap);
                     }
                 }
@@ -1724,13 +1721,33 @@ public class MoleculeUtils
                 }
             }
 
-            return new ArrayList<>(uniqueAtomMappingsByKey.values());
+            List<Map<IAtom,IAtom>> uniqueMappings = new ArrayList<>(
+                    uniqueAtomMappingsByKey.values());
+            Collections.sort(uniqueMappings, (left, right) ->
+                    targetAtomKey(left).compareTo(targetAtomKey(right)));
+            return uniqueMappings;
         }
         catch (Exception e)
         {
             logger.log(Level.WARNING, "Error finding MCS: " + e.getMessage());
             return new ArrayList<>();
         }
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * @return the template-rebuild index when present, otherwise the atom's
+     * current container index
+     */
+    private static int assignmentAtomId(IAtom atom)
+    {
+        Object originalIndex = atom.getProperty("DENOPTIM_ORIGINAL_ATOM_INDEX");
+        if (originalIndex instanceof Number)
+        {
+            return ((Number) originalIndex).intValue();
+        }
+        return atom.getIndex();
     }
 
 //------------------------------------------------------------------------------

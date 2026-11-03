@@ -1154,5 +1154,86 @@ public class FragmenterToolsTest
         assertEquals(4, graph.getVertexCount());
     }
 
+//------------------------------------------------------------------------------
 
+    @Test
+    public void testFragmentationByTemplate_differentAtomOrder() 
+            throws Exception
+    {
+        // Create a molecule to fragment by template
+        SmilesParser smilesParser = new SmilesParser(builder);
+        IAtomContainer mol = smilesParser.parseSmiles("CC(=O)CCC1C=CC1");
+        MoleculeUtils.explicitHydrogens(mol);
+
+        // Create the template graph
+        DGraph scaffoldGraph = new DGraph();
+        IAtomContainer scaffoldIAC = smilesParser.parseSmiles("CC1C=CC1");
+        MoleculeUtils.explicitHydrogens(scaffoldIAC);
+        // Replace the first H with an AP
+        IAtom hAtom = null;
+        IAtom cAtom = null;
+        for (IAtom atom : scaffoldIAC.atoms())
+        {
+            if (atom.getSymbol().equals("H"))
+            {
+                hAtom = atom;
+                cAtom = scaffoldIAC.getConnectedAtomsList(hAtom).get(0);
+                break;
+            }
+        }
+        scaffoldIAC.removeAtom(hAtom);
+        Fragment scaffoldFragment = new Fragment(scaffoldIAC, BBType.SCAFFOLD);
+        scaffoldFragment.addAP(scaffoldIAC.indexOf(cAtom), 
+            APClass.make("scaffold", 0), 
+            new Point3d(0.0, 0.0, 0.0));
+        scaffoldFragment.projectAPsToProperties();
+        scaffoldGraph.addVertex(scaffoldFragment);
+        scaffoldGraph.addCapOnAllFreeAPs(Arrays.asList(scaffoldFragment), 
+            getVertexWithWildcard("R"));
+    
+        FragmenterParameters frgParams = new FragmenterParameters();
+
+        List<Vertex> fragments = FragmenterTools.fragmentation(mol,Arrays.asList(scaffoldGraph), frgParams);
+        assertEquals(2, fragments.size());
+
+        // Change order of atoms in molecule
+        IAtomContainer mol2 = smilesParser.parseSmiles("C1=CCC1CCC(=O)C");
+        MoleculeUtils.explicitHydrogens(mol2);
+
+        List<Vertex> fragments2 = FragmenterTools.fragmentation(mol,Arrays.asList(scaffoldGraph), frgParams);
+        assertEquals(2, fragments2.size());
+
+        int count = 0;
+        for (Vertex frag : fragments2)
+        {
+            for (Vertex frag2 : fragments)
+            {
+                if (frag instanceof Fragment && frag2 instanceof Fragment)
+                {
+                    if (((Fragment)frag).isIsomorphicTo((Fragment)frag2))
+                    {
+                        count++;
+                        break;
+                    }
+                }
+            }
+        }
+        assertEquals(2, count);
+    }
+
+//------------------------------------------------------------------------------
+
+    private static Vertex getVertexWithWildcard(String wildcard) throws Exception
+    {
+        Fragment vertex = new Fragment();
+        PseudoAtom atm = new PseudoAtom(wildcard, 
+            new Point3d(new double[]{0.0, 0.0, 0.0}));
+            vertex.addAtom(atm);
+        vertex.addAPOnAtom(atm, APClass.make("wildcard",0), 
+                new Point3d(new double[]{0.0, 0.0, 0.0}));
+        vertex.setVertexId(-12);
+        return vertex;
+    }
+
+//------------------------------------------------------------------------------
 }

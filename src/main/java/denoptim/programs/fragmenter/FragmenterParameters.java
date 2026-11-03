@@ -410,7 +410,7 @@ public class FragmenterParameters extends RunTimeParameters
     /**
      * Maximum number of buffer shells to consider for fragmentation.
      */
-    private int maxBufferShellSize = 2;
+    private int maxBufferShellSize = 3;
     
 //------------------------------------------------------------------------------
     

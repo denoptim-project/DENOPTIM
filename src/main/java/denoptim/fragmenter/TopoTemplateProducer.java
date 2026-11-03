@@ -1,6 +1,7 @@
 package denoptim.fragmenter;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -249,9 +250,14 @@ public class TopoTemplateProducer
             thisLevelAtoms = nextLevelAtoms;
         }
             
+        // Emit atoms in container order. HashSet iteration follows identity
+        // hash codes, which shift when an earlier hashCode() call runs.
+        List<IAtom> orderedAtoms = new ArrayList<>(atomsToKeep);
+        orderedAtoms.sort(Comparator.comparingInt(originalIAC::indexOf));
+
         // Add atoms with original index stored as property
         Map<IAtom, IAtom> originalToReduced = new HashMap<>(); // original atom -> reduced atom
-        for (IAtom originalAtom : atomsToKeep)
+        for (IAtom originalAtom : orderedAtoms)
         {
             IAtom reducedAtom = originalAtom.getBuilder().newInstance(
                 IAtom.class, originalAtom);
