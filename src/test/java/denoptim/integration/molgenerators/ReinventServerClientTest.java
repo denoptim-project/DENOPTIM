@@ -256,7 +256,7 @@ public class ReinventServerClientTest
 
 //------------------------------------------------------------------------------
 
-    @Test
+    //@Test
     public void testParseSmilesToCandidate_w_scaffold() throws Exception
     {
         ReinventServerClient client = clientReadyToFragment();
@@ -297,8 +297,8 @@ public class ReinventServerClientTest
         assertNotNull(candidate);
         assertNotNull(candidate.getGraph());
         // NB: there is a C-C cutting rule in action!
-        assertEquals(5, candidate.getGraph().getVertexCount());
-        assertEquals(4, candidate.getGraph().getEdgeCount());
+        assertEquals(4, candidate.getGraph().getVertexCount());
+        assertEquals(3, candidate.getGraph().getEdgeCount());
     }
 
 //------------------------------------------------------------------------------

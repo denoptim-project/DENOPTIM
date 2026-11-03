@@ -506,35 +506,38 @@ public class ThreeDimTreeBuilder
         }
         apsPerVertexId.put(idRootVrtx,apsOnThisFrag);
         
-        // Recursion on all branches of the tree (i.e., all incident edges)
-        for (Edge edge : graph.getEdgesWithSrc(rootVrtx))
+        // Recursion on every incident edge, whichever end is stored as source.
+        for (Edge edge : getIncidentEdges(graph, rootVrtx))
         {
-            // Get the AP from the current vertex to the next
-            AttachmentPoint apSrc = edge.getSrcAP();
+            AttachmentPoint apOnRoot = attachmentPointOn(edge, rootVrtx);
+            if (isVisitedBy3DBuilder(otherAttachmentPoint(edge, apOnRoot).getOwner()))
+            {
+                continue;
+            }
 
             // Add APs to the map of APs per Edges
             List<AttachmentPoint> apOnThisEdge =
                                       new ArrayList<AttachmentPoint>();
-            apOnThisEdge.add(apSrc);
+            apOnThisEdge.add(edge.getSrcAP());
             apOnThisEdge.add(edge.getTrgAP());
             apsPerEdge.put(edge,apOnThisEdge);
             
             if (rootVrtx.containsAtoms())
             {
-                Point3d trgPtApSrc = new Point3d(apSrc.getDirectionVector());
+                Point3d trgPtApSrc = new Point3d(apOnRoot.getDirectionVector());
                 Point3d srcPtApSrc = new Point3d(
                         MoleculeUtils.getPoint3d(iacRootVrtx.getAtom(
-                        apSrc.getAtomPositionNumber())));
+                        apOnRoot.getAtomPositionNumber())));
                 
                 // Append next building block on AP-vector - start recursion
                 append3DFragmentsViaEdges(mol, graph,
-                        apSrc.getAtomPositionNumberInMol(),
-                        srcPtApSrc,trgPtApSrc,edge,removeUsedRCAs, rebuild,
+                        apOnRoot.getAtomPositionNumberInMol(),
+                        srcPtApSrc,trgPtApSrc,edge,apOnRoot,removeUsedRCAs, rebuild,
                         apsPerVertexId, apsPerEdge, apsPerAtom, apsPerBond);
             } else {
                 // Append next building block - start recursion
                 Point3d pt = getRandomPoint(mol);
-                append3DFragmentsViaEdges(mol, graph, -1, pt, pt, edge, 
+                append3DFragmentsViaEdges(mol, graph, -1, pt, pt, edge, apOnRoot,
                         removeUsedRCAs, rebuild,
                         apsPerVertexId, apsPerEdge, apsPerAtom, apsPerBond);
             }
@@ -547,11 +550,13 @@ public class ThreeDimTreeBuilder
      * Recursive method that appends branches of building blocks following the 
      * edges of the graph. The connection is controlled by the geometries of the
      * attachment point on a growing molecule and that of the
-     * attachment point of the incoming vertex, i.e., the child/target vertex 
-     * connected via the <code>edge</code> argument. If the latter contains
-     * no atoms, then we simply return. Thus, vertexes that contain no atoms are
-     * not expected to have more than one incident edge (i.e., the edge to their
-     * parent vertex).
+     * attachment point of the incoming vertex. The incoming vertex is the end of
+     * <code>edge</code> that is not <code>placedAp</code>, so an edge is followed
+     * whether the vertex already in the molecule owns the source or the target
+     * attachment point. A vertex already placed is not appended again.
+     * If the incoming vertex contains no atoms, then we simply return. Thus,
+     * vertexes that contain no atoms are not expected to have more than one
+     * incident edge (i.e., the edge to their parent vertex).
      * @param mol the container of atoms that is being built.
      * @param idSrcAtmA the index of the atom holding the AP on the growing
      * molecules, or a negative number if no such bond exists and, thus, we do
@@ -564,6 +569,9 @@ public class ThreeDimTreeBuilder
      * @param edge the <code>DENOPTIMEdge</code> corresponding to the
      * connection this method is asked to make between 3D molecular
      * fragments
+     * @param placedAp the attachment point on the vertex that is already in the
+     * growing molecule. The other end of <code>edge</code> is the incoming
+     * vertex.
      * @param removeUsedRCAs when <code>true</code> this method will remove 
      * used RCAs (the content of ring-closing vertexes, RCVs) 
      * and add bonds to close the rings
@@ -581,7 +589,8 @@ public class ThreeDimTreeBuilder
      */
 
     private void append3DFragmentsViaEdges(IAtomContainer mol, DGraph graph,
-            int idSrcAtmA, Point3d srcApA, Point3d trgApA, Edge edge, 
+            int idSrcAtmA, Point3d srcApA, Point3d trgApA, Edge edge,
+            AttachmentPoint placedAp,
             boolean removeUsedRCAs, boolean rebuild,
             Map<Long, List<AttachmentPoint>> apsPerVertexId,
             Map<Edge,List<AttachmentPoint>> apsPerEdge,
@@ -592,10 +601,14 @@ public class ThreeDimTreeBuilder
         logger.log(Level.FINE, "Appending 3D fragment via edge: "+edge + NL 
                 +"#Atoms on growing mol: "+mol.getAtomCount());
         
-        // Get the incoming fragment and its AP
-        Vertex inVtx = edge.getTrgAP().getOwner();
+        // The incoming fragment is the end that is not already in the molecule.
+        AttachmentPoint apB = otherAttachmentPoint(edge, placedAp);
+        Vertex inVtx = apB.getOwner();
+        if (isVisitedBy3DBuilder(inVtx))
+        {
+            return;
+        }
         inVtx.setProperty(DENOPTIMConstants.VISITEDBY3DBUILDER, true);
-        AttachmentPoint apB = edge.getTrgAP();
         
         //Used to keep track of which atom comes from which vertex
         long idInVrx = inVtx.getVertexId();
@@ -843,7 +856,7 @@ public class ThreeDimTreeBuilder
             if (inVtx.isRCV())
             {
                 atmToBind.setProperty(DENOPTIMConstants.RCAPROPAPCTORCA, 
-                        edge.getSrcAP().getAPClass());
+                        placedAp.getAPClass());
                 //Since inVtx is RCV there can be only one ring, if any...
                 List<Ring> rings = graph.getRingsInvolvingVertex(inVtx);
                 if (rings.size()>0)
@@ -857,7 +870,7 @@ public class ThreeDimTreeBuilder
                 } else {
                     //...but if none is there, the APClass is enough
                     atmToBind.setProperty(DENOPTIMConstants.RCAPROPCHORDBNDTYP, 
-                            edge.getSrcAP().getAPClass().getBondType());
+                            placedAp.getAPClass().getBondType());
                 }
             }
         }
@@ -889,9 +902,15 @@ public class ThreeDimTreeBuilder
         }
         apsPerVertexId.put(idInVrx, apsOnThisFrag);
         
-        // Recursion on all the edges leaving from this fragment
-        for (Edge nextEdge : graph.getEdgesWithSrc(inVtx))
+        // Recursion on every other incident edge, in either stored direction.
+        for (Edge nextEdge : getIncidentEdges(graph, inVtx))
         {
+            AttachmentPoint apOnThis = attachmentPointOn(nextEdge, inVtx);
+            if (isVisitedBy3DBuilder(otherAttachmentPoint(nextEdge, apOnThis).getOwner()))
+            {
+                continue;
+            }
+
             // Add APs to the map of APs per Edges
             List<AttachmentPoint> apOnThisEdge =
                                       new ArrayList<AttachmentPoint>();
@@ -901,27 +920,75 @@ public class ThreeDimTreeBuilder
 
             if (inVtx.containsAtoms())
             {
-                // Get two points defining the src AP vector in 3D
-                Point3d trgNextApA = new Point3d(
-                        nextEdge.getSrcAP().getDirectionVector());
+                // Get two points defining the AP vector on the placed vertex
+                Point3d trgNextApA = new Point3d(apOnThis.getDirectionVector());
                 Point3d srcNextApA = new Point3d(MoleculeUtils.getPoint3d(
-                        inFrag.getAtom(
-                        nextEdge.getSrcAP().getAtomPositionNumber())));
+                        inFrag.getAtom(apOnThis.getAtomPositionNumber())));
     
                 // Append fragment on AP-vector and start recursion
                 append3DFragmentsViaEdges(mol, graph,
-                        nextEdge.getSrcAP().getAtomPositionNumberInMol(), 
-                        srcNextApA, trgNextApA, nextEdge, removeUsedRCAs,
+                        apOnThis.getAtomPositionNumberInMol(), 
+                        srcNextApA, trgNextApA, nextEdge, apOnThis, removeUsedRCAs,
                         rebuild,
                         apsPerVertexId,apsPerEdge,apsPerAtom,apsPerBond);
             } else {
                 // Append next building block - start recursion
                 Point3d pt = getRandomPoint(mol);
-                append3DFragmentsViaEdges(mol, graph, -1, pt, pt, nextEdge, 
+                append3DFragmentsViaEdges(mol, graph, -1, pt, pt, nextEdge, apOnThis,
                         removeUsedRCAs, rebuild,
                         apsPerVertexId,apsPerEdge,apsPerAtom,apsPerBond);
             }
         }
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Edges that touch {@code vertex}, stored source end first. An edge whose
+     * both attachment points belong to {@code vertex} is returned once.
+     */
+    private static List<Edge> getIncidentEdges(DGraph graph, Vertex vertex)
+    {
+        List<Edge> edges = new ArrayList<>(graph.getEdgesWithSrc(vertex));
+        for (Edge edge : graph.getEdgesWithTrg(vertex))
+        {
+            if (edge.getSrcAP().getOwner() != vertex)
+            {
+                edges.add(edge);
+            }
+        }
+        return edges;
+    }
+
+//------------------------------------------------------------------------------
+
+    private static AttachmentPoint attachmentPointOn(Edge edge, Vertex vertex)
+    {
+        if (edge.getSrcAP().getOwner() == vertex)
+        {
+            return edge.getSrcAP();
+        }
+        return edge.getTrgAP();
+    }
+
+//------------------------------------------------------------------------------
+
+    private static AttachmentPoint otherAttachmentPoint(Edge edge, AttachmentPoint ap)
+    {
+        if (edge.getSrcAP() == ap)
+        {
+            return edge.getTrgAP();
+        }
+        return edge.getSrcAP();
+    }
+
+//------------------------------------------------------------------------------
+
+    private static boolean isVisitedBy3DBuilder(Vertex vertex)
+    {
+        Boolean visited = (Boolean) vertex.getProperty(
+                DENOPTIMConstants.VISITEDBY3DBUILDER);
+        return visited != null && visited;
     }
     
 //------------------------------------------------------------------------------

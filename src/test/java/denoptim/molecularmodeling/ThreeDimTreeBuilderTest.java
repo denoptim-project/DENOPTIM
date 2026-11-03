@@ -556,9 +556,6 @@ public class ThreeDimTreeBuilderTest
         Randomizer rng = new Randomizer();
         ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(logger, rng);
 
-        //TODO-gg del
-        DenoptimIO.writeGraphToFile(new File("/tmp/g4.json"), FileFormat.GRAPHJSON, g4);
-
         IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(g4,true);
 
         assertEquals(3, MoleculeUtils.getDimensions(mol));
