@@ -2754,10 +2754,12 @@ public class GraphOperations
                 if (chosenApId < 0)
                 {
                     List<Integer> candidates = new ArrayList<Integer>();
-                    for (Vertex c : vertex.getChilddren())
+                    for (AttachmentPoint ap : vertex.getAttachmentPoints())
                     {
-                        candidates.add(c.getEdgeToParent().getSrcAP()
-                                .getIndexInOwner());
+                        if (ap.getEdgeUser() != null && ap.getEdgeUser().getSrcAP() == ap)
+                        {
+                            candidates.add(ap.getIndexInOwner());
+                        }
                     }
                     if (candidates.size() == 0)
                     {
@@ -2790,7 +2792,7 @@ public class GraphOperations
                 break;
                 
             case EXTEND:
-                //TODO-ai: add AI analogue
+                //TODO-ai: add AI analogue: just as done for scafold but using the entire graph as scaffold.
                 vertex.getGraphOwner().removeCappingGroupsOn(vertex);
                 done = extendGraph(vertex, false, false, force, chosenVrtxIdx, 
                         chosenApId, settings);

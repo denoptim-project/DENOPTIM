@@ -423,9 +423,6 @@ public class ReinventServerClient
      */
     Candidate parseSmilesToCandidate(String smiles, DGraph scaffoldGraph, int index) 
     {
-        //TODO-gg del
-        System.out.println("SMILES From Reinvent: " + smiles);
-
         // Get a CDK IAtomContainer object from the SMILES string
         IAtomContainer iac = null;
         try {
@@ -482,9 +479,6 @@ public class ReinventServerClient
                 graph = makeTemplatedGraph(iac, scaffoldGraph);
             } catch (DENOPTIMException e) {
                 //TODO-ai consider counting events in monitor
-
-                //TODO-gg del
-                System.out.println("     could not make templated graph");
                 return null;
             } 
 
@@ -564,15 +558,6 @@ public class ReinventServerClient
                     return null;
                 }
             }
-        }
-
-        //TODO-gg del
-        try {
-            DenoptimIO.writeGraphToFile(new File("/tmp/graph.json"), 
-                FileFormat.GRAPHJSON, graph);
-        } catch (DENOPTIMException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
 
         Candidate candidate = null;

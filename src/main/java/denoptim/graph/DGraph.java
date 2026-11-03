@@ -670,7 +670,7 @@ public class DGraph implements Cloneable
      * programmatically build graphs that do not follow this convention. 
      * Therefore, here we test if the first vertex is a seed (i.e., it only has
      * departing edges) and, if not, we search for the deepest descendant seed.
-     * Note that the type of verted (i.e., scaffold/fragment/capping) is not 
+     * Note that the type of vertex (i.e., scaffold/fragment/capping) is not 
      * relevant for this method.
      * <b>WARNING</b>: the graph is assumed to be an healthy spanning tree, in 
      * that it has only one seed that is reachable from any vertex by a 
@@ -1677,7 +1677,9 @@ public class DGraph implements Cloneable
      * that does not involve any other vertex not included in this collections.
      * @param newSubGraph the graph that will be used to create the new branch 
      * replacing the old one. Vertices of such branch will be cloned to create
-     * the new vertices to be added to this graph.
+     * the new vertices to be added to this graph. Also the order of the vertexes 
+     * will be changed to flip edge direction (if allowed by APClass compatibility)
+     * as to fix the spanning tree directionof this graph.
      * @param apMap mapping of attachment points belonging to any vertex in
      * <code>subGrpVrtxs</code> to attachment points in <code>newSubGraph</code>.
      * @param fragSpace the fragment space used to create the new RCVs or 
@@ -1686,6 +1688,7 @@ public class DGraph implements Cloneable
      * @throws DENOPTIMException is capping groups are the only vertices in the
      * subgraph.
      */
+
     public boolean replaceSubGraph(List<Vertex> subGrpVrtxs, 
             DGraph incomingGraph, 
             LinkedHashMap<AttachmentPoint,AttachmentPoint> apMap,
@@ -2262,6 +2265,20 @@ public class DGraph implements Cloneable
                 }
             }
         }
+
+        // Identify the APs acting as target on the subgraph to be removed: 
+        // we'll use them to reorder the vertixes in the incoming graph so
+        // that we keep a consistent direction of the edges. Multiple APs
+        // are possible, for example when the receiving graph contains rings,
+        // and we process them all.
+        List<AttachmentPoint> targetAPs = new ArrayList<>();
+        for (AttachmentPoint ap : apMapping.keySet())
+        {
+            if (!ap.isAvailable() && !ap.isSrcInUser())
+            {
+                targetAPs.add(ap);
+            }
+        }
         
         // Remove the vertexes to remove from the graphs
         for (Vertex v : verticesToRemoveFromReceivingGraph)
@@ -2275,6 +2292,17 @@ public class DGraph implements Cloneable
         
         // we need to guarantee that new vertixe IDs are unique within a graph
         incomingGraph.renumberGraphVertices();
+
+        // Recover the incoming graph to obtain edge directions consistent with
+        // this graph's spanning tree structure. 
+        if (targetAPs.size() > 0)
+        {
+            for (AttachmentPoint targetAP : targetAPs)
+            {
+                Vertex newSrcOfIncomingGraph = apMapping.get(targetAP).getOwner();
+                DGraph.fixEdgeDirections(newSrcOfIncomingGraph, new HashSet<>());
+            }
+        }
 
         // finally introduce the new vertices from incoming graph into receiving graph
         for (Vertex incomingVrtx : incomingGraph.getVertexList())
@@ -5227,12 +5255,17 @@ public class DGraph implements Cloneable
      * Recursive utility method for fixEdgeDirections(graph).
      * @param v current vertex
      */
+    
+    // NB: since the edge direction is an expression of AP-class compatibility,
+    // we should never arbitrarily change the direction of edges.
+
     private static void fixEdgeDirections(Vertex v, 
             Set<Long> visited) 
     {
         visited.add(v.getVertexId());
         int visitedVertexEncounters = 0;
-        for (int i = 0; i < v.getNumberOfAPs(); i++) {
+        for (int i = 0; i < v.getNumberOfAPs(); i++) 
+        {
             AttachmentPoint ap = v.getAP(i);
             Edge edge = ap.getEdgeUser();
             if (edge != null) {

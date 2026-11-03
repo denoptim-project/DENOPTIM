@@ -1,6 +1,7 @@
 package denoptim.fragmenter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,7 +23,7 @@ public class TopoTemplateProducer
 {
     
     /**
-     * topology-critical atoms
+     * Set of topology-critical atoms
      */
     Set<IAtom> topoCriticalAtoms = new HashSet<>();
 
@@ -140,30 +141,9 @@ public class TopoTemplateProducer
         if (produceHDepleted)
         {
             // We did not manage to find a sensible subset possibly because the input
-            // is a disconnected graph, or s single-vertex graph.
-            // So, we make a simplified version removing all H and dummy atoms
-            for (IAtom atom : originalIAC.atoms())
-            {
-                // DUmmy atoms that are not AP sources are not considered
-                if (MoleculeUtils.getSymbolOrLabel(atom).equals(DENOPTIMConstants.DUMMYATMSYMBOL))
-                {
-                    if (atomsWithAPs.contains(atom))
-                    {
-                        topoCriticalAtoms.add(atom);
-                    } else {
-                        continue;
-                    }
-                }
-                if (atom.getSymbol().equals("H"))
-                {
-                    if (atomsWithAPs.contains(atom))
-                    {
-                        topoCriticalAtoms.add(atom);
-                    }
-                } else {
-                    topoCriticalAtoms.add(atom);
-                }
-            }
+            // is a disconnected graph, or a single-vertex graph.
+            // So, we make a simplified version removing all H and dummy atoms.
+            topoCriticalAtoms.addAll(nonHydrogenSkeleton(atomsWithAPs));
         } else {
             // Use the boundaries to identify the smallest set of atoms needed
             // to identify matching topology. 
@@ -188,6 +168,11 @@ public class TopoTemplateProducer
                     }
                 }
             }
+            // A shortest-path skeleton can embed in the template in more than
+            // one way. Add further non-H atoms, one bond-shell at a time, until
+            // a single set of template atoms is matched, or every non-H atom
+            // is included. A remaining multiplicity is symmetry of that skeleton.
+            extendUntilUniqueSelfMatch(nonHydrogenSkeleton(atomsWithAPs));
         }
 
         // Log
@@ -200,6 +185,128 @@ public class TopoTemplateProducer
                 sb.append(MoleculeUtils.getAtomRef(atm, originalIAC) + "\n");
             }
             logger.fine(sb.toString());
+        }
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Atoms kept by the hydrogen-depleted template: every non-hydrogen atom,
+     * plus hydrogens and dummy atoms that carry an attachment point.
+     */
+    private Set<IAtom> nonHydrogenSkeleton(Set<IAtom> atomsWithAPs)
+    {
+        Set<IAtom> skeleton = new HashSet<>();
+        for (IAtom atom : originalIAC.atoms())
+        {
+            if (MoleculeUtils.getSymbolOrLabel(atom).equals(
+                    DENOPTIMConstants.DUMMYATMSYMBOL))
+            {
+                if (atomsWithAPs.contains(atom))
+                {
+                    skeleton.add(atom);
+                }
+                continue;
+            }
+            if (atom.getSymbol().equals("H"))
+            {
+                if (atomsWithAPs.contains(atom))
+                {
+                    skeleton.add(atom);
+                }
+            } else {
+                skeleton.add(atom);
+            }
+        }
+        return skeleton;
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Adds bond-shells of {@code ceiling} until the critical atoms match one
+     * distinct set of atoms in {@link #originalIAC}. Several assignments that
+     * occupy the same atoms count as one match. Growth stops when every ceiling
+     * atom has been added, even if symmetry still leaves more than one match.
+     */
+    private void extendUntilUniqueSelfMatch(Set<IAtom> ceiling)
+    {
+        while (countDistinctSelfMatches() != 1
+                && !topoCriticalAtoms.containsAll(ceiling))
+        {
+            if (addNextCeilingShell(ceiling).isEmpty())
+            {
+                topoCriticalAtoms.addAll(ceiling);
+                break;
+            }
+        }
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Adds every ceiling atom bonded to the current critical set.
+     * @return the atoms added, empty when the remaining ceiling atoms are not
+     * neighbors of the current set
+     */
+    private Set<IAtom> addNextCeilingShell(Set<IAtom> ceiling)
+    {
+        Set<IAtom> added = new HashSet<>();
+        for (IAtom atom : new ArrayList<>(topoCriticalAtoms))
+        {
+            for (IAtom neighbor : originalIAC.getConnectedAtomsList(atom))
+            {
+                if (ceiling.contains(neighbor)
+                        && !topoCriticalAtoms.contains(neighbor))
+                {
+                    topoCriticalAtoms.add(neighbor);
+                    added.add(neighbor);
+                }
+            }
+        }
+        return added;
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * @return how many different sets of atoms in {@link #originalIAC} match
+     * the current critical atoms. Assignments that cover the same atoms count
+     * once. Zero when the comparison could not be made.
+     */
+    private int countDistinctSelfMatches()
+    {
+        if (topoCriticalAtoms.isEmpty())
+        {
+            return 0;
+        }
+        try
+        {
+            IAtomContainer query = getTemplateWithBufferShell(0);
+            IAtomContainer target = MoleculeUtils.makeSameAs(originalIAC);
+            List<List<Map<IAtom,IAtom>>> mappings =
+                    MoleculeUtils.findUniqueAtomMappings(query, target, logger);
+            Set<String> distinctSets = new HashSet<>();
+            for (List<Map<IAtom,IAtom>> overall : mappings)
+            {
+                for (Map<IAtom,IAtom> placement : overall)
+                {
+                    List<Integer> targetIndices = new ArrayList<>();
+                    for (IAtom targetAtom : placement.values())
+                    {
+                        targetIndices.add(target.indexOf(targetAtom));
+                    }
+                    Collections.sort(targetIndices);
+                    distinctSets.add(targetIndices.toString());
+                }
+            }
+            return distinctSets.size();
+        }
+        catch (Exception e)
+        {
+            logger.log(Level.WARNING, "Could not count self-matches of the "
+                    + "topology template: " + e.getMessage());
+            return 0;
         }
     }
 

@@ -1235,33 +1235,6 @@ public class FragmenterToolsTest
         return vertex;
     }
 
-
-    //------------------------------------------------------------------------------
-
-    //TODO make a unit test independent on SDF input
-    @Test
-    public void testFragmentationByTemplate_TODO() 
-            throws Exception
-    {
-        // Create a molecule to fragment by template
-        SmilesParser smilesParser = new SmilesParser(builder);
-        //IAtomContainer mol = smilesParser.parseSmiles("CC(C)=CCC(C)(O)c1c(O)ccc(C(=O)O)c1O");
-        IAtomContainer mol = smilesParser.parseSmiles("CC(=O)Nc1c(O)ccc(C(O)=S)c1O");
-        
-        MoleculeUtils.explicitHydrogens(mol);
-
-        // Create the template graph
-        DGraph scaffoldGraph = DenoptimIO.readDENOPTIMGraphsFromFile(
-            new File("/Users/marcof/butta/tmpl.json")).get(0);
-
-        FragmenterParameters frgParams = new FragmenterParameters();
-
-        List<Vertex> fragments = FragmenterTools.fragmentation(mol,Arrays.asList(scaffoldGraph), frgParams);
-
-        //TODO-gg
-        System.out.println("fragments.size() = " + fragments.size());
-        DenoptimIO.writeVertexesToSDF(new File("/tmp/fragments.sdf"), fragments, false);
-    }
-
 //------------------------------------------------------------------------------
+
 }

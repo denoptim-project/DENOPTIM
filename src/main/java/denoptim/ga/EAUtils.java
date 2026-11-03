@@ -1302,7 +1302,6 @@ public class EAUtils
                         matesStr, true);
             } catch (DENOPTIMException e)
             {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }

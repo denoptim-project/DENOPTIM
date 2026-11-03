@@ -291,6 +291,10 @@ public class Edge
     /**
      * Exchanges source and target vertices and respective APs of this edge.
      */
+
+    // NB: since the edge direction is an expression of AP-class compatibility,
+    // we should never arbitrarily change the direction of edges.
+
     public void flipEdge() {
         AttachmentPoint newTrgAP = getSrcAP();
         srcAP = getTrgAP();

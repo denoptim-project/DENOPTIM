@@ -754,8 +754,9 @@ public class FragmenterTools
                         {
                             if (matchedVrtx != originalAP.getOwner())
                             {
-                                throw new IllegalStateException("Multiple matched vertices found for the same fragment. "
-                                    + "This is not possible.");
+                                frgParams.getLogger().log(Level.WARNING, "Multiple matched vertices found for the same fragment. "
+                                    + "This is not allowed.");
+                                return new ArrayList<>();
                             }
                         } else {
                             matchedVrtx = (Vertex) originalAP.getOwner();
@@ -844,7 +845,7 @@ public class FragmenterTools
      * remove the corresponding bonds and create the corresponding attachment points.
      * 
      * TODO: 
-     * 2) deal with multihapticity.
+     * -> deal with multihapticity.
      */
     private static void exploreDGraphForMappings(DGraph graph, IAtomContainer graphIAC, 
         Fragment masterFrag, IAtomContainer masterFragIAC, IAtomContainer mol,

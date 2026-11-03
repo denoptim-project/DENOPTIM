@@ -1088,8 +1088,6 @@ public abstract class Vertex implements Cloneable
      * @return the edge to the parent.
      */
 
-    // TODO-gg: remove ssumption that there can be only one parent
-    
     public Edge getEdgeToParent() {
         for (AttachmentPoint ap : getAttachmentPoints())
         {

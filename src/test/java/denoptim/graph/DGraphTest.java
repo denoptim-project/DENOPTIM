@@ -61,7 +61,6 @@ import denoptim.graph.Vertex.VertexType;
 import denoptim.graph.rings.PathSubGraph;
 import denoptim.utils.MutationType;
 
-
 /**
  * Unit test for DENOPTIMGraph
  * 

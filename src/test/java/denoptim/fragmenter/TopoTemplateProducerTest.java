@@ -76,6 +76,8 @@ public class TopoTemplateProducerTest
     public void testBoundaryTemplateGrowsInContainerAtomOrder()
     {
         // Two vertexes joined by the bond between atoms 1 and 3.
+        // That bond alone also matches C0-C1, so the critical set grows by the
+        // next non-H shell (C0 and O4) until one atom set matches.
         // Atom order is the container order, not the order of a shell expansion.
         IAtomContainer mol = builder.newAtomContainer();
         mol.addAtom(new Atom("C")); // 0 vertex A
@@ -98,20 +100,72 @@ public class TopoTemplateProducerTest
 
         TopoTemplateProducer producer = new TopoTemplateProducer(mol);
 
-        assertEquals(List.of("C", "C"),
+        assertEquals(List.of("C", "C", "C", "O"),
                 symbolsOf(producer.getTemplateWithBufferShell(0)));
-        assertEquals(List.of(1, 3),
+        assertEquals(List.of(0, 1, 3, 4),
                 originalIndicesOf(producer.getTemplateWithBufferShell(0)));
 
-        assertEquals(List.of("C", "C", "H", "C", "O"),
+        assertEquals(List.of("C", "C", "H", "C", "O", "H"),
                 symbolsOf(producer.getTemplateWithBufferShell(1)));
-        assertEquals(List.of(0, 1, 2, 3, 4),
+        assertEquals(List.of(0, 1, 2, 3, 4, 5),
                 originalIndicesOf(producer.getTemplateWithBufferShell(1)));
 
         assertEquals(List.of("C", "C", "H", "C", "O", "H"),
                 symbolsOf(producer.getTemplateWithBufferShell(2)));
         assertEquals(List.of(0, 1, 2, 3, 4, 5),
                 originalIndicesOf(producer.getTemplateWithBufferShell(2)));
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testUniqueBoundaryPairIsNotExtended()
+    {
+        // O-N occurs once, so the boundary pair is already one matched atom set.
+        IAtomContainer mol = builder.newAtomContainer();
+        mol.addAtom(new Atom("C")); // 0 vertex A
+        mol.addAtom(new Atom("O")); // 1 vertex A, boundary
+        mol.addAtom(new Atom("N")); // 2 vertex B, boundary
+        mol.getAtom(0).setProperty(DENOPTIMConstants.ATMPROPVERTEXPATH, "A");
+        mol.getAtom(1).setProperty(DENOPTIMConstants.ATMPROPVERTEXPATH, "A");
+        mol.getAtom(2).setProperty(DENOPTIMConstants.ATMPROPVERTEXPATH, "B");
+        mol.addBond(0, 1, IBond.Order.SINGLE);
+        mol.addBond(1, 2, IBond.Order.SINGLE);
+
+        TopoTemplateProducer producer = new TopoTemplateProducer(mol);
+
+        assertEquals(List.of("O", "N"),
+                symbolsOf(producer.getTemplateWithBufferShell(0)));
+        assertEquals(List.of(1, 2),
+                originalIndicesOf(producer.getTemplateWithBufferShell(0)));
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testRepeatedSubgraphExtendsPastTheBoundary()
+    {
+        // The boundary bond is C-N, and the same bond occurs again inside one
+        // vertex. Those are two matched atom sets, so the critical set grows
+        // to the whole non-H skeleton.
+        IAtomContainer mol = builder.newAtomContainer();
+        mol.addAtom(new Atom("C")); // 0 vertex A, boundary
+        mol.addAtom(new Atom("N")); // 1 vertex B, boundary
+        mol.addAtom(new Atom("C")); // 2 vertex C
+        mol.addAtom(new Atom("N")); // 3 vertex C
+        mol.getAtom(0).setProperty(DENOPTIMConstants.ATMPROPVERTEXPATH, "A");
+        mol.getAtom(1).setProperty(DENOPTIMConstants.ATMPROPVERTEXPATH, "B");
+        mol.getAtom(2).setProperty(DENOPTIMConstants.ATMPROPVERTEXPATH, "C");
+        mol.getAtom(3).setProperty(DENOPTIMConstants.ATMPROPVERTEXPATH, "C");
+        mol.addBond(0, 1, IBond.Order.SINGLE);
+        mol.addBond(2, 3, IBond.Order.SINGLE);
+
+        TopoTemplateProducer producer = new TopoTemplateProducer(mol);
+
+        assertEquals(List.of("C", "N", "C", "N"),
+                symbolsOf(producer.getTemplateWithBufferShell(0)));
+        assertEquals(List.of(0, 1, 2, 3),
+                originalIndicesOf(producer.getTemplateWithBufferShell(0)));
     }
 
 //------------------------------------------------------------------------------
