@@ -49,6 +49,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.APClass;
+import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Candidate;
 import denoptim.graph.DGraph;
 import denoptim.graph.EmptyVertex;
@@ -75,6 +76,9 @@ public class ReinventServerClientTest
         DefaultChemObjectBuilder.getInstance();
 
     private static SmilesParser smilesParser = new SmilesParser(cdkBuilder);
+
+    private static final String CCRULENAME = "C-C";
+    private static final String SCAFFOLDAPCLASSNAME = "scaffold";
 
 //------------------------------------------------------------------------------
 
@@ -256,7 +260,7 @@ public class ReinventServerClientTest
 
 //------------------------------------------------------------------------------
 
-    //@Test
+    @Test
     public void testParseSmilesToCandidate_w_scaffold() throws Exception
     {
         ReinventServerClient client = clientReadyToFragment();
@@ -280,7 +284,7 @@ public class ReinventServerClientTest
         scaffoldIAC.removeAtom(hAtom);
         Fragment scaffoldFragment = new Fragment(scaffoldIAC, BBType.SCAFFOLD);
         scaffoldFragment.addAP(scaffoldIAC.indexOf(cAtom), 
-            APClass.make("scaffold", 0), 
+            APClass.make(SCAFFOLDAPCLASSNAME, 0), 
             new Point3d(0.0, 0.0, 0.0));
         scaffoldFragment.projectAPsToProperties();
         scaffoldGraph.addVertex(scaffoldFragment);
@@ -289,16 +293,54 @@ public class ReinventServerClientTest
 
         Candidate candidate = client.parseSmilesToCandidate("CC(=O)CCC1C=CC1", scaffoldGraph, 0);
 
-        //TODO-gg del
-        FragmenterParameters frgParams = new FragmenterParameters();
-        DenoptimIO.writeGraphToSDF(new File("/tmp/cand.sdf"), candidate.getGraph(), 
-        false,  frgParams.getLogger(), frgParams.getRandomizer());
-
         assertNotNull(candidate);
         assertNotNull(candidate.getGraph());
         // NB: there is a C-C cutting rule in action!
         assertEquals(4, candidate.getGraph().getVertexCount());
         assertEquals(3, candidate.getGraph().getEdgeCount());
+
+        int numScaffolds = 0;
+        int numFragments = 0;
+        int numCaps = 0;
+        for (Vertex v : candidate.getGraph().getVertexList())
+        {
+            switch (v.getBuildingBlockType())
+            {
+                case SCAFFOLD:
+                    numScaffolds++;
+                    break;
+                case FRAGMENT:
+                    numFragments++;
+                    break;
+                case CAP:
+                    numCaps++;
+                    break;
+            }
+        }
+        assertEquals(1, numScaffolds);
+        assertEquals(2, numFragments);
+        assertEquals(0, numCaps);
+        
+        int numCCAPClass = 0;
+        int numScaffAPClass = 0;
+        int numPlaceholderAPClass = 0;
+        for (AttachmentPoint ap : candidate.getGraph().getAttachmentPoints())
+        {
+            if (ap.getAPClass().getRule().equals(CCRULENAME))
+            {
+                numCCAPClass++;
+            } else if (ap.getAPClass().getRule().equals(SCAFFOLDAPCLASSNAME))
+            {
+                numScaffAPClass++;
+            } else if (ap.getAPClass().getRule().equals(
+                ReinventServerClient.PLACEHOLDERAPCLASSNAME))
+            {
+                numPlaceholderAPClass++;
+            }
+        }
+        assertEquals(4, numCCAPClass);
+        assertEquals(1, numScaffAPClass);
+        assertEquals(0, numPlaceholderAPClass);
     }
 
 //------------------------------------------------------------------------------
@@ -312,7 +354,7 @@ public class ReinventServerClientTest
 
         FragmenterParameters frgParams = new FragmenterParameters();
         List<CuttingRule> rules = new ArrayList<CuttingRule>();
-        rules.add(new CuttingRule("C-C", "[#6]", "[#6]", "-", 0,
+        rules.add(new CuttingRule(CCRULENAME, "[#6]", "[#6]", "-", 0,
                 new ArrayList<String>()));
         frgParams.setCuttingRules(rules);
         settings.setParameters(frgParams);

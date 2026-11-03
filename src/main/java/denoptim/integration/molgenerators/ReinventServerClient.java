@@ -164,7 +164,7 @@ public class ReinventServerClient
     /**
      * APClass for placeholder atoms
      */
-    private static String APClassPlaceholderName = "PlaceholderAPForReinvent"; 
+    public static final String PLACEHOLDERAPCLASSNAME = "PlaceholderAPForReinvent"; 
 
 //------------------------------------------------------------------------------
     
@@ -482,6 +482,9 @@ public class ReinventServerClient
                 graph = makeTemplatedGraph(iac, scaffoldGraph);
             } catch (DENOPTIMException e) {
                 //TODO-ai consider counting events in monitor
+
+                //TODO-gg del
+                System.out.println("     could not make templated graph");
                 return null;
             } 
 
@@ -491,7 +494,7 @@ public class ReinventServerClient
             //TODO-gg consider APClassQuery
             for (AttachmentPoint ap : graph.getAttachmentPoints())
             {
-                if (ap.getAPClass().getRule().startsWith(APClassPlaceholderName))
+                if (ap.getAPClass().getRule().startsWith(ReinventServerClient.PLACEHOLDERAPCLASSNAME))
                 {
                     placeholdingAPs.add(ap);
                 }
@@ -518,7 +521,7 @@ public class ReinventServerClient
                 } catch (DENOPTIMException e) {
                     // Keep the original un-fragmented fragment, so do nothing.
                 }
-                if (fragGraph != null) {
+                if (fragGraph != null && fragGraph.getVertexList().size() > 1) {
                     replacements.put(fragToFragment, fragGraph);
                 }
                 visitedFragments.add(fragToFragment);
@@ -534,7 +537,7 @@ public class ReinventServerClient
                 //TODO-gg consider APClassQuery
                 for (AttachmentPoint ap : incomingGraph.getAttachmentPoints())
                 {
-                    if (ap.getAPClass().getRule().startsWith(APClassPlaceholderName))
+                    if (ap.getAPClass().getRule().startsWith(ReinventServerClient.PLACEHOLDERAPCLASSNAME))
                     {
                         placeholdingAPsOnIncGraph.add(ap);
                     }
@@ -908,13 +911,16 @@ public class ReinventServerClient
         try {
             // Use apID in the "rule" part of the APClass to avoid having to 
             // match also the subclass.
-            placeHolderFrag.addAPOnAtom(atm, APClass.make(APClassPlaceholderName+"_"+apId,0), 
+            placeHolderFrag.addAPOnAtom(atm, APClass.make(
+                ReinventServerClient.PLACEHOLDERAPCLASSNAME+"_"+apId,0), 
                 new Point3d(new double[]{0.0, 0.0, 1.0}));
         } catch (DENOPTIMException e) {
             // This cannot happen unless there are unforeseen changed to APClass
             // basename syntax.
             throw new IllegalArgumentException(
-                "Illegal APClass built form 'APClassPlaceholderName'. "
+                "Illegal APClass built form '" 
+                + ReinventServerClient.PLACEHOLDERAPCLASSNAME + "'"
+                + " with apId=" + apId + ". "
                 + "Report this to the developers.", e);
         }
         placeHolderFrag.setVertexId(GraphUtils.getUniqueVertexIndex());

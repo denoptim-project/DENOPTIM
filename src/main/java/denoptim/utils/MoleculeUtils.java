@@ -1647,15 +1647,33 @@ public class MoleculeUtils
             MoleculeUtils.ensureNoUnsetBondOrdersSilent(substructure);
             MoleculeUtils.ensureNoUnsetBondOrdersSilent(mol);
             
-            // Create a pattern from the template molecule
+            // Create a query that considers only 
+            // -> connectivity (intrinsic, not controlled by predicate)
+            // -> atomic number only
             IAtomContainer query = QueryAtomContainer.create(substructure,
-                Expr.Type.ELEMENT,   // atomic number only
-                Expr.Type.ORDER);    // bond-order number only
+                Expr.Type.ELEMENT);   // atomic number only
             Pattern pattern = Pattern.findSubstructure(query);
-            // NOT THIS: 
+            // DO NOT USE THIS: 
             // Pattern pattern = Pattern.findSubstructure(substructure);
             // Because the so-created pattern is too sensitive to aromaticity flags.
-            
+
+            /* 
+            //TODO-gg del
+            for (int i=0; i<Math.min(substructure.getAtomCount(), mol.getAtomCount()); i++) {
+                System.out.println("SUB: "+substructure.getAtom(i)+" "+substructure.getAtom(i).isAromatic());
+                System.out.println("mol: "+mol.getAtom(i)+" "+mol.getAtom(i).isAromatic());
+            }
+            for (int i=0; i<Math.min(substructure.getBondCount(), mol.getBondCount()); i++) {
+                System.out.println("SUB: "+substructure.getBond(i).getOrder());
+                System.out.println("mol: "+mol.getBond(i).getOrder());
+            }
+
+            //TODO-gg del
+            DenoptimIO.writeSDFFile("/tmp/substructure.sdf", substructure);
+            DenoptimIO.writeSDFFile("/tmp/mol.sdf", mol);
+            System.out.println("pattern.matches(mol) = " + pattern.matches(mol));
+            */
+           
             // Check if template is a substructure of mol
             if (!pattern.matches(mol))
             {

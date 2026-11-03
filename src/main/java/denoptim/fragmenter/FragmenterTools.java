@@ -2373,6 +2373,9 @@ public class FragmenterTools
                 if (v.getAttachmentPoints().size()!=1 || v.isRCV())
                     continue;
                 
+                if (v.getAP(0).getLinkedAPThroughout()==null) {
+                    continue;
+                }
                 APClass srcAPC = v.getAP(0).getLinkedAPThroughout().getAPClass();
                 APClass capAPC = fragSpace.getAPClassOfCappingVertex(srcAPC);
                 Vertex cap = fragSpace.getCappingVertexWithAPClass(capAPC);

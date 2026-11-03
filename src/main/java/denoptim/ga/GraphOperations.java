@@ -2763,7 +2763,7 @@ public class GraphOperations
                     {
                         mnt.increase(
                                 CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDLINK);
-                    break;
+                        break;
                     }   
                     chosenApId = settings.getRandomizer().randomlyChooseOne(
                             candidates);
