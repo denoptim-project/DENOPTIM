@@ -61,6 +61,8 @@ import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.interfaces.IElement;
 import org.openscience.cdk.isomorphism.Mappings;
 import org.openscience.cdk.isomorphism.Pattern;
+import org.openscience.cdk.isomorphism.matchers.Expr;
+import org.openscience.cdk.isomorphism.matchers.QueryAtomContainer;
 import org.openscience.cdk.layout.StructureDiagramGenerator;
 import org.openscience.cdk.qsar.DescriptorValue;
 import org.openscience.cdk.qsar.IMolecularDescriptor;
@@ -780,7 +782,8 @@ public class MoleculeUtils
     /**
      * Sets bond order = single to all otherwise unset bonds. In case of failed 
      * kekulization this method reports a warning but does not throw an 
-     * exception.
+     * exception. Also removes aromaticity flags that may be left after 
+     * kekulization.
      * @param iac the container to process
      * @throws CDKException 
      */
@@ -788,6 +791,12 @@ public class MoleculeUtils
     public static void ensureNoUnsetBondOrders(IAtomContainer iac) throws CDKException
     {
         Kekulization.kekulize(iac);
+
+        // Remove aromaticity flags that may be left after kekulization
+        for (IAtom atom : iac.atoms())
+            atom.setIsAromatic(false);
+        for (IBond bond : iac.bonds())
+            bond.setIsAromatic(false);
         
         for (IBond bnd : iac.bonds())
         {
@@ -1601,7 +1610,13 @@ public class MoleculeUtils
             MoleculeUtils.ensureNoUnsetBondOrdersSilent(mol);
             
             // Create a pattern from the template molecule
-            Pattern pattern = Pattern.findSubstructure(substructure);
+            IAtomContainer query = QueryAtomContainer.create(substructure,
+                Expr.Type.ELEMENT,   // atomic number only
+                Expr.Type.ORDER);    // bond-order number only
+            Pattern pattern = Pattern.findSubstructure(query);
+            // NOT THIS: 
+            // Pattern pattern = Pattern.findSubstructure(substructure);
+            // Because the so-created pattern is too sensitive to aromaticity flags.
             
             // Check if template is a substructure of mol
             if (!pattern.matches(mol))

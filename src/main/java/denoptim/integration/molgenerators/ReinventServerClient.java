@@ -19,6 +19,7 @@
 package denoptim.integration.molgenerators;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,7 +29,11 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,11 +58,15 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileFormat;
+import denoptim.fragmenter.FragmenterTools;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.ga.EAUtils;
 import denoptim.graph.APClass;
+import denoptim.graph.APMapping;
 import denoptim.graph.AttachmentPoint;
+import denoptim.graph.AttachmentPointQuery;
 import denoptim.graph.Candidate;
 import denoptim.graph.DGraph;
 import denoptim.graph.Fragment;
@@ -68,7 +77,8 @@ import denoptim.logging.Monitor;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
-import denoptim.utils.DummyAtomHandler;
+import denoptim.programs.fragmenter.FragmenterParameters;
+import denoptim.utils.GraphUtils;
 import denoptim.utils.MoleculeUtils;
 import denoptim.utils.Randomizer;
 
@@ -129,6 +139,12 @@ public class ReinventServerClient
     private static SmilesParser smilesParser = new SmilesParser(cdkBuilder);
 
     /**
+     * Smiles generator to generate SMILES strings.
+     */
+    private static final SmilesGenerator CANONICAL_SMGEN = new SmilesGenerator(
+        SmiFlavor.Canonical);
+
+    /**
      * Monitor to count events related to ægs run.
      */
     private Monitor mnt;
@@ -143,6 +159,11 @@ public class ReinventServerClient
      * generation of molecules)
      */
     private JsonObject deNovoConfig;
+
+    /**
+     * APClass for placeholder atoms
+     */
+    private static String APClassPlaceholderName = "PlaceholderAPForReinvent"; 
 
 //------------------------------------------------------------------------------
     
@@ -283,13 +304,26 @@ public class ReinventServerClient
     /**
      * Generate molecules from scratch.
      */
-    public List<Candidate> generateCandidates(List<String> inputs, int n, Logger logger)
-                    throws IOException, JsonSyntaxException, DENOPTIMException
+    public List<Candidate> generateCandidates(Map<String, DGraph> smilesDGraphMap, int n)
+        throws IOException, JsonSyntaxException, DENOPTIMException
     {
-        String requestAsJSONString = formulateRequest(inputs, n);
+        List<String> inputSmiles = new ArrayList<>(smilesDGraphMap.keySet());
+
+        // Reinvent returns scaffolds SMILES that re not the same as those given as input.
+        // So we generate acanonical SMILES to ude it a key
+        Map<String, DGraph> canonicalSmilesDGraphMap = new HashMap<>();
+        for (Map.Entry<String, DGraph> e : smilesDGraphMap.entrySet())
+        {
+            String scaffSMI = e.getKey();
+            String scaffKey = getCanonicalSMILES(scaffSMI);
+            canonicalSmilesDGraphMap.put(scaffKey, e.getValue());
+        }
+
+        String requestAsJSONString = formulateRequest(inputSmiles, n);
         
         //This might be useful for debugging to get the actual request placed to the server
-        logger.log(Level.FINE, "Request to the AI Generator socket server: " + requestAsJSONString);
+        gaSettings.getLogger().log(Level.FINE, 
+            "Request to the AI Generator socket server: " + requestAsJSONString);
         if (requestFileName != null) {
             DenoptimIO.writeData(requestFileName, 
                 requestAsJSONString+System.lineSeparator(), true);
@@ -331,8 +365,17 @@ public class ReinventServerClient
         {
             JsonObject molecule = molecules.get(i).getAsJsonObject();
             String smiles = molecule.get("SMILES").getAsString();
+
+            DGraph scaffoldGraph = null;
+            String scaffoldKey = "Scaffold";
+            if (molecule.has(scaffoldKey))
+            {
+                String scaffSMIFromReinvent = molecule.get(scaffoldKey).getAsString();
+                String scaffKey = getCanonicalSMILES(scaffSMIFromReinvent);
+                scaffoldGraph = canonicalSmilesDGraphMap.get(scaffKey);
+            }
             
-            Candidate candidate = parseSmilesToCandidate(smiles, i);
+            Candidate candidate = parseSmilesToCandidate(smiles, scaffoldGraph, i);
             if (candidate != null) {
                 candidates.add(candidate);
             }
@@ -341,44 +384,220 @@ public class ReinventServerClient
         return candidates;
     }
 
+
+
 //------------------------------------------------------------------------------
 
     /**
-     * Converts a SMILES string to a {@link Candidate} object.
+     * Gets the canonical SMILES string for a given SMILES string.
      * @param smiles The SMILES string
-     * @param index The index of the candidate in the list of candidates. 
-     * This is only meant for logging.
-     * @return The {@link Candidate} object
+     * @return The canonical SMILES string
      */
-    private Candidate parseSmilesToCandidate(String smiles, int index) 
+    private String getCanonicalSMILES(String smiles)
     {
-        //TODO-gg del
-        System.out.println("Smiles From Reinvent: " + smiles);
-
         IAtomContainer iac = null;
         try {
             iac = smilesParser.parseSmiles(smiles);
         } catch (InvalidSmilesException e) {
-            // Skipp results that cannot be converted for whatever reason
-            return null;
+            throw new IllegalArgumentException(
+                "Invalid SMILES string for processing with Reinvent: " + smiles, e);
         }
-
-        if (iac == null) {
-            return null;
-        }
-
-        //TODO-ai consider counting events in monitor
+        String canonicalSmiles = null;
         try {
-            MoleculeUtils.explicitHydrogens(iac);
-            Candidate candidate = EAUtils.buildCandidateByFragmentingMolecule(iac, 
-                mnt, gaSettings, index);
-            if (candidate != null) {
-                candidate.getGraph().setLocalMsg("REINVENT_DE_NOVO");
-            }
-            return candidate;
-        } catch (DENOPTIMException e) {
+            canonicalSmiles = CANONICAL_SMGEN.create(iac);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(
+                "Error generating canonical SMILES string for: " + smiles, e);
+        }
+        return canonicalSmiles;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Converts a SMILES string to a {@link Candidate} object. 
+     * @param smiles The SMILES string
+     * @param scaffoldGraph The pre-existing scaffold graph structure, if any.
+     * @param index The index of the candidate in the list of candidates. 
+     * This is only meant for logging.
+     * @return The {@link Candidate} object
+     */
+    private Candidate parseSmilesToCandidate(String smiles, DGraph scaffoldGraph, int index) 
+    {
+        //TODO-gg del
+        System.out.println("SMILES From Reinvent: " + smiles);
+
+        // Get a CDK IAtomContainer object from the SMILES string
+        IAtomContainer iac = null;
+        try {
+            iac = smilesParser.parseSmiles(smiles);
+        } catch (InvalidSmilesException e) {
+            // Skip results that cannot be converted for whatever reason
             return null;
         }
+        if (iac == null) {
+            // Skip results that cannot be converted for whatever reason
+            return null;
+        }
+
+        // Prepare molecular fragmentation
+        MoleculeUtils.explicitHydrogens(iac);
+        //TODO-ai make it 3D
+        /*
+        if (gaSettings.getWorkOn3D())
+        {
+            MoleculeUtils.make3D(iac);
+        }
+        */
+
+        //TODO-gg move to GAParameters
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        if (gaSettings.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsParams = (FragmentSpaceParameters) gaSettings.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
+        FragmentSpace fragSpace = fsParams.getFragmentSpace();
+        
+        FragmenterParameters frgParams = new FragmenterParameters();
+        if (gaSettings.containsParameters(ParametersType.FRG_PARAMS))
+        {
+            frgParams = (FragmenterParameters) gaSettings.getParameters(
+                    ParametersType.FRG_PARAMS);
+        }
+
+        DGraph graph = null;
+        if (scaffoldGraph == null)
+        {
+            try {
+                graph = FragmenterTools.makeGraphFromFragmentationOfMol(
+                    iac, frgParams, fragSpace, false);
+            } catch (DENOPTIMException e) {
+                //TODO-ai consider counting events in monitor
+                return null;
+            }
+        } else {
+            // Run a template-based fragmentation to identify any pre-existing
+            // graph structure (scaffold or warheads) ot build on.
+            try {
+                graph = makeTemplatedGraph(iac, scaffoldGraph);
+            } catch (DENOPTIMException e) {
+                //TODO-ai consider counting events in monitor
+                return null;
+            } 
+
+            // Since the scaffoldGraph is decorated with placeholder atoms,
+            // we can use the placeholder class to identify attachment points.
+            List<AttachmentPoint> placeholdingAPs = new ArrayList<>();
+            //TODO-gg consider APClassQuery
+            for (AttachmentPoint ap : graph.getAttachmentPoints())
+            {
+                if (ap.getAPClass().getRule().startsWith(APClassPlaceholderName))
+                {
+                    placeholdingAPs.add(ap);
+                }
+            }
+
+            // Keep track of the mapping between placeholdingAPs and their users.
+            APMapping placeholderToUserMap = new APMapping();
+            for (int i = 0; i < placeholdingAPs.size(); i++)
+            {
+                placeholderToUserMap.put(placeholdingAPs.get(i), placeholdingAPs.get(i).getLinkedAP());
+            }
+
+            // Each placeholdingAPs is on a fragment that we must try to chop further.
+            Map<Vertex,DGraph> replacements = new HashMap<>();
+            Set<Vertex> visitedFragments = new HashSet<>();
+            for (AttachmentPoint placeholdingAP : placeholdingAPs)
+            {
+                Vertex fragToFragment = placeholdingAP.getOwner();
+                if (visitedFragments.contains(fragToFragment)) {
+                    continue;
+                }
+
+                IAtomContainer fragIAC = fragToFragment.getIAtomContainer();
+                DGraph fragGraph = null;
+                try {
+                    fragGraph = FragmenterTools.makeGraphFromFragmentationOfMol(
+                        fragIAC, frgParams, fragSpace, false);
+                } catch (DENOPTIMException e) {
+                    // Keep the original un-fragmented fragment, so do nothing.
+                }
+                if (fragGraph != null) {
+                    replacements.put(fragToFragment, fragGraph);
+                }
+                visitedFragments.add(fragToFragment);
+            }
+
+            // Replaced un-fragmenter fragment with its graph version.
+            for (Map.Entry<Vertex,DGraph> e : replacements.entrySet()) 
+            {
+                Vertex fragToReplace = e.getKey();
+                DGraph incomingGraph = e.getValue();
+
+                List<AttachmentPoint> placeholdingAPsOnIncGraph = new ArrayList<>();
+                //TODO-gg consider APClassQuery
+                for (AttachmentPoint ap : incomingGraph.getAttachmentPoints())
+                {
+                    if (ap.getAPClass().getRule().startsWith(APClassPlaceholderName))
+                    {
+                        placeholdingAPsOnIncGraph.add(ap);
+                    }
+                }
+
+                APMapping apMapping = new APMapping();
+                for (AttachmentPoint apOnIncGraph : placeholdingAPsOnIncGraph)
+                {
+                    for (AttachmentPoint placeholderAP : placeholderToUserMap.keySet())
+                    {
+                        if (placeholderAP.getAPClass().equals(apOnIncGraph.getAPClass()))
+                        {
+                            apMapping.put(apOnIncGraph, placeholderToUserMap.get(placeholderAP));
+                            break;
+                        }
+                    }
+                }
+
+                try {
+                    graph.replaceSubGraph(Arrays.asList(fragToReplace), incomingGraph, 
+                        apMapping, fragSpace);
+                } catch (DENOPTIMException e2) {
+                    //TODO-ai consider counting events in monitor
+                    return null;
+                }
+            }
+        }
+
+        Candidate candidate = null;
+        try {
+            candidate = EAUtils.graphToCandidate(graph, mnt, gaSettings);
+        } catch (DENOPTIMException e) {
+            //TODO-ai consider counting events in monitor
+            return null;
+        } 
+        if (candidate != null) {
+            candidate.getGraph().setLocalMsg("REINVENT_DE_NOVO");
+        }
+        return candidate;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Produced a graph using the scaffoldGraph as a template.
+     * @param iac the molecule to fragment
+     * @param scaffoldGraph the graph template
+     * @return the graph produced using the scaffoldGraph as a template.
+     * @throws DENOPTIMException 
+     */
+    private DGraph makeTemplatedGraph(IAtomContainer iac, DGraph scaffoldGraph) throws DENOPTIMException
+    {
+        //WARNING; here we are ignoring any other fragmentation settings that might be present in the GA settings.
+        //TODO-gg consider cloning runtime settings
+        FragmenterParameters frgParams = new FragmenterParameters();
+        frgParams.setFragmentationTmpls(Arrays.asList(scaffoldGraph));
+        DGraph graph = EAUtils.makeGraphFromFragmentationOfMol(iac, frgParams);
+        return graph;
     }
 
 //------------------------------------------------------------------------------
@@ -598,7 +817,7 @@ public class ReinventServerClient
      * @param settings the GA settings.
      * @return the scaffolds SMILES strings or null if no scaffolds are available.
      */
-    public List<String> getScaffoldsSMILES(GAParameters settings)
+    public Map<String, DGraph> getSMILESToDGraphMapForScaffolds(GAParameters settings)
     {
         FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
         if (settings.containsParameters(ParametersType.FS_PARAMS))
@@ -608,7 +827,7 @@ public class ReinventServerClient
         }
         FragmentSpace fragSpace = fsParams.getFragmentSpace();
 
-        List<String> smilesList = new ArrayList<>();
+        Map<String, DGraph> smilesDGraphMap = new HashMap<String, DGraph>();
         if (fragSpace != null && fragSpace.getScaffoldLibrary() != null 
                 && !fragSpace.getScaffoldLibrary().isEmpty()) 
         {
@@ -627,7 +846,7 @@ public class ReinventServerClient
                 String smiles = null;
                 try {
                     graph.addVertex(scafVertex);
-                    graph.addCapOnAllFreeAPs(Arrays.asList(scafVertex), getAPPlaceHolder());
+                    addCapOnAllFreeAPs(Arrays.asList(scafVertex));
 
                     ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(settings.getLogger(),
                         settings.getRandomizer());
@@ -642,14 +861,32 @@ public class ReinventServerClient
                         + "for de novo generation with Reinvent.");
                     continue;
                 }
-                smilesList.add(smiles);
+                smilesDGraphMap.put(smiles, graph);
             }
         }
 
-        if (smilesList.size() > 0) {
-            return smilesList;
+        if (smilesDGraphMap.size() > 0) {
+            return smilesDGraphMap;
         }
         return null;
+    }
+
+//------------------------------------------------------------------------------
+
+    private void addCapOnAllFreeAPs(List<Vertex> vertexes) throws DENOPTIMException
+    {
+        int apId = -1;
+        for (Vertex curVertex : vertexes)
+        {
+            for (AttachmentPoint curDap : curVertex.getAttachmentPoints())
+            {
+                if (curDap.isAvailableThroughout())
+                {
+                    Vertex capVrtx = getAPPlaceHolder(apId++);
+                    curVertex.getGraphOwner().appendVertexOnAP(curDap, capVrtx.getAP(0));
+                }
+            }
+        }
     }
 
 //------------------------------------------------------------------------------
@@ -657,17 +894,27 @@ public class ReinventServerClient
     /**
      * Gets a placeholder vertex for attachment points.
      * @return the placeholder vertex.
-     * @throws DENOPTIMException 
      */
-    private Vertex getAPPlaceHolder() throws DENOPTIMException
+    private Vertex getAPPlaceHolder(int apId)
     {
-        Fragment apPlaceHolder = new Fragment();
+        Fragment placeHolderFrag = new Fragment();
         PseudoAtom atm = new PseudoAtom("R", 
             new Point3d(new double[]{0.0, 0.0, 0.0}));
-    	apPlaceHolder.addAtom(atm);
-    	apPlaceHolder.addAPOnAtom(atm, APClass.make("APPlaceholder:0"), 
-            new Point3d(new double[]{0.0, 0.0, 1.0}));
-        return apPlaceHolder;
+        placeHolderFrag.addAtom(atm);
+        try {
+            // Use apID in the "rule" part of the APClass to avoid having to 
+            // match also the subclass.
+            placeHolderFrag.addAPOnAtom(atm, APClass.make(APClassPlaceholderName+"_"+apId,0), 
+                new Point3d(new double[]{0.0, 0.0, 1.0}));
+        } catch (DENOPTIMException e) {
+            // This cannot happen unless there are unforeseen changed to APClass
+            // basename syntax.
+            throw new IllegalArgumentException(
+                "Illegal APClass built form 'APClassPlaceholderName'. "
+                + "Report this to the developers.", e);
+        }
+        placeHolderFrag.setVertexId(GraphUtils.getUniqueVertexIndex());
+        return placeHolderFrag;
     }
 
 //------------------------------------------------------------------------------

@@ -854,8 +854,7 @@ public class EAUtils
         List<Candidate> candidates;
         try {
             candidates = reinventClient.generateCandidates(
-                reinventClient.getScaffoldsSMILES(settings),
-                nextBatchSize, settings.getLogger());
+                reinventClient.getSMILESToDGraphMapForScaffolds(settings), nextBatchSize);
         } catch (IOException e) {
             mnt.increase(CounterID.FAILEDBUILDATTEMPTS);
             throw new DENOPTIMException("Error generating candidates from Reinvent service", e);
@@ -983,21 +982,86 @@ public class EAUtils
             frgParams = (FragmenterParameters) settings.getParameters(
                     ParametersType.FRG_PARAMS);
         }
-        
-        if (frgParams.getCuttingRules()==null 
-                || frgParams.getCuttingRules().isEmpty())
-        {
-            throw new DENOPTIMException("Request to generate candidates by "
-                    + "fragmentation but no cutting rules provided. Please,"
-                    + "add FRG-CUTTINGRULESFILE=path/to/your/file to the "
-                    + "input.");
-        }
-        mnt.increase(CounterID.CONVERTBYFRAGATTEMPTS);
-        mnt.increase(CounterID.NEWCANDIDATEATTEMPTS);
 
         // Hand-built or late-attached fragmenter settings keep DummyLogger
         // unless they are pointed at the GA logger here.
         frgParams.adoptLogger(settings.getLogger());
+
+        DGraph graph = makeGraphFromFragmentationOfMol(mol, frgParams, fragSpace, mnt, index);
+        if (graph == null)
+        {
+            mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS);
+            return null;
+        }
+        
+        return graphToCandidate(graph, mnt, settings);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Builds a {@link Candidate} from a {@link DGraph}.
+     * @param graph the graph to convert.
+     * @param mnt the monitor to use for logging purposes.
+     * @param settings the settings to use for the conversion.
+     * @return the candidate.
+     * @throws DENOPTIMException 
+     */
+    public static Candidate graphToCandidate(DGraph graph, Monitor mnt, 
+        GAParameters settings) throws DENOPTIMException
+    {
+        Object[] res = graph.checkConsistency(settings);
+        if (res == null)
+        {
+            graph.cleanup();
+            mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_EVAL);
+            return null;
+        }
+        
+        Candidate candidate = new Candidate(graph);
+        candidate.setUID(res[0].toString().trim());
+        candidate.setSmiles(res[1].toString().trim());
+        candidate.setChemicalRepresentation((IAtomContainer) res[2]);
+        
+        candidate.setName("M" + GeneralUtils.getPaddedString(
+                DENOPTIMConstants.MOLDIGITS,
+                GraphUtils.getUniqueMoleculeIndex()));
+        
+        return candidate;
+    }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Converts a molecule into a {@link DGraph} by fragmentation and 
+     * re-assembling of the fragments. Includes preparation of the molecule
+     * according to the given settings.
+     * @param mol the molecule to convert
+     * @param settings the settings to use for the fragmentation
+     * @param mnt the monitor to use for logging purposes
+     * @param index the index of the molecule in the list of molecules to convert
+     * This is used only for logging.
+     * @return the graph.
+     * @throws DENOPTIMException 
+    */
+    public static DGraph makeGraphFromFragmentationOfMol(IAtomContainer mol, 
+        FragmenterParameters frgParams,
+        FragmentSpace fragSpace, Monitor mnt, int index) throws DENOPTIMException
+    {   
+        if ((frgParams.getCuttingRules()==null 
+                || frgParams.getCuttingRules().isEmpty())  
+            && (frgParams.getFragmentationTmpls()==null 
+                ||frgParams.getFragmentationTmpls().isEmpty()))
+        {
+            throw new DENOPTIMException("Request to generate candidates by "
+                    + "fragmentation but no cutting rules and "
+                    + "no fragmentation templates areprovided. Please,"
+                    + "add FRG-CUTTINGRULESFILE=path/to/your/file or "
+                    + "FRG-FRAGMENTATIONTEMPLATESFILE=path/to/your/file to the "
+                    + "input.");
+        }
+        mnt.increase(CounterID.CONVERTBYFRAGATTEMPTS);
+        mnt.increase(CounterID.NEWCANDIDATEATTEMPTS);
 
         // Adjust molecular representation to our settings
         if (!FragmenterTools.prepareMolToFragmentation(mol, frgParams, index))
@@ -1026,35 +1090,11 @@ public class EAUtils
             }
             String msg = "Unable to convert molecule (" + mol.getAtomCount() 
                 + " atoms) to DENOPTIM graph. " + de.getMessage();
-            settings.getLogger().log(Level.WARNING, msg);
+            frgParams.getLogger().log(Level.WARNING, msg);
             return null;
         }
-        if (graph == null)
-        {
-            mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS);
-            return null;
-        }
-        
-        graph.setLocalMsg("INITIAL_MOL_FRAGMENTED");
-        
-        Object[] res = graph.checkConsistency(settings);
-        if (res == null)
-        {
-            graph.cleanup();
-            mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_EVAL);
-            return null;
-        }
-        
-        Candidate candidate = new Candidate(graph);
-        candidate.setUID(res[0].toString().trim());
-        candidate.setSmiles(res[1].toString().trim());
-        candidate.setChemicalRepresentation((IAtomContainer) res[2]);
-        
-        candidate.setName("M" + GeneralUtils.getPaddedString(
-                DENOPTIMConstants.MOLDIGITS,
-                GraphUtils.getUniqueMoleculeIndex()));
-        
-        return candidate;
+
+        return graph;
     }
 
 //------------------------------------------------------------------------------  

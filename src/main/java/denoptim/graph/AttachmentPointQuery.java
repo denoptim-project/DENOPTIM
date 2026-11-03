@@ -80,6 +80,7 @@ public class AttachmentPointQuery
     {
         this.apID = apID;
         this.apIndex = apIndex;
+        //TODO-gg consider using APClassQuery instead of APClass
         this.apClass = apClass;
         this.vertexQuery = vertexQuery;
         this.edgeQuery = edgeQuery;

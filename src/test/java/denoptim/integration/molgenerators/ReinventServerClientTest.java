@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import javax.vecmath.Point3d;
 
@@ -41,6 +42,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.APClass;
+import denoptim.graph.DGraph;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
 import denoptim.graph.Vertex;
@@ -65,7 +67,7 @@ public class ReinventServerClientTest
         ReinventServerClient client = newClient();
         GAParameters settings = new GAParameters();
 
-        assertNull(client.getScaffoldsSMILES(settings));
+        assertNull(client.getSMILESToDGraphMapForScaffolds(settings));
     }
 
 //------------------------------------------------------------------------------
@@ -76,7 +78,7 @@ public class ReinventServerClientTest
         ReinventServerClient client = newClient();
         GAParameters settings = settingsWithScaffolds(new ArrayList<Vertex>());
 
-        assertNull(client.getScaffoldsSMILES(settings));
+        assertNull(client.getSMILESToDGraphMapForScaffolds(settings));
     }
 
 //------------------------------------------------------------------------------
@@ -91,7 +93,7 @@ public class ReinventServerClientTest
         scaffolds.add(empty);
         GAParameters settings = settingsWithScaffolds(scaffolds);
 
-        assertNull(client.getScaffoldsSMILES(settings));
+        assertNull(client.getSMILESToDGraphMapForScaffolds(settings));
     }
 
 //------------------------------------------------------------------------------
@@ -106,7 +108,8 @@ public class ReinventServerClientTest
         GAParameters settings = settingsWithScaffolds(scaffolds);
         settings.getRandomizer().initialiseRNG(1L);
 
-        List<String> smiles = client.getScaffoldsSMILES(settings);
+        Map<String, DGraph> smilesDGraphMap = client.getSMILESToDGraphMapForScaffolds(settings);
+        List<String> smiles = new ArrayList<>(smilesDGraphMap.keySet());
 
         assertNotNull(smiles);
         assertEquals(2, smiles.size());

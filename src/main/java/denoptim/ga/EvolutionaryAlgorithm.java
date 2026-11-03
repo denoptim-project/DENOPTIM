@@ -482,6 +482,7 @@ public class EvolutionaryAlgorithm
                     Candidate candidate = 
                             EAUtils.buildCandidateByFragmentingMolecule(
                                 iterMolsToFragment.next(), mnt, settings, i);
+                    candidate.getGraph().setLocalMsg("INITIAL_MOL_FRAGMENTED");
 
                     // NB: here we request to keep only the best candidates
                     // so that the tmp population does not become too large

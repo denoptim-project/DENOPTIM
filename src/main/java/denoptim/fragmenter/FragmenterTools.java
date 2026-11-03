@@ -548,7 +548,7 @@ public class FragmenterTools
                 frgParams.getRandomizer());
             IAtomContainer templateMol = tb.convertGraphTo3DAtomContainer(templateGraph, 
                 true, true, true);
-            
+        
             // Optimized creation of a reduced templateMol for faster isomorphism search
             // Keep full templateMol for exploreDGraphForMappings
             TopoTemplateProducer ttp = new TopoTemplateProducer(templateMol);
@@ -600,7 +600,7 @@ public class FragmenterTools
                 IAtomContainer reducedTemplateMol = ttp.getTemplateWithBufferShell(bufferShellSize);
                 List<List<Map<IAtom,IAtom>>> redTmpltoMolMappings = MoleculeUtils.findUniqueAtomMappings(
                         reducedTemplateMol, mol, frgParams.getLogger());
-                
+
                 // Convert mappings from reducedTemplateMol:mol to templateMol:mol using stored indices
                 List<List<Map<IAtom,IAtom>>> tmplToMolMappings = new ArrayList<>();
                 for (List<Map<IAtom,IAtom>> redMapping : redTmpltoMolMappings)

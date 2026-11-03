@@ -4604,10 +4604,10 @@ public class DGraph implements Cloneable
      * performed.
      */
 
-    public void addCapOnAllFreeAPs(List<Vertex> vertexAddedToThis, 
+    public void addCapOnAllFreeAPs(List<Vertex> vertexes, 
         Vertex cappingVrtx) throws DENOPTIMException
     {
-        for (Vertex curVertex : vertexAddedToThis)
+        for (Vertex curVertex : vertexes)
         {
             for (AttachmentPoint curDap : curVertex.getAttachmentPoints())
             {

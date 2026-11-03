@@ -37,7 +37,7 @@ import denoptim.utils.MutationType;
 
 
 /**
- *Parameters for genetic algorithm.
+ * Parameters for genetic algorithm.
  * @author Vishwesh Venkatraman
  * @author Marco Foscato
  */
