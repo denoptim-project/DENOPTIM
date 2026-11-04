@@ -24,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -56,7 +55,6 @@ import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
-import denoptim.io.DenoptimIO;
 import denoptim.logging.Monitor;
 import denoptim.programs.denovo.GAParameters;
 import denoptim.programs.fragmenter.CuttingRule;
@@ -254,7 +252,6 @@ public class ReinventServerClientTest
         // NB: there is a C-C cutting rule in action!
         assertEquals(2, candidate.getGraph().getVertexCount());
         assertEquals(1, candidate.getGraph().getEdgeCount());
-        assertEquals("REINVENT_DE_NOVO", candidate.getGraph().getLocalMsg());
         assertFalse(candidate.getSmiles().isBlank());
     }
 

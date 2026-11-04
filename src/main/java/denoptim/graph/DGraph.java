@@ -277,7 +277,7 @@ public class DGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    //TODO: rename to Provenance
+    //TODO-gg: rename to Provenance
     public void setLocalMsg(String msg)
     {
         localMsg = msg;
@@ -285,7 +285,7 @@ public class DGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    //TODO: rename to Provenance
+    //TODO-gg: rename to Provenance
     public String getLocalMsg()
     {
         return localMsg;

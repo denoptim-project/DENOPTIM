@@ -58,7 +58,6 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.files.FileFormat;
 import denoptim.fragmenter.FragmenterTools;
 import denoptim.fragmenter.ScaffoldingPolicy;
 import denoptim.fragspace.FragmentSpace;
@@ -67,7 +66,6 @@ import denoptim.ga.EAUtils;
 import denoptim.graph.APClass;
 import denoptim.graph.APMapping;
 import denoptim.graph.AttachmentPoint;
-import denoptim.graph.AttachmentPointQuery;
 import denoptim.graph.Candidate;
 import denoptim.graph.DGraph;
 import denoptim.graph.Fragment;
@@ -199,12 +197,12 @@ public class ReinventServerClient
     {
         if (instance == null) {
             instance = new ReinventServerClient(
-                gaSettings.getAIEngineServerHostname(), 
-                gaSettings.getAIEngineServerPort());
+                gaSettings.getReinventServerHostname(), 
+                gaSettings.getReinventServerPort());
             instance.randomizer = gaSettings.getRandomizer();
             instance.gaSettings = gaSettings;
             instance.deNovoConfig = readReinventConfigurationFile(
-                gaSettings.getPathnameReinventDeNovoConfig());
+                gaSettings.getReinventDeNovoConfigPathname());
             instance.mnt = mnt;
         }
         return instance;
@@ -304,6 +302,15 @@ public class ReinventServerClient
 
     /**
      * Generate molecules from scratch.
+     * @param smilesDGraphMap the map of SMILES strings to DGraph objects.
+     * @param n the total number of candidates to generate,
+     * but the result may contain less candidates depending on the hitting of
+     * invalid SMILES strings. If the amount of input in smilesDGraphMap is 
+     * higher than n, then we randomy pick n results.
+     * @return the list of generated candidates, which may be empty.
+     * @throws IOException if an I/O error occurs.
+     * @throws JsonSyntaxException if the JSON syntax is invalid.
+     * @throws DENOPTIMException if an error occurs.
      */
     public List<Candidate> generateCandidates(Map<String, DGraph> smilesDGraphMap, int n)
         throws IOException, JsonSyntaxException, DENOPTIMException
@@ -361,6 +368,13 @@ public class ReinventServerClient
         }
 
         JsonArray molecules = answer.get("molecules").getAsJsonArray();
+        JsonArray extraToDelete = new JsonArray();
+        while (molecules.size() > n)
+        {
+            int iii = randomizer.nextInt(molecules.size());
+            molecules.remove(iii);
+        }
+
         List<Candidate> candidates = new ArrayList<>();
         for (int i = 0; i < molecules.size(); i++)
         {
@@ -566,9 +580,6 @@ public class ReinventServerClient
         } catch (DENOPTIMException e) {
             //TODO-ai consider counting events in monitor
             return null;
-        } 
-        if (candidate != null) {
-            candidate.getGraph().setLocalMsg("REINVENT_DE_NOVO");
         }
         return candidate;
     }

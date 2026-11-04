@@ -7,21 +7,31 @@ FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf
 FS-cappingFragmentLibFile=OTF_WDIR/lib_cap.sdf
 FS-compMatrixFile=OTF_WDIR/CPMap.par
 
-# Used by mol-to-graph (TODO: make it use default rules)
+# Used by mol-to-graph (TODO-ai TODO-gg: make it use default rules)
 FRG-CuttingrulesFile=OTF_WDIR/cutting_rules
 
 # Genetic Algorithm parameters
 GA-randomSeed=8572368003836
 GA-Parallelization=synchronous
 GA-numParallelTasks=1
-GA-populationSize=20
-GA-numChildren=10
-GA-numGenerations=4
+GA-populationSize=10
+GA-numChildren=5
+GA-numGenerations=3
+
+# We do only generation from scratch (evolutionary algorithm, not genetic algorithm)
+GA-crossoverWeight=0
+GA-mutationWeight=0
+GA-ConstructionWeight=1
 
 # Interface with Reinvent
-GA-UseAIEngineForInitialPopulation=true
+GA-UseReinventForConstruction=true
 GA-ReinventDeNovoConfigFile=OTF_WDIR/reinvent_config_denovo.json
+# There is a default, but we want to ensure this info is shared
+GA-ReinventServerHostname=localhost 
+# There is a default, but we want to ensure this info is shared
+GA-ReinventServerPort=5973
 
+#TODO-ai remove
 # These caps are used to ensure consistency with the pre-computed expected results in case default values change
 GA-MaxXoverCompatVrtxPairs=500
 GA-MaxXoverEndPointsCombinations=50

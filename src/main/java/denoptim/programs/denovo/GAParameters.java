@@ -473,31 +473,31 @@ public class GAParameters extends RunTimeParameters
     protected boolean writePopOnDisk = false;
 
     /**
-     * Hostname of the AI Engine Server
+     * Hostname of the Reinvent Server
      */
-    protected String aiEngineServerHostname = "localhost";
+    protected String reinventServerHostname = "localhost";
 
     /**
-     * Port of the AI Engine Server
+     * Port of the Reinvent Server
      */
-    protected Integer aiEngineServerPort = 5973;
+    protected Integer reinventServerPort = 5973;
 
     /**
-     * Pathname to file where to record requests sent to the AI Engine Server.
+     * Pathname to file where to record requests sent to the Reinvent Server.
      * If <code>null</code>, no file is written.
      */
-    protected String aiEngineServerRequestsFileName = null;
+    protected String reinventServerRequestsPathname = null;
 
     /**
-     * Flag requesting to use the AI engine for generating the initial population.
+     * Flag requesting to use the Reinvent engine for generating the initial population.
      */
-    protected boolean useAIEngineForInitialPopulation = false;
+    protected boolean useReinventForConstruction = false;
 
     /**
      * Pathname to file where to store the configuration for the Reinvent de novo
      * engine.
      */
-    protected String reinventDeNovoConfigFileName = null;
+    protected String reinventDeNovoConfigPathname = null;
 
 //------------------------------------------------------------------------------
     
@@ -962,37 +962,37 @@ public class GAParameters extends RunTimeParameters
 
 //------------------------------------------------------------------------------
 
-    public String getAIEngineServerHostname() 
+    public String getReinventServerHostname() 
     {
-        return aiEngineServerHostname;
+        return reinventServerHostname;
     }
 
 //------------------------------------------------------------------------------
 
-    public Integer getAIEngineServerPort() 
+    public Integer getReinventServerPort() 
     {
-        return aiEngineServerPort;
+        return reinventServerPort;
     }
 
 //------------------------------------------------------------------------------
 
-    public String getPathnameForRecordingAIEngineRequests() 
+    public String getReinventRequestsPathname() 
     {
-        return aiEngineServerRequestsFileName;
+        return reinventServerRequestsPathname;
     } 
 
 //------------------------------------------------------------------------------
 
-    public boolean useAIEngineForInitialPopulation() 
+    public boolean useReinventForConstruction() 
     {
-        return useAIEngineForInitialPopulation;
+        return useReinventForConstruction;
     }
 
 //------------------------------------------------------------------------------
 
-    public String getPathnameReinventDeNovoConfig() 
+    public String getReinventDeNovoConfigPathname() 
     {
-        return reinventDeNovoConfigFileName;
+        return reinventDeNovoConfigPathname;
     } 
 
 //------------------------------------------------------------------------------
@@ -1568,36 +1568,36 @@ public class GAParameters extends RunTimeParameters
                 break;
             }
 
-            case "AIENGINEHOSTNAME=":
+            case "REINVENTSERVERHOSTNAME=":
             {
                 if (value.length() > 0)
                 {
-                    aiEngineServerHostname = value;
+                    reinventServerHostname = value;
                 }
                 break;
             }
             
-            case "AIENGINEPORT=":
+            case "REINVENTSERVERPORT=":
             {
                 if (value.length() > 0)
                 {
-                    aiEngineServerPort = Integer.parseInt(value);
+                    reinventServerPort = Integer.parseInt(value);
                 }
                 break;
             }
             
-            case "RECORDAIENGINEREQUESTSTOFILE=":
+            case "RECORDREINVENTREQUESTSTOFILE=":
             {
                 if (value.length() > 0)
                 {
-                    aiEngineServerRequestsFileName = value;
+                    reinventServerRequestsPathname = value;
                 }
                 break;
             }
 
-            case "USEAIENGINEFORINITIALPOPULATION=":
+            case "USEREINVENTFORCONSTRUCTION=":
             {
-                useAIEngineForInitialPopulation = readYesNoTrueFalse(value);
+                useReinventForConstruction = readYesNoTrueFalse(value);
                 break;
             }
 
@@ -1605,7 +1605,7 @@ public class GAParameters extends RunTimeParameters
             {
                 if (value.length() > 0)
                 {
-                    reinventDeNovoConfigFileName = value;
+                    reinventDeNovoConfigPathname = value;
                 }
                 break;
             }

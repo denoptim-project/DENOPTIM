@@ -117,5 +117,17 @@
             "cwd": "/tmp/denoptim_test/t34",
             "console": "integratedTerminal"
         },
+        {
+            "type": "java",
+            "name": "Run test t12g",
+            "projectName": "denoptim",
+            "request": "launch",
+            "mainClass": "denoptim.main.Main",
+            "args": [
+                "-r", "GA", "t12g.params"
+            ],
+            "cwd": "/tmp/denoptim_test/t12g",
+            "console": "integratedTerminal"
+        },
     ]
 }

@@ -281,7 +281,7 @@ public class EAUtils
      * @param mnt monitoring tool used to record events during the run of the
      * evolutionary algorithm.
      * @param settings the settings of the genetic algorithm.
-     * @return a candidate chosen in a stochastic manner.
+     * @return the list of new candidates.
      */
     protected static List<Candidate> buildCandidatesByXOver(
             List<Candidate> eligibleParents, Population population, 
@@ -301,7 +301,7 @@ public class EAUtils
      * are hosted.
      * @param mnt monitoring tool used to record events during the run of the
      * evolutionary algorithm.
-     * @return a candidate chosen in a stochastic manner.
+     * @return the new candidate.
      */
     protected static Candidate buildCandidateByXOver(
             List<Candidate> eligibleParents, Population population, 
@@ -832,41 +832,84 @@ public class EAUtils
     }
 
 //------------------------------------------------------------------------------
-
+    
     /**
-     * Uses an external microservice for unbiased generation of candidates.
-     * @param mnt
-     * @param settings
-     * @param nextBatchSize
-     * @return
+     * Builds a list of candidates from scratch. This may imply generation from
+     * fragment space or from Reinvent.
+     * @param mnt the monitor to use for logging purposes.
+     * @param settings the settings to use for the generation.
+     * @param requestedSize the number of candidates to generate, but the result
+     * may contain less candidates.
+     * @return the list of generated candidates, which may be empty.
      * @throws DENOPTIMException
      */
-    public static List<Candidate> buildCandidateFromAIEngine(Monitor mnt,
+    public static List<Candidate> buildCandidatesFromScratch(Monitor mnt,
+        GAParameters settings, int requestedSize) throws DENOPTIMException
+    {
+        List<Candidate> candidates = new ArrayList<>();
+        if (settings.useReinventForConstruction())
+        {
+            candidates.addAll(buildCandidatesFromReinvent(mnt, settings, requestedSize));
+        } else {
+            for (int i = 0; i < requestedSize; i++)
+            {
+                Candidate candidate = buildCandidateFromScratch(mnt, settings);
+                if (candidate != null)
+                {
+                    candidates.add(candidate);
+                }
+            }
+        }
+        return candidates;
+    }   
+
+//------------------------------------------------------------------------------
+    /**
+     * Uses Reinvent microservice for generation of candidates. If scaffold 
+     * are defined in the given GA settings, they are used to generate the 
+     * candidates.
+     * @param mnt the monitor to use for logging purposes.
+     * @param settings the settings to use for the generation.
+     * @param nextBatchSize the number of candidates to ask for, but the result
+     * may contain less candidates.
+     * @return the list of generated candidates, which may be empty.
+     * @throws DENOPTIMException
+     */
+    protected static List<Candidate> buildCandidatesFromReinvent(Monitor mnt,
         GAParameters settings, int nextBatchSize) throws DENOPTIMException
     {
-        mnt.increase(CounterID.BUILDANEWATTEMPTS);
-        mnt.increase(CounterID.NEWCANDIDATEATTEMPTS);
+        mnt.increaseBy(CounterID.BUILDANEWATTEMPTS, nextBatchSize);
+        mnt.increaseBy(CounterID.NEWCANDIDATEATTEMPTS, nextBatchSize);
         ReinventServerClient reinventClient = ReinventServerClient.getInstance(
             settings,
             mnt);
         reinventClient.setRecordRequestsFileName(
-            settings.getPathnameForRecordingAIEngineRequests());
+            settings.getReinventRequestsPathname());
         List<Candidate> candidates;
         try {
             candidates = reinventClient.generateCandidates(
-                reinventClient.getSMILESToDGraphMapForScaffolds(settings), nextBatchSize);
+                reinventClient.getSMILESToDGraphMapForScaffolds(settings), 
+                nextBatchSize);
         } catch (IOException e) {
-            mnt.increase(CounterID.FAILEDBUILDATTEMPTS);
-            throw new DENOPTIMException("Error generating candidates from Reinvent service", e);
+            mnt.increaseBy(CounterID.FAILEDBUILDATTEMPTS, nextBatchSize);
+            throw new DENOPTIMException(
+                "Error generating candidates from Reinvent service", e);
         }
+        candidates.forEach(c -> c.getGraph().setLocalMsg("NEW_FROM_REINVENT"));
         return candidates;
     }
     
 //------------------------------------------------------------------------------
     
+    /**
+     * Generates a candidate by generating the graph from scratch.
+     * @param mnt the monitor to use for logging purposes.
+     * @param settings the settings to use for the generation.
+     * @return the candidate.
+     * @throws DENOPTIMException if the graph cannot be generated.
+     */
     protected static Candidate buildCandidateFromScratch(Monitor mnt, 
-            GAParameters settings) 
-            throws DENOPTIMException
+            GAParameters settings) throws DENOPTIMException
     {
         FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
         if (settings.containsParameters(ParametersType.FS_PARAMS))
@@ -886,6 +929,7 @@ public class EAUtils
             mnt.increase(CounterID.FAILEDBUILDATTEMPTS);
             return null;
         }
+        //TODO-gg NEW to DENOVO_FROM_FRAGSPACE
         graph.setLocalMsg("NEW");
         
         Object[] res = graph.checkConsistency(settings);

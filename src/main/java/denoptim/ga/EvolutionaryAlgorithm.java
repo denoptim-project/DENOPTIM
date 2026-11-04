@@ -525,52 +525,35 @@ public class EvolutionaryAlgorithm
         List<Task> tasks = new ArrayList<>();
         try 
         {
-            if (settings.useAIEngineForInitialPopulation()) 
+            while (i < settings.getPopulationSize() * settings.getMaxTriesFactor()) 
             {
-                while (i < settings.getPopulationSize() * settings.getMaxTriesFactor()) 
-                {
-                    i++;
-                    if (stopped)
-                        break;
-                    
-                    int nextBatchSize = settings.getPopulationSize() - population.size();
-                    if (nextBatchSize <= 0)
-                        break;
+                i++;
+                if (stopped)
+                    break;
 
-                    List<Candidate> candidates = EAUtils.buildCandidateFromAIEngine(mnt, 
-                        settings, nextBatchSize);
-                    for (Candidate candidate : candidates)
-                    {
-                        i = processInitialPopCandidate(candidate, population, mnt, 
-                            tasks, i, false, false);
-                    }
-                }
-            } else {
-                // Fragment-based generation of candidates
-                while (i < settings.getPopulationSize() * settings.getMaxTriesFactor()) 
+                if (checkForException())
                 {
-                    i++;
-                    if (stopped)
+                    stopRun();
+                    throw new DENOPTIMException("Errors found during sub tasks "
+                            + "execution.", ex);
+                }
+
+                synchronized (population)
+                {
+                    if (population.size() >= settings.getPopulationSize())
                         break;
-                    
-                    if (checkForException())
-                    {
-                        stopRun();
-                        throw new DENOPTIMException("Errors found during sub tasks "
-                                + "execution.", ex);
-                    }
-                    
-                    synchronized (population)
-                    {
-                        if (population.size() >= settings.getPopulationSize())
-                            break;
-                    }
-                    
-                    Candidate candidate = EAUtils.buildCandidateFromScratch(mnt,
-                            settings);
-                    
+                }
+                
+                int nextBatchSize = settings.getPopulationSize() - population.size();
+                if (nextBatchSize <= 0)
+                    break;
+
+                List<Candidate> candidates = EAUtils.buildCandidatesFromScratch(mnt, 
+                    settings, nextBatchSize);
+                for (Candidate candidate : candidates)
+                {
                     i = processInitialPopCandidate(candidate, population, mnt, 
-                            tasks, i, false, false);
+                        tasks, i, false, false);
                 }
             }
         } catch (DENOPTIMException dex)
@@ -747,10 +730,7 @@ public class EvolutionaryAlgorithm
         int newPopSize = -1;
         synchronized (population)
         {
-            for (Candidate c : population)
-            {
-                eligibleParents.add(c);
-            }
+            eligibleParents.addAll(population);
             if (settings.parentsSurvive())
             {
                 newPopSize = settings.getNumberOfChildren() 
@@ -831,15 +811,9 @@ public class EvolutionaryAlgorithm
                 }
                 
                 if (candidatesToEvaluate.size()==0)
-                {
-                    if (settings.coupleMutationAndCrossover())
-                    {
-                        candidatesToEvaluate.addAll(makeOffspringB(
+                {  
+                    candidatesToEvaluate.addAll(makeOffspring(
                                 eligibleParents, population, mnt));
-                    } else {    
-                        candidatesToEvaluate.addAll(makeOffspringA(
-                                eligibleParents, population, mnt));
-                    }
                 }
                 if (candidatesToEvaluate.size()==0)
                     continue;
@@ -977,18 +951,19 @@ public class EvolutionaryAlgorithm
 //------------------------------------------------------------------------------
 
     /**
-     * Generates one offspring according to the method where crossover and 
-     * mutation are decoupled, i.e., we can do mutation without doing crossover.
-     * Besides crossover and mutation, this offspring generation method includes
+     * Generates one or more offspring according to the method chosen by the
+     * a weited generation method selection.
+     * Besides crossover, this offspring generation method includes
      * also construction from scratch, which corresponds to mutation of 
      * everything. Effectively, these are the alternative possibilities: <ul>
-     * <li>Crossover between selected population members.</li>
+     * <li>Crossover between selected population members, possibly followed by 
+     * mutation.</li>
      * <li>Mutation of a selected population member.</li>
      * <li>Construction from scratch.</li>
      * </ul>
-     * The operation chosen to try to generate the offspring is 
-     * given by the weights of the respective strategies in the genetic 
-     * algorithm settings.
+     * The weights of the respective operation defined in the 
+     * genetic algorithm settings define which way we try to generate the
+     * offspring.
      * Since it is possible that there is no pair of population members that
      * allows to do crossover, it is possible that this method has no way to
      * produce an offspring, in which case it returns <code>null</code>.
@@ -996,7 +971,7 @@ public class EvolutionaryAlgorithm
      * @throws DENOPTIMException 
      */
     @SuppressWarnings("incomplete-switch")
-    private List<Candidate> makeOffspringA(List<Candidate> eligibleParents, 
+    private List<Candidate> makeOffspring(List<Candidate> eligibleParents, 
             Population population, Monitor mnt) throws DENOPTIMException
     {
         CandidateSource src = EAUtils.chooseGenerationMethod(settings);
@@ -1011,85 +986,30 @@ public class EvolutionaryAlgorithm
                         eligibleParents, population, mnt, settings));
                 break;
             }
-                
-            case MUTATION:
-            {
-                Candidate candidate = EAUtils.buildCandidateByMutation(
-                        eligibleParents, mnt, settings);
-                if (candidate!=null)
-                    candidates.add(candidate);
-                break;
-            }
-                
-            case CONSTRUCTION:
-            {
-                Candidate candidate = EAUtils.buildCandidateFromScratch(mnt,
-                        settings);
-                if (candidate!=null)
-                    candidates.add(candidate);
-                break;
-            }
-        }
-        return candidates;
-    }
-    
-//------------------------------------------------------------------------------
-
-    /**
-     * Generates one offspring according to the method where crossover and 
-     * mutation are coupled, i.e., we do mutation only on offsprings that come 
-     * from a successful crossover.
-     * Besides crossover, this offspring generation method includes
-     * also construction from scratch, which corresponds to mutation of 
-     * everything. Effectively, these are the alternative possibilities: <ul>
-     * <li>Crossover between selected population members.</li>
-     * <li>Crossover between selected population members followed by 
-     * mutation.</li>
-     * <li>Construction from scratch.</li>
-     * </ul>
-     * The weights of the respective operation defined in the 
-     * genetic algorithm settings define which way we try to generate the
-     * offspring.
-     * Since it is possible that there is no pair of population members that
-     * allows to do crossover, it is possible that this method has no way to
-     * produce an offspring, in which case it returns <code>null</code>.
-     * @return the new offspring if it could be made or null.
-     * @throws DENOPTIMException 
-     */
-    @SuppressWarnings("incomplete-switch")
-    private List<Candidate> makeOffspringB(List<Candidate> eligibleParents, 
-            Population population, Monitor mnt) throws DENOPTIMException
-    {
-        CandidateSource src = EAUtils.pickNewCandidateGenerationMode(
-                settings.getCrossoverWeight(), 
-                settings.getMutationWeight(),
-                settings.getConstructionWeight(),
-                settings.getRandomizer());
-    
-        List<Candidate> candidates = new ArrayList<Candidate>();
-        switch (src)
-        {   
-            case CROSSOVER:
-            {
-                candidates.addAll(EAUtils.buildCandidatesByXOver(
-                        eligibleParents, population, mnt, settings));
-                break;
-            }
             
             case MUTATION:
             {
-                List<Candidate> parents = EAUtils.buildCandidatesByXOver(
-                        eligibleParents, population, mnt, settings);
-                for (Candidate parent : parents)
+                if (!settings.coupleMutationAndCrossover())
                 {
-                    String provenanceMsg = parent.getGraph().getLocalMsg();
                     Candidate candidate = EAUtils.buildCandidateByMutation(
-                            Arrays.asList(parent), mnt, settings);
+                        eligibleParents, mnt, settings);
                     if (candidate!=null)
-                    {
-                        candidate.getGraph().setLocalMsg("MutationOn" + 
-                                provenanceMsg);
                         candidates.add(candidate);
+                    break;
+                } else {
+                    List<Candidate> parents = EAUtils.buildCandidatesByXOver(
+                            eligibleParents, population, mnt, settings);
+                    for (Candidate parent : parents)
+                    {
+                        String provenanceMsg = parent.getGraph().getLocalMsg();
+                        Candidate candidate = EAUtils.buildCandidateByMutation(
+                                Arrays.asList(parent), mnt, settings);
+                        if (candidate!=null)
+                        {
+                            candidate.getGraph().setLocalMsg("MutationOn" + 
+                                    provenanceMsg);
+                            candidates.add(candidate);
+                        }
                     }
                 }
                 break;
@@ -1097,10 +1017,19 @@ public class EvolutionaryAlgorithm
                 
             case CONSTRUCTION:
             {
-                Candidate candidate = EAUtils.buildCandidateFromScratch(mnt,
-                        settings);
-                if (candidate!=null)
-                    candidates.add(candidate);
+                // NB: we request for only one candidate to let the balance
+                // between number of candidated generated by each source be
+                // controlled by the chooseGenerationMethod method.
+                List<Candidate> lst = EAUtils.buildCandidatesFromScratch(mnt,
+                        settings, 1);
+                for (Candidate candidate : lst)
+                {
+                    if (candidate!=null)
+                    {
+                        candidates.add(candidate);
+                        break;
+                    }
+                }
                 break;
             }
         }

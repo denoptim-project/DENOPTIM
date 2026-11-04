@@ -546,5 +546,10 @@ runTest "t32"
 #
 runTest "t33"
 
+#
+# t34: GA run with Reinvent as generator biased by scaffolds
+#
+runTest "t34"
+
 echo "All done!"
 exit 0
