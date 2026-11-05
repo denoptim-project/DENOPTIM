@@ -80,6 +80,7 @@ import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
 import denoptim.programs.fragmenter.CuttingRule;
 import denoptim.programs.fragmenter.FragmenterParameters;
+import denoptim.utils.CrossoverType;
 import denoptim.utils.GeneralUtils;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.ManySMARTSQuery;
@@ -397,7 +398,6 @@ public class EAUtils
         // Identify a pair of parents that can do crossover, and a pair of
         // vertexes from which we can define a subgraph (or a branch) to swap
         XoverSite xos = null;
-        boolean foundPars = false;
         while (numatt < settings.getMaxGeneticOpAttempts())
         {   
             if (fragSpace.useAPclassBasedApproach())
@@ -429,13 +429,18 @@ public class EAUtils
                 List<Vertex> subGraphB = new ArrayList<Vertex>();
                 gpB.getChildrenTree(EAUtils.selectNonScaffoldNonCapVertex(
                         gpB, settings.getRandomizer()),subGraphB);
+                if (subGraphA.size() == 0 || subGraphB.size() == 0)
+                {
+                    numatt++;
+                    continue;
+                }
+                xos = new XoverSite(subGraphA, subGraphB, CrossoverType.BRANCH);
             }
-            foundPars = true;
             break;
         }
         mnt.increaseBy(CounterID.XOVERPARENTSEARCH, numatt);
 
-        if (!foundPars)
+        if (xos == null)
         {
             mnt.increase(CounterID.FAILEDXOVERATTEMPTS_FINDPARENTS);
             mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
@@ -1081,6 +1086,7 @@ public class EAUtils
         FragmenterParameters frgParams,
         FragmentSpace fragSpace, Monitor mnt, int index) throws DENOPTIMException
     {   
+        //TODO-gg: assume default cutting rules are available
         if ((frgParams.getCuttingRules()==null 
                 || frgParams.getCuttingRules().isEmpty())  
             && (frgParams.getFragmentationTmpls()==null 
@@ -1088,7 +1094,7 @@ public class EAUtils
         {
             throw new DENOPTIMException("Request to generate candidates by "
                     + "fragmentation but no cutting rules and "
-                    + "no fragmentation templates areprovided. Please,"
+                    + "no fragmentation templates are provided. Please,"
                     + "add FRG-CUTTINGRULESFILE=path/to/your/file or "
                     + "FRG-FRAGMENTATIONTEMPLATESFILE=path/to/your/file to the "
                     + "input.");

@@ -190,7 +190,10 @@ public class Population extends ArrayList<Candidate> implements Cloneable
             clone.add(c);
         }
         
-        clone.xoverCompatibilities = xoverCompatibilities.clone();
+        if (xoverCompatibilities!=null)
+        {
+            clone.xoverCompatibilities = xoverCompatibilities.clone();
+        }
         
         return clone;
     }
@@ -370,6 +373,16 @@ public class Population extends ArrayList<Candidate> implements Cloneable
     public List<Candidate> getXoverPartners(Candidate memberA,
             List<Candidate> eligibleParents, FragmentSpace fragSpace)
     {   
+        if (xoverCompatibilities==null)
+        {
+            if (fragSpace.useAPclassBasedApproach())
+            {
+                return new ArrayList<Candidate>();
+            } else {
+                return new ArrayList<Candidate>(eligibleParents);
+            }
+        }
+
         DGraph gA = memberA.getGraph();
         
         // Update to make sure we cover any combination of members that has not 
@@ -419,13 +432,19 @@ public class Population extends ArrayList<Candidate> implements Cloneable
      * crossover sites are given using the same order used to specify the 
      * parents. This method should always be run after the 
      * {@link Population#getXoverPartners(Candidate, List)}, which 
-     * populated the crossover compatibility data.
+     * populated the crossover compatibility data. 
+     * Otherwise, an empty list is returned.
      * @param parentA
      * @param parentB
-     * @return the list crossover sites.
+     * @return the list crossover sites, or an empty list if no crossover 
+     * compatibility data is available.
      */
     public List<XoverSite> getXoverSites(Candidate parentA, Candidate parentB)
     {
+        if (xoverCompatibilities==null) 
+        {
+            return new ArrayList<XoverSite>();
+        }
         return xoverCompatibilities.get(parentA,parentB);
     }
 
@@ -441,7 +460,10 @@ public class Population extends ArrayList<Candidate> implements Cloneable
         int k = this.size();
         for (Candidate c : this.subList(settings.getPopulationSize(), k))
         {
-            xoverCompatibilities.remove(c);
+            if (xoverCompatibilities!=null)
+            {
+                xoverCompatibilities.remove(c);
+            }
         }
         this.subList(settings.getPopulationSize(), k).clear();
     }

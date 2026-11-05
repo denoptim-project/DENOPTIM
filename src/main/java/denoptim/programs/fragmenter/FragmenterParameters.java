@@ -83,9 +83,10 @@ public class FragmenterParameters extends RunTimeParameters
     private String cutRulesFile;
     
     /**
-     * List of cutting rules sorted by priority.
+     * List of cutting rules sorted by priority. Contains either the default
+     * cutting rules or the cutting rules specified by the user.
      */
-    List<CuttingRule> cuttingRules;
+    private List<CuttingRule> cuttingRules;
 
     /**
      * Unique identifier of cut operation.
@@ -420,6 +421,16 @@ public class FragmenterParameters extends RunTimeParameters
     public FragmenterParameters()
     {
         super(ParametersType.FRG_PARAMS);
+
+        this.cuttingRules = new ArrayList<CuttingRule>();
+        try {
+            this.cuttingRules = getDefaultCuttingRules(
+                this.getClass().getClassLoader());
+        } catch (Exception e )
+        {
+            throw new IllegalStateException("Cannot load default cutting "
+                    + "rules.", e);
+        }
     }
 
 //------------------------------------------------------------------------------
@@ -490,7 +501,9 @@ public class FragmenterParameters extends RunTimeParameters
 //------------------------------------------------------------------------------
 
     /**
-     * @return the cutting rules currently configured in this set of parameters.
+     * @return the cutting rules currently configured in this set of parameters,
+     * which may be the default cutting rules if no cutting rules were configured
+     * by the user.
      */
     public List<CuttingRule> getCuttingRules()
     {
@@ -1428,16 +1441,6 @@ public class FragmenterParameters extends RunTimeParameters
 //------------------------------------------------------------------------------
 
     /**
-     * Get default cutting rules from the class loader of the current class
-     */
-    public List<CuttingRule> getDefaultCuttingRules() throws IOException, DENOPTIMException
-    {
-        return getDefaultCuttingRules(this.getClass().getClassLoader());
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
      * Get default cutting rules from a given class loader
      */
     public List<CuttingRule> getDefaultCuttingRules(ClassLoader classLoader) throws IOException, DENOPTIMException
@@ -1554,11 +1557,6 @@ public class FragmenterParameters extends RunTimeParameters
         if (!doCheckFormula && !doPreFilter && !doFragmentation && !doFragExtractionFromGraphs && !doFiltering && !doManageIsomorphicFamilies && !doExtactRepresentativeConformer)
         {
             doFragmentation = true;
-            try {
-                cuttingRules = getDefaultCuttingRules();
-            } catch (IOException | DENOPTIMException e) {
-                throw new DENOPTIMException("Problems reading default cutting rules", e);
-            }
         }
        
 		if (isMaster)

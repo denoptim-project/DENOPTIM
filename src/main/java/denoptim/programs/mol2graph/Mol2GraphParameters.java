@@ -330,33 +330,6 @@ public class Mol2GraphParameters extends RunTimeParameters
         
         ensureFragmenterParams();
         ensureFragSpareParams();
-        
-        FragmenterParameters frgParams = (FragmenterParameters) 
-                getParameters(ParametersType.FRG_PARAMS);
-        
-        if (frgParams.getCuttingRules() == null ||
-                frgParams.getCuttingRules().isEmpty())
-        {
-            List<CuttingRule> defaultCutRules = new ArrayList<CuttingRule>();
-            try {
-                BufferedReader reader = null;
-                try {
-                    reader = new BufferedReader(new InputStreamReader(this
-                            .getClass().getClassLoader().getResourceAsStream(
-                                            "data/cutting_rules")));
-                    DenoptimIO.readCuttingRules(reader, defaultCutRules, 
-                            "bundled jar");
-                    frgParams.setCuttingRules(defaultCutRules);
-                } finally {
-                    if (reader!=null)
-                        reader.close();
-                }
-            } catch (Exception e )
-            {
-                throw new DENOPTIMException("Cannot load default cutting "
-                        + "rules.", e);
-            }
-        }
     }
     
 //-----------------------------------------------------------------------------

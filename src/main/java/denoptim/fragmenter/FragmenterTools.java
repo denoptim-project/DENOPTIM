@@ -1203,7 +1203,7 @@ public class FragmenterTools
         
         // Identify bonds
         Map<String, List<MatchedBond>> matchingbonds = 
-                FragmenterTools.getMatchingBondsAllInOne(fragsMol,rules,logger);
+            getMatchingBondsAllInOne(fragsMol, rules, logger);
         
         // Select bonds to cut and what rule to use for cutting them
         int cutId = -1;

@@ -3130,8 +3130,7 @@ public class DGraph implements Cloneable
      * This method does not cross template 
      * boundaries, thus all children belong to the same graph.
      * @param vertex the vertex whose children are to be located
-     * @param children list containing the references to all the children
-     * @return the list of children (does not include the initial vertex)
+     * @param children list collecting the resulting references to all the children
      */
     public void getChildrenTree(Vertex vertex, List<Vertex> children) 
     {

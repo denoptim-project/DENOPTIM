@@ -1,14 +1,9 @@
 #
-# This is the parameter file for test t34
+# This is the parameter file for test t34-1
 #
 
 # Definition of the Fragment Space
 FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf
-FS-cappingFragmentLibFile=OTF_WDIR/lib_cap.sdf
-FS-compMatrixFile=OTF_WDIR/CPMap.par
-
-# Used by mol-to-graph (TODO-ai TODO-gg: make it use default rules)
-FRG-CuttingrulesFile=OTF_WDIR/cutting_rules
 
 # Genetic Algorithm parameters
 GA-randomSeed=8572368003836

@@ -520,6 +520,7 @@ public class ReinventServerClient
                     continue;
                 }
 
+                // TODO: this will benefit from copying of RunTimeParameters
                 IAtomContainer fragIAC = fragToFragment.getIAtomContainer();
                 DGraph fragGraph = null;
                 try {
