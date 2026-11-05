@@ -107,12 +107,24 @@
         },
         {
             "type": "java",
-            "name": "Run test t34 REINVENT4",
+            "name": "Run test t34-1 REINVENT4",
             "projectName": "denoptim",
             "request": "launch",
             "mainClass": "denoptim.main.Main",
             "args": [
-                "-r", "GA", "t34.params"
+                "-r", "GA", "t34-1.params"
+            ],
+            "cwd": "/tmp/denoptim_test/t34",
+            "console": "integratedTerminal"
+        },
+        {
+            "type": "java",
+            "name": "Run test t34-2 REINVENT4",
+            "projectName": "denoptim",
+            "request": "launch",
+            "mainClass": "denoptim.main.Main",
+            "args": [
+                "-r", "GA", "t34-2.params"
             ],
             "cwd": "/tmp/denoptim_test/t34",
             "console": "integratedTerminal"
@@ -127,6 +139,18 @@
                 "-r", "GA", "t12g.params"
             ],
             "cwd": "/tmp/denoptim_test/t12g",
+            "console": "integratedTerminal"
+        },
+        {
+            "type": "java",
+            "name": "Run test t5",
+            "projectName": "denoptim",
+            "request": "launch",
+            "mainClass": "denoptim.main.Main",
+            "args": [
+                "-r", "FSE", "t5.params"
+            ],
+            "cwd": "/tmp/denoptim_test/t5",
             "console": "integratedTerminal"
         },
     ]

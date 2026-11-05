@@ -315,16 +315,18 @@ public class ReinventServerClient
     public List<Candidate> generateCandidates(Map<String, DGraph> smilesDGraphMap, int n)
         throws IOException, JsonSyntaxException, DENOPTIMException
     {
-        List<String> inputSmiles = new ArrayList<>(smilesDGraphMap.keySet());
+        List<String> inputSmiles = new ArrayList<>();
+        if (smilesDGraphMap!=null && !smilesDGraphMap.isEmpty()) {
+            inputSmiles.addAll(smilesDGraphMap.keySet());
+        }
 
-        // Reinvent returns scaffolds SMILES that re not the same as those given as input.
-        // So we generate acanonical SMILES to ude it a key
+        // Reinvent returns scaffolds SMILES that are not the same as those given as input.
+        // So we generate canonical SMILES to use as keys.
         Map<String, DGraph> canonicalSmilesDGraphMap = new HashMap<>();
-        for (Map.Entry<String, DGraph> e : smilesDGraphMap.entrySet())
+        for (String scaffSMI : inputSmiles)
         {
-            String scaffSMI = e.getKey();
             String scaffKey = getCanonicalSMILES(scaffSMI);
-            canonicalSmilesDGraphMap.put(scaffKey, e.getValue());
+            canonicalSmilesDGraphMap.put(scaffKey, smilesDGraphMap.get(scaffSMI));
         }
 
         String requestAsJSONString = formulateRequest(inputSmiles, n);
@@ -612,8 +614,7 @@ public class ReinventServerClient
      * @param n the number of candidates to generate.
      * @return The request as a JSON string.
      */
-    public String formulateRequest(List<String> inputs, 
-        int n) throws IOException
+    public String formulateRequest(List<String> inputs, int n) throws IOException
     {    
         // compute the number of molecules to generate so that they are almost equally 
         // distributed among the scaffolds.
@@ -631,7 +632,7 @@ public class ReinventServerClient
         // when that element is already present and leaves the other parameters in place.
         overwriteProperty(jsonObj, new JsonPrimitive(totalNumMols), "parameters", "num_smiles");
         
-        if (inputs != null)
+        if (inputs != null && !inputs.isEmpty())
         {
             JsonArray inputsArray = new JsonArray();
             for (String oneInput : inputs)
@@ -646,7 +647,7 @@ public class ReinventServerClient
 //------------------------------------------------------------------------------
 
     /**
-     * Calculates the number of molecules to request from the Reinvent socket server.
+     * Calculates the number of molecules to request to the Reinvent socket server.
      * Since Reinvent generates a number of molecules per each input, we want to 
      * adjust the request to the number of inputs to avoid generating too many
      * molecules just to trash them.

@@ -1,6 +1,6 @@
 {
     "device": "cpu",
     "parameters": {
-       "model_file": "/Users/marcof/REINVENT4/priors/libinvent.prior"
+       "model_file": "/Users/marcof/REINVENT4/priors/reinvent.prior"
     }
 }

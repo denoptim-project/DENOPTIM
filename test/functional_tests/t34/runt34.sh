@@ -15,8 +15,6 @@
 #
 
 wrkDir=`pwd`
-logFile="t34.log"
-paramFile="t34.params"
 
 # First JSON string value of key $1 in file $2. Portable on BSD and GNU sed.
 jsonStringValue() {
@@ -30,8 +28,8 @@ then
 fi
 
 # Check if Reinvent-specific dependencies are satisfied
-reinventConfig=($(ls data/reinvent_config_*.json))
-if [[ ${#reinventConfig[@]} -eq 0 ]]
+reinventConfigFiles=($(ls data/reinvent_config_*.json))
+if [[ ${#reinventConfigFiles[@]} -eq 0 ]]
 then
     # This is not possible unless you temper with the repo, but it's a good check.
     echo " "
@@ -50,20 +48,24 @@ do
 done
 
 # Check if the Reinvent socket server is reachable
-reinventHostname=$(grep -i 'REINVENTSERVERHOSTNAME' "$paramFile" | awk -F'=' '{print $2}')
-reinventPort=$(grep -i 'REINVENTSERVERPORT' "$paramFile" | awk -F'=' '{print $2}')
-if [[ -z "$reinventHostname" ]] || [[ -z "$reinventPort" ]]
-then
-    echo " "
-    echo "Test 't34' NOT PASSED: Reinvent hostname or port not found in $paramFile"
-    exit 1
-fi
-if ! nc -z $reinventHostname $reinventPort > /dev/null 2>&1
-then
-    echo " "
-    echo "Test 't34' SKIPPED: Reinvent socket server ($reinventHostname:$reinventPort) not reachable"
-    exit 0
-fi
+paramFiles=($(ls t*.params))
+for paramFile in "${paramFiles[@]}"
+    do
+    reinventHostname=$(grep -i 'REINVENTSERVERHOSTNAME' "$paramFile" | awk -F'=' '{print $2}')
+    reinventPort=$(grep -i 'REINVENTSERVERPORT' "$paramFile" | awk -F'=' '{print $2}')
+    if [[ -z "$reinventHostname" ]] || [[ -z "$reinventPort" ]]
+    then
+        echo " "
+        echo "Test 't34' NOT PASSED: Reinvent hostname or port not found in $paramFile"
+        exit 1
+    fi
+    if ! nc -z $reinventHostname $reinventPort > /dev/null 2>&1
+    then
+        echo " "
+        echo "Test 't34' SKIPPED: Reinvent socket server ($reinventHostname:$reinventPort) not reachable"
+        exit 0
+    fi
+done
 
 # Now, start the test
 mv data/* "$wrkDir"
@@ -83,37 +85,80 @@ do
     fi
 done
 
-#Run it
+#
+# Run first
+#
+testName="t34-1"
+logFile="$testName.log"
+paramFile="$testName.params"
 exec 6>&1
 exec > "$logFile"
 exec 2>&1
-"$javaDENOPTIM" -jar "$denoptimJar" -r GA "$paramFile"
+"$javaDENOPTIM" -jar "$denoptimJar" -r GA "$paramFile" > "$logFile" 2>&1
 exec 1>&6 6>&-
 
-runFolder=$(basename "$(ls -1dt "$wrkDir"/RUN*/ | head -n 1)")
+runFolder="$(grep "Output files associated with the current run are located in" "$logFile" | awk -F'are located in ' '{print $2}')"
 
-grep -q 'DENOPTIM EA run completed' "$wrkDir"/$runFolder.log
-if [[ $? != 0 ]]
+if ! grep -q 'DENOPTIM EA run completed' "$runFolder.log"
 then
     echo " "
-    echo "Test 't34' NOT PASSED (symptom: completion msg not found)"
+    echo "Test '$testName' NOT PASSED (symptom: completion msg not found in $runFolder.log)"
     exit 1
 fi
 
-totalCandidates=$(ls "$wrkDir/"RUN*/Gen*/*.sdf | wc -l)
-expectedTotalCandidates=25
+totalCandidates=$(ls "$runFolder/"Gen*/*.sdf | wc -l)
+expectedTotalCandidates=20
 if [[ "$totalCandidates" -lt "$expectedTotalCandidates" ]]
 then
    echo " "
-   echo "Test 't34' NOT PASSED (Found $totalCandidates/$expectedTotalCandidates candidates)"
+   echo "Test '$testName' NOT PASSED (Found $totalCandidates/$expectedTotalCandidates candidates)"
    exit 1
 fi
 
-nDeNovoFromReinvent=$(grep -l '"attribute":"Reinvent"' "$wrkDir/"RUN*/Gen*/*.sdf | wc -l)
+nDeNovoFromReinvent=$(grep -l '"attribute":"Reinvent"' "$runFolder/"Gen*/*.sdf | wc -l)
 if [[ "$nDeNovoFromReinvent" -lt "$expectedTotalCandidates" ]]
 then
    echo " "
-   echo "Test 't34' NOT PASSED (Found $nDeNovoFromReinvent/$expectedTotalCandidates de novo candidates from Reinvent)"
+   echo "Test '$testName' NOT PASSED (Found $nDeNovoFromReinvent/$expectedTotalCandidates de novo candidates from Reinvent)"
+   exit 1
+fi
+
+
+#
+# Run second
+#
+testName="t34-2"
+logFile="$testName.log"
+paramFile="$testName.params"
+exec 6>&1
+exec > "$logFile"
+exec 2>&1
+"$javaDENOPTIM" -jar "$denoptimJar" -r GA "$paramFile" > "$logFile" 2>&1
+exec 1>&6 6>&-
+
+runFolder="$(grep "Output files associated with the current run are located in" "$logFile" | awk -F'are located in ' '{print $2}')"
+
+if ! grep -q 'DENOPTIM EA run completed' "$runFolder.log"
+then
+    echo " "
+    echo "Test '$testName' NOT PASSED (symptom: completion msg not found)"
+    exit 1
+fi
+
+totalCandidates=$(ls "$runFolder/"Gen*/*.sdf | wc -l)
+expectedTotalCandidates=20
+if [[ "$totalCandidates" -lt "$expectedTotalCandidates" ]]
+then
+   echo " "
+   echo "Test '$testName' NOT PASSED (Found $totalCandidates/$expectedTotalCandidates candidates)"
+   exit 1
+fi
+
+nDeNovoFromReinvent=$(grep -l '"attribute":"Reinvent"' "$runFolder"/Gen*/*.sdf | wc -l)
+if [[ "$nDeNovoFromReinvent" -lt "$expectedTotalCandidates" ]]
+then
+   echo " "
+   echo "Test '$testName' NOT PASSED (Found $nDeNovoFromReinvent/$expectedTotalCandidates de novo candidates from Reinvent)"
    exit 1
 fi
 
