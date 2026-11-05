@@ -40,7 +40,7 @@ exec 2>&1
 exec 1>&6 6>&- 
 
 #Check outcome
-nFromFragmentation=$(grep -l "INITIAL_MOL_FRAGMENTED" "$wrkDir/"RUN*/Gen0/*.sdf | wc -l)
+nFromFragmentation=$(grep -l '"attribute":"fragmented"' "$wrkDir/"RUN*/Gen0/*.sdf | wc -l)
 if [[ 36 -ne "$nFromFragmentation" ]]; then
    echo " "
    echo "Test 't12g' NOT PASSED (Found $nFromFragmentation instead of 36 candidates build from fragmentation)"

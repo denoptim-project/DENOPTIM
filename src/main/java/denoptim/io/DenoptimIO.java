@@ -87,6 +87,7 @@ import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Candidate;
 import denoptim.graph.CandidateLW;
 import denoptim.graph.DGraph;
+import denoptim.graph.Provenance;
 import denoptim.graph.Template;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
@@ -924,7 +925,10 @@ public class DenoptimIO
                             break;
                         
                         case DENOPTIMConstants.PROVENANCE:
-                            item.setGeneratingSource(obj.toString());
+                            Provenance provenance = Provenance.parse(
+                                    obj.toString());
+                            if (provenance != null)
+                                item.setGeneratingSource(provenance.summary());
                             break;
                             
                         case DENOPTIMConstants.GRAPHLEVELTAG:

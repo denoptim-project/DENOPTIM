@@ -6,12 +6,13 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -25,7 +26,8 @@ public class ScrollableJPupupMenu
 {
     private JPopupMenu menu;
     private JPanel menuPanel;
-    private List<JCheckBox> allBChekBoxes = new ArrayList<JCheckBox>();
+    private List<JCheckBoxMenuItem> allBChekBoxes =
+            new ArrayList<JCheckBoxMenuItem>();
     
 //------------------------------------------------------------------------------
     
@@ -46,7 +48,7 @@ public class ScrollableJPupupMenu
         menu.setLayout(new BorderLayout());
         menuPanel = new JPanel();
         menuPanel.setLayout(new BoxLayout(menuPanel, SwingConstants.VERTICAL)); 
-        for (JCheckBox cb : allBChekBoxes)
+        for (JCheckBoxMenuItem cb : allBChekBoxes)
         {
             menuPanel.add(cb);
         }        
@@ -77,7 +79,7 @@ public class ScrollableJPupupMenu
      * Add a check box to the list of check boxes to display in the menu
      * @param item
      */
-    public void addCheckBox(JCheckBox item)
+    public void addCheckBox(JCheckBoxMenuItem item)
     {
         allBChekBoxes.add(item);
     }
@@ -88,9 +90,51 @@ public class ScrollableJPupupMenu
      * Returns the list of check boxes that is displayed in the menu
      * @return
      */
-    protected List<JCheckBox> getAllBChekBoxes()
+    protected List<JCheckBoxMenuItem> getAllBChekBoxes()
     {
         return allBChekBoxes;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Menu check box that toggles without closing this popup. The items are
+     * held in a scroll pane, so the menu UI would otherwise replace the
+     * popup's selection path and hide it on the opening click.
+     */
+    public static class StayOpenCheckBoxMenuItem extends JCheckBoxMenuItem
+    {
+        private static final long serialVersionUID = 1L;
+
+        private boolean pressedInside;
+
+        public StayOpenCheckBoxMenuItem(String text)
+        {
+            super(text);
+        }
+
+        @Override
+        protected void processMouseEvent(MouseEvent evt)
+        {
+            switch (evt.getID())
+            {
+                case MouseEvent.MOUSE_PRESSED:
+                    pressedInside = isEnabled() && contains(evt.getPoint());
+                    break;
+                case MouseEvent.MOUSE_RELEASED:
+                    if (pressedInside && contains(evt.getPoint()))
+                        doClick();
+                    pressedInside = false;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        @Override
+        protected void processMouseMotionEvent(MouseEvent evt)
+        {
+        }
     }
     
 //------------------------------------------------------------------------------

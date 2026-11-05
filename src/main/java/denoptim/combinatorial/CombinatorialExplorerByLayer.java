@@ -42,6 +42,7 @@ import denoptim.fragspace.FragsCombination;
 import denoptim.fragspace.FragsCombinationIterator;
 import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.graph.DGraph;
+import denoptim.graph.Provenance;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.io.DenoptimIO;
@@ -872,7 +873,7 @@ public class CombinatorialExplorerByLayer
 
         // add the scaffold as a vertex
         molGraph.addVertex(scafVertex);
-        molGraph.setLocalMsg("NEW");
+        molGraph.setProvenance(Provenance.construction("Fragment space"));
         
         return molGraph;
     }

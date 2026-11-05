@@ -219,10 +219,10 @@ public class GraphUtils
             iac.setProperty(DENOPTIMConstants.GRAPHTAG, g.toString());
             iac.setProperty(DENOPTIMConstants.GRAPHJSONTAG, g.toJson());
         }
-        if (g.getLocalMsg() != null
-                && !g.getLocalMsg().toString().equals(""))
+        if (g.getProvenance() != null)
         {
-            iac.setProperty(DENOPTIMConstants.PROVENANCE,g.getLocalMsg());
+            iac.setProperty(DENOPTIMConstants.PROVENANCE,
+                    g.getProvenance().toString());
         }
     }
     

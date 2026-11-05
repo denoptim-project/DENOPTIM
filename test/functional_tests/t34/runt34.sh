@@ -109,7 +109,7 @@ then
    exit 1
 fi
 
-nDeNovoFromReinvent=$(grep -l "NEW_FROM_REINVENT" "$wrkDir/"RUN*/Gen*/*.sdf | wc -l)
+nDeNovoFromReinvent=$(grep -l '"attribute":"Reinvent"' "$wrkDir/"RUN*/Gen*/*.sdf | wc -l)
 if [[ "$nDeNovoFromReinvent" -lt "$expectedTotalCandidates" ]]
 then
    echo " "

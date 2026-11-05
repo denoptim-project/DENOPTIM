@@ -65,7 +65,7 @@ public class GUIPreferences
                 MolDimDisplay.THREE_DIMENSIONAL;
         public static final boolean SHOW_2D_HYDROGENS = false;
         public static final boolean SHOW_LEGEND_IN_EVOLUTION_PLOT = false;
-        public static final boolean SHOW_LEGEND_IN_MONITOR_PLOT = false;
+        public static final boolean SHOW_LEGEND_IN_MONITOR_PLOT = true;
         public static final TreeSet<String> CHOSEN_SDF_TAGS;
         static {
             CHOSEN_SDF_TAGS = new TreeSet<String>();

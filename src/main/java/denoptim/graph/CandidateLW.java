@@ -66,7 +66,10 @@ public class CandidateLW
     private Integer level;
     
     /**
-     * A statement defining how this item was generated.
+     * Short record of how this item was generated, or {@code null} when that
+     * is not recorded. This is {@link Provenance#summary()}: the source, any
+     * mutation type, then each parent as {@code candidateId(generation)}.
+     * The full provenance stays in the SDF file.
      */
     private String generatingSource;
     

@@ -44,7 +44,6 @@ while IFS=  read -r -d $'\0'; do
 done < <(find "$wrkDir/$runFolder" -name "Gen*.txt" -print0)
 numFromXover=0
 numFromMutXover=0
-numFromMut=0
 numNew=0
 for i in $(seq 0 $((${#genSummaryFiles[@]}-2)))
 do
@@ -58,14 +57,15 @@ do
     done 
     for memberinGenI in $(grep "M00" ${genSummaryFiles[$i]} | awk '{print $5}')
     do
-        provenance=$(grep -A 1 "Provenance" "$memberinGenI" | tail -n 1 | awk '{print $1}')
-        if [[ "Xover:" == "$provenance" ]]; then
+        # Provenance is one JSON object. Coupled mutation is MUTATION of the
+        # crossover offspring, not of that offspring's parents.
+        provenance=$(grep -A 1 "Provenance" "$memberinGenI" | tail -n 1 \
+            | sed -n 's/.*"source":"\([^"]*\)".*/\1/p')
+        if [[ "CROSSOVER" == "$provenance" ]]; then
            ((numFromXover++))
-        elif [[ "MutationOnXover:" == "$provenance" ]]; then
+        elif [[ "MUTATION" == "$provenance" ]]; then
            ((numFromMutXover++))
-        elif [[ "Mutation:" == "$provenance" ]]; then
-           ((numFromMut++))
-        elif [[ "NEW" == "$provenance" ]]; then
+        elif [[ "CONSTRUCTION" == "$provenance" ]]; then
            ((numNew++))
         fi
     done
@@ -77,10 +77,6 @@ if [ $numFromXover -lt 15 ]; then
 fi
 if [ $numFromMutXover -gt 12 ]; then
     echo "NOT PASSED (sympton: wrong number of Mut+Xover: $numFromMutXover)"
-    exit -1
-fi
-if [ $numFromMut -ne 0 ]; then
-    echo "NOT PASSED (sympton: wrong number of Mutation: $numFromMut)"
     exit -1
 fi
 if [ $numNew -ne 6 ]; then

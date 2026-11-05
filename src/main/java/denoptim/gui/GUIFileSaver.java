@@ -102,6 +102,29 @@ public class GUIFileSaver
     
 //-----------------------------------------------------------------------------
     
+    /**
+     * Asks for a file in which to save candidates. Only SDF is offered.
+     * @param parent the component that owns the dialog.
+     * @return the chosen file, or {@code null} when the dialog is cancelled.
+     */
+    public static FileAndFormat pickFileForSavingCandidates(Component parent)
+    {
+        fileChooser.resetChoosableFileFilters();
+        FileNameExtensionFilter sdfFilter = new FileNameExtensionFilter(
+                "SDF", "sdf");
+        fileChooser.addChoosableFileFilter(sdfFilter);
+        fileChooser.setFileFilter(sdfFilter);
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        if (fileChooser.showSaveDialog(parent) != JFileChooser.APPROVE_OPTION)
+            return null;
+        File file = fileChooser.getSelectedFile();
+        if (!file.getName().toLowerCase().endsWith(".sdf"))
+            file = new File(file.getParentFile(), file.getName() + ".sdf");
+        return new FileAndFormat(file, FileFormat.CANDIDATESDF);
+    }
+
+//-----------------------------------------------------------------------------
+
     public static FileAndFormat pickFileForSavingCuttingRules(Component parent)
     {
         fileChooser.resetChoosableFileFilters();

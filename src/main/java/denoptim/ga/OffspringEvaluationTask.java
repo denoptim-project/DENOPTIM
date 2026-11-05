@@ -153,10 +153,10 @@ public class OffspringEvaluationTask extends FitnessTask
         fitProvMol.setProperty(DENOPTIMConstants.UNIQUEIDTAG, result.getUID());
         fitProvMol.setProperty(DENOPTIMConstants.GRAPHTAG, dGraph.toString());
         fitProvMol.setProperty(DENOPTIMConstants.GRAPHJSONTAG, dGraph.toJson());
-        if (dGraph.getLocalMsg() != null)
+        if (dGraph.getProvenance() != null)
         {
         	fitProvMol.setProperty(DENOPTIMConstants.PROVENANCE, 
-        	        dGraph.getLocalMsg());
+        	        dGraph.getProvenance().toString());
         }
         
         // Run the fitness provider, whatever that is (internal or external)

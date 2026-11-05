@@ -275,14 +275,9 @@ public class Candidate implements Comparable<Candidate>, Cloneable
         	}
         }
         
-        if (iac.getProperty(DENOPTIMConstants.PROVENANCE) != null)
-        {
-            this.comment = iac.getProperty(
-                    DENOPTIMConstants.PROVENANCE).toString();
-        }
-        
         this.graph = DenoptimIO.readGraphFromSDFileIAC(iac);
         this.graph.setCandidateOwner(this);
+        readProvenance(iac);
     }
 
 //------------------------------------------------------------------------------
@@ -357,11 +352,7 @@ public class Candidate implements Comparable<Candidate>, Cloneable
             }
         }
         
-        if (iac.getProperty(DENOPTIMConstants.PROVENANCE) != null)
-        {
-            cand.comment = iac.getProperty(
-                    DENOPTIMConstants.PROVENANCE).toString();
-        }
+        cand.readProvenance(iac);
         
         return cand;
     }
@@ -411,9 +402,10 @@ public class Candidate implements Comparable<Candidate>, Cloneable
         iacForFitFile.setProperty(DENOPTIMConstants.GCODETAG, graph.getGraphId());
         iacForFitFile.setProperty(DENOPTIMConstants.GRAPHTAG, graph.toString());
         iacForFitFile.setProperty(DENOPTIMConstants.GRAPHJSONTAG, graph.toJson());
-        if (graph.getLocalMsg() != null && !graph.getLocalMsg().equals(""))
+        if (graph.getProvenance() != null)
         {
-            iacForFitFile.setProperty(DENOPTIMConstants.PROVENANCE, graph.getLocalMsg());
+            iacForFitFile.setProperty(DENOPTIMConstants.PROVENANCE,
+                    graph.getProvenance().toString());
         }
         iacForFitFile.setProperty(DENOPTIMConstants.SMILESTAG, smiles);
         iacForFitFile.setProperty(DENOPTIMConstants.UNIQUEIDTAG, uid);
@@ -426,6 +418,32 @@ public class Candidate implements Comparable<Candidate>, Cloneable
         return iacForFitFile;
     } 
     
+//------------------------------------------------------------------------------
+    
+    /**
+     * @return how this candidate was produced, or {@code null} when its graph
+     * has no provenance.
+     */
+    public Provenance getProvenance()
+    {
+        if (graph == null)
+            return null;
+        return graph.getProvenance();
+    }
+
+//------------------------------------------------------------------------------
+
+    private void readProvenance(IAtomContainer iac)
+    {
+        if (iac.getProperty(DENOPTIMConstants.PROVENANCE) == null)
+            return;
+        String text = iac.getProperty(DENOPTIMConstants.PROVENANCE).toString();
+        this.comment = text;
+        Provenance provenance = Provenance.parse(text);
+        if (provenance != null && this.graph != null)
+            this.graph.setProvenance(provenance);
+    }
+
 //------------------------------------------------------------------------------
     
     public void setComments(String str)

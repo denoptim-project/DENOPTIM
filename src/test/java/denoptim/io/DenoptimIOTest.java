@@ -60,6 +60,9 @@ import denoptim.graph.Edge;
 import denoptim.graph.Edge.BondType;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
+import denoptim.graph.Provenance;
+import denoptim.graph.Provenance.Parent;
+import denoptim.utils.MutationType;
 import denoptim.graph.FragmentTest;
 import denoptim.graph.Ring;
 import denoptim.graph.SymmetricVertexes;
@@ -305,13 +308,13 @@ public class DenoptimIOTest
         String name = "myName";
         double fitness = 999.123;
         String err = "myError";
-        String msg = "myMSG";
+        Provenance provenance = Provenance.construction("Reinvent");
         int level = 26;
         iac.setProperty(DENOPTIMConstants.UNIQUEIDTAG, uid);
         iac.setProperty(CDKConstants.TITLE, name);
         iac.setProperty(DENOPTIMConstants.FITNESSTAG, fitness);
         iac.setProperty(DENOPTIMConstants.MOLERRORTAG, err);
-        iac.setProperty(DENOPTIMConstants.PROVENANCE, msg);
+        iac.setProperty(DENOPTIMConstants.PROVENANCE, provenance.toString());
         iac.setProperty(DENOPTIMConstants.GRAPHLEVELTAG, level);
         
         DenoptimIO.writeSDFFile(pathName, iac, false);
@@ -322,13 +325,15 @@ public class DenoptimIOTest
         String name2 = "myName2";
         double fitness2 = 999.1232;
         String err2 = "myError2";
-        String msg2 = "myMSG2";
+        Provenance provenance2 = Provenance.mutation(
+                new Parent(1, "M00000007", 4))
+                .withMutation(MutationType.CHANGEBRANCH, 8L, 2);
         int level2 = 262;
         iac2.setProperty(DENOPTIMConstants.UNIQUEIDTAG, uid2);
         iac2.setProperty(CDKConstants.TITLE, name2);
         iac2.setProperty(DENOPTIMConstants.FITNESSTAG, fitness2);
         iac2.setProperty(DENOPTIMConstants.MOLERRORTAG, err2);
-        iac2.setProperty(DENOPTIMConstants.PROVENANCE, msg2);
+        iac2.setProperty(DENOPTIMConstants.PROVENANCE, provenance2.toString());
         iac2.setProperty(DENOPTIMConstants.GRAPHLEVELTAG, level2);
         
         DenoptimIO.writeSDFFile(pathName, iac2, true);
@@ -345,6 +350,10 @@ public class DenoptimIOTest
                 "fitness 1st");
         assertTrue(0.001 > Math.abs(fitness2 - cands.get(1).getFitness()), 
                 "fitness 2nd");
+        assertEquals("CONSTRUCTION", cands.get(0).getGeneratingSource(),
+                "provenance 1st");
+        assertEquals("MUTATION CHANGEBRANCH M00000007(1)",
+                cands.get(1).getGeneratingSource(), "provenance 2nd");
     }
     
 //------------------------------------------------------------------------------

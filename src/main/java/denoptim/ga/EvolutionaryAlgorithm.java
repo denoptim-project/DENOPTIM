@@ -41,8 +41,8 @@ import org.openscience.cdk.io.iterator.IteratingSMILESReader;
 import denoptim.exception.DENOPTIMException;
 import denoptim.exception.ExceptionUtils;
 import denoptim.fitness.FitnessParameters;
-import denoptim.ga.EAUtils.CandidateSource;
 import denoptim.graph.Candidate;
+import denoptim.graph.Provenance;
 import denoptim.io.IteratingAtomContainerReader;
 import denoptim.logging.CounterID;
 import denoptim.logging.Monitor;
@@ -484,7 +484,8 @@ public class EvolutionaryAlgorithm
                             iterMolsToFragment.next(), mnt, settings, i);
                     if (candidate != null)
                     {
-                        candidate.getGraph().setLocalMsg("INITIAL_MOL_FRAGMENTED");
+                        candidate.getGraph().setProvenance(
+                                Provenance.input("fragmented"));
                     }
 
                     // NB: here we request to keep only the best candidates
@@ -974,7 +975,7 @@ public class EvolutionaryAlgorithm
     private List<Candidate> makeOffspring(List<Candidate> eligibleParents, 
             Population population, Monitor mnt) throws DENOPTIMException
     {
-        CandidateSource src = EAUtils.chooseGenerationMethod(settings);
+        Provenance.Source src = EAUtils.chooseGenerationMethod(settings);
     
         List<Candidate> candidates = new ArrayList<Candidate>();
         switch (src)
@@ -1001,13 +1002,19 @@ public class EvolutionaryAlgorithm
                             eligibleParents, population, mnt, settings);
                     for (Candidate parent : parents)
                     {
-                        String provenanceMsg = parent.getGraph().getLocalMsg();
                         Candidate candidate = EAUtils.buildCandidateByMutation(
                                 Arrays.asList(parent), mnt, settings);
                         if (candidate!=null)
                         {
-                            candidate.getGraph().setLocalMsg("MutationOn" + 
-                                    provenanceMsg);
+                            // The crossover offspring is not kept, so its
+                            // identity cannot be used as a parent. Keep the
+                            // provenance it already carries, which points at
+                            // the population members used for the crossover.
+                            if (parent.getProvenance() != null)
+                            {
+                                candidate.getGraph().setProvenance(
+                                        parent.getProvenance());
+                            }
                             candidates.add(candidate);
                         }
                     }

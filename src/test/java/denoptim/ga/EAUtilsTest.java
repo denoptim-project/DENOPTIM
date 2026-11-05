@@ -48,7 +48,6 @@ import org.openscience.cdk.smiles.SmilesParser;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.ga.EAUtils.CandidateSource;
 import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Candidate;
@@ -57,6 +56,7 @@ import denoptim.graph.DGraphTest;
 import denoptim.graph.Edge.BondType;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
+import denoptim.graph.Provenance;
 import denoptim.graph.RelatedAPPair;
 import denoptim.graph.Template;
 import denoptim.graph.Template.ContractLevel;
@@ -562,7 +562,7 @@ public class EAUtilsTest
         Randomizer rng = new Randomizer();
         for (int i=0; i<tot; i++)
         {
-            CandidateSource mode = EAUtils.pickNewCandidateGenerationMode(
+            Provenance.Source mode = EAUtils.pickNewCandidateGenerationMode(
                     wx, wm, wc, rng);
             switch (mode)
             {
@@ -602,21 +602,21 @@ public class EAUtilsTest
         double wx = 2, wm = 0.6, wc=0.05;
         
         Randomizer rng = new Randomizer(seed);
-        List<CandidateSource> resultsA = new ArrayList<CandidateSource>();
+        List<Provenance.Source> resultsA = new ArrayList<Provenance.Source>();
         for (int i=0; i<tot; i++)
         {
             resultsA.add(EAUtils.pickNewCandidateGenerationMode(wx,wm,wc,rng));
         }
         
         Randomizer rng2 = new Randomizer(otherSeed);
-        List<CandidateSource> resultsB = new ArrayList<CandidateSource>();
+        List<Provenance.Source> resultsB = new ArrayList<Provenance.Source>();
         for (int i=0; i<tot; i++)
         {
             resultsB.add(EAUtils.pickNewCandidateGenerationMode(wx,wm,wc,rng2));
         }
         
         rng = new Randomizer(seed);
-        List<CandidateSource> resultsC = new ArrayList<CandidateSource>();
+        List<Provenance.Source> resultsC = new ArrayList<Provenance.Source>();
         for (int i=0; i<tot; i++)
         {
             resultsC.add(EAUtils.pickNewCandidateGenerationMode(wx,wm,wc,rng));

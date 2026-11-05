@@ -2704,14 +2704,20 @@ public class GraphOperations
         
         int graphId = graph.getGraphId();
         int positionOfVertex = graph.indexOf(vertex);
-        //NB: since we have renumbered the vertexes, we use the old vertex ID
-        // when reporting what vertex is being mutated. Also, note that the
-        // identity of the candidate is already in the graph's local msg.
-        String mutantOrigin = graph.getLocalMsg() + "|"
-                + mType + "|"
-                + vertex.getProperty(DENOPTIMConstants.STOREDVID) 
-                + " (" + positionOfVertex + ")";
-        graph.setLocalMsg(mutantOrigin);
+        // The candidate identity is already the nearest parent on the graph
+        // provenance. Record only this mutation site, using the vertex id from
+        // before renumbering.
+        if (graph.getProvenance() != null)
+        {
+            long vertexId = vertex.getVertexId();
+            Object storedId = vertex.getProperty(DENOPTIMConstants.STOREDVID);
+            if (storedId instanceof Number)
+                vertexId = ((Number) storedId).longValue();
+            else if (storedId != null)
+                vertexId = Long.parseLong(storedId.toString());
+            graph.setProvenance(graph.getProvenance().withMutation(mType,
+                    vertexId, positionOfVertex));
+        }
         
         boolean done = false;
         switch (mType) 

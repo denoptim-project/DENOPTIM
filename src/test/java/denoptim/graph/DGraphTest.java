@@ -2629,8 +2629,8 @@ public class DGraphTest
                 "Number of symmetric sets");
         assertEquals(graph.closableChains.size(), clone.closableChains.size(),
                 "Number of closable chains");
-        assertEquals(graph.localMsg, clone.localMsg,
-                "Local msg");
+        assertEquals(graph.getProvenance(), clone.getProvenance(),
+                "Provenance");
         assertEquals(graph.graphId, clone.graphId,
                 "Graph ID");
         

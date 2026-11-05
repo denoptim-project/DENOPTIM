@@ -42,6 +42,9 @@ import javax.swing.table.JTableHeader;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 
+import denoptim.constants.DENOPTIMConstants;
+import denoptim.graph.Provenance;
+
 
 /**
  * Base panel with an unspecified molecular viewer (subclass-specific) and a property data
@@ -286,11 +289,18 @@ public abstract class MolAndPropTableViewPanel extends JSplitPane
             {
                 continue;
             }
+            String value = p.toString();
+            if (DENOPTIMConstants.PROVENANCE.equals(key))
+            {
+                Provenance provenance = Provenance.parse(value);
+                if (provenance != null)
+                    value = provenance.summary();
+            }
             if (defPropMap.containsKey(key))
             {
-                dataTabModel.addRow(new Object[] {defPropMap.get(key), p.toString()});
+                dataTabModel.addRow(new Object[] {defPropMap.get(key), value});
             } else {
-                dataTabModel.addRow(new Object[] {key, p.toString()});
+                dataTabModel.addRow(new Object[] {key, value});
             }
         }
 	}

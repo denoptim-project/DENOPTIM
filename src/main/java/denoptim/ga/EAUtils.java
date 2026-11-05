@@ -36,7 +36,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.openscience.cdk.graph.ShortestPaths;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -59,6 +58,7 @@ import denoptim.graph.Candidate;
 import denoptim.graph.DGraph;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
+import denoptim.graph.Provenance;
 import denoptim.graph.RelatedAPPair;
 import denoptim.graph.Ring;
 import denoptim.graph.SymmetricAPs;
@@ -120,13 +120,6 @@ public class EAUtils
     // for each fragment store the reactions associated with it
     protected static HashMap<Integer, List<String>> lstFragmentClass;
 
-    /**
-     * A chosen method for generation of new {@link Candidate}s.
-     */
-    public enum CandidateSource {
-        CROSSOVER, MUTATION, CONSTRUCTION, MANUAL;
-    }
-    
     private static final String NL =System.getProperty("line.separator");
     private static final String FSEP = System.getProperty("file.separator");
     
@@ -194,10 +187,10 @@ public class EAUtils
      * The choice is biased
      * by the weights of the methods as defined in the {@link GAParameters}.
      * @param the genetic algorithm settings
-     * @return one among the possible {@link CandidateSource} excluding
-     * {@value CandidateSource#MANUAL}.
+     * @return one among {@link Provenance.Source#CROSSOVER}, 
+     * {@link Provenance.Source#MUTATION}, or {@link Provenance.Source#CONSTRUCTION}.
      */
-    protected static CandidateSource chooseGenerationMethod(GAParameters settings)
+    protected static Provenance.Source chooseGenerationMethod(GAParameters settings)
     {
         return pickNewCandidateGenerationMode(
                 settings.getCrossoverWeight(), 
@@ -242,7 +235,7 @@ public class EAUtils
 //------------------------------------------------------------------------------
     
     /**
-     * Takes a decision on which {@link CandidateSource} method to use for 
+     * Takes a decision on which {@link Provenance.Source} method to use for 
      * generating a new {@link Candidate}. The choice is made according to the
      * weights given as arguments, and shooting a random number over a weighted
      * score range.
@@ -250,10 +243,10 @@ public class EAUtils
      * members.
      * @param mutWeight weight of mutation of existing population members.
      * @param newWeight weight of construction from scratch.
-     * @return one among the possible {@link CandidateSource} excluding
-     * {@value CandidateSource#MANUAL}.
+     * @return one among {@link Provenance.Source#CROSSOVER}, 
+     * {@link Provenance.Source#MUTATION}, or {@link Provenance.Source#CONSTRUCTION}.
      */
-    public static CandidateSource pickNewCandidateGenerationMode(
+    public static Provenance.Source pickNewCandidateGenerationMode(
             double xoverWeight, double mutWeight, double newWeight,
             Randomizer randomizer)
     {
@@ -261,12 +254,12 @@ public class EAUtils
                 * (xoverWeight + mutWeight + newWeight);
         if (hit <= xoverWeight)
         {
-            return CandidateSource.CROSSOVER;
+            return Provenance.Source.CROSSOVER;
         } else if (xoverWeight < hit && hit <= (mutWeight+xoverWeight))
         {
-            return CandidateSource.MUTATION;
+            return Provenance.Source.MUTATION;
         } else {
-            return CandidateSource.CONSTRUCTION;
+            return Provenance.Source.CONSTRUCTION;
         }
     }
     
@@ -458,8 +451,6 @@ public class EAUtils
         DGraph gB = vB.getGraphOwner();
         cB = gB.getOutermostGraphOwner().getCandidateOwner();
         
-        String candIdA = cA.getName();
-        String candIdB = cB.getName();
         int gid1 = gA.getGraphId();
         int gid2 = gB.getGraphId();
         
@@ -498,25 +489,13 @@ public class EAUtils
         }
         gAClone.setGraphId(GraphUtils.getUniqueGraphIndex());
         gBClone.setGraphId(GraphUtils.getUniqueGraphIndex());
-        String lstIdVA = "";
-        for (Vertex v : xos.getA())
-            lstIdVA = lstIdVA + "_" + v.getVertexId();
-        String lstIdVB = "";
-        for (Vertex v : xos.getB())
-            lstIdVB = lstIdVB + "_" + v.getVertexId();
-        String[] msgs = new String[2];
-        msgs[0] = "Xover: "
-                + "Gen:" + cA.getGeneration() + " Cand:" + candIdA 
-                + "|" + gid1 + "|" + lstIdVA 
-                + " X "
-                + "Gen:" + cB.getGeneration() + " Cand:" + candIdB
-                + "|" + gid2 + "|" + lstIdVB;
-        msgs[1] = "Xover: "
-                + "Gen:" + cB.getGeneration() + " Cand:" + candIdB
-                + "|" + gid2 + "|" + lstIdVB 
-                + " X "
-                + "Gen:" + cA.getGeneration() + " Cand:" + candIdA 
-                + "|" + gid1 + "|" + lstIdVA;
+        Provenance[] provenances = new Provenance[2];
+        provenances[0] = Provenance.crossover(
+                parentOf(cA, gid1, xos.getA()),
+                parentOf(cB, gid2, xos.getB()));
+        provenances[1] = Provenance.crossover(
+                parentOf(cB, gid2, xos.getB()),
+                parentOf(cA, gid1, xos.getA()));
         
         DGraph[] graphsAffectedByXover = new DGraph[2];
         graphsAffectedByXover[0] = gAClone;
@@ -540,7 +519,7 @@ public class EAUtils
             DGraph gOutermost = g.getOutermostGraphOwner();
             gOutermost.addCappingGroups(fragSpace);
             gOutermost.renumberGraphVertices();
-            gOutermost.setLocalMsg(msgs[ig]);
+            gOutermost.setProvenance(provenances[ig]);
             
             // Consider if the result can be used to define a new candidate
             Object[] res = null;
@@ -633,6 +612,18 @@ public class EAUtils
         }
         return validOffspring;
     }
+
+//------------------------------------------------------------------------------
+
+    private static Provenance.Parent parentOf(Candidate candidate, int graphId,
+            List<Vertex> vertices)
+    {
+        List<Long> vertexIds = new ArrayList<Long>();
+        for (Vertex vertex : vertices)
+            vertexIds.add(vertex.getVertexId());
+        return new Provenance.Parent(candidate.getGeneration(),
+                candidate.getName(), graphId, vertexIds);
+    }
     
 //------------------------------------------------------------------------------
 
@@ -673,11 +664,9 @@ public class EAUtils
         DGraph graph = parent.getGraph().clone();
         graph.renumberGraphVertices();
         
-        String parentMolName = FilenameUtils.getBaseName(parent.getSDFFile());
-        int parentGraphId = parent.getGraph().getGraphId();
-        graph.setLocalMsg("Mutation:"
-                + " Gen:" + parent.getGeneration() + " Cand:" + parentMolName 
-                + "|" + parentGraphId);
+        graph.setProvenance(Provenance.mutation(new Provenance.Parent(
+                parent.getGeneration(), parent.getName(),
+                parent.getGraph().getGraphId())));
         
         if (!GraphOperations.performMutation(graph, mnt, settings))
         {
@@ -699,7 +688,7 @@ public class EAUtils
             if (!settings.mutatedGraphFailedEvalTolerant)
             {
                 settings.getLogger().log(Level.INFO, "WRITING DEBUG FILE for " 
-                        + graph.getLocalMsg());
+                        + graph.getProvenance());
                 DenoptimIO.writeGraphToSDF(new File("debug_evalGrp_parent.sdf"),
                         parent.getGraph(),false, settings.getLogger(),
                         settings.getRandomizer());
@@ -799,7 +788,7 @@ public class EAUtils
             settings.getLogger().log(Level.SEVERE, msg);
             return null;
         }
-        graph.setLocalMsg("MANUAL_ADD");
+        graph.setProvenance(Provenance.manual());
         
         // We expect users to know what they ask for. Therefore, we do
         // evaluate the graph, but in a permissive manner, meaning that 
@@ -895,7 +884,8 @@ public class EAUtils
             throw new DENOPTIMException(
                 "Error generating candidates from Reinvent service", e);
         }
-        candidates.forEach(c -> c.getGraph().setLocalMsg("NEW_FROM_REINVENT"));
+        candidates.forEach(c -> c.getGraph().setProvenance(
+                Provenance.construction("Reinvent")));
         return candidates;
     }
     
@@ -929,8 +919,7 @@ public class EAUtils
             mnt.increase(CounterID.FAILEDBUILDATTEMPTS);
             return null;
         }
-        //TODO-gg NEW to DENOVO_FROM_FRAGSPACE
-        graph.setLocalMsg("NEW");
+        graph.setProvenance(Provenance.construction());
         
         Object[] res = graph.checkConsistency(settings);
         
@@ -1584,7 +1573,7 @@ public class EAUtils
                 String molName = "M" + GeneralUtils.getPaddedString(8, ctr);
                 candidate.setName(molName);
                 candidate.getGraph().setGraphId(gctr);
-                candidate.getGraph().setLocalMsg("INITIAL_POPULATION");
+                candidate.getGraph().setProvenance(Provenance.input());
                 String sdfPathName = genDir + System.getProperty("file.separator") 
                             + molName + DENOPTIMConstants.FITFILENAMEEXTOUT;
                 candidate.setSDFFile(sdfPathName);
@@ -1690,7 +1679,7 @@ public class EAUtils
         
         // add the scaffold as a vertex
         graph.addVertex(scafVertex);
-        graph.setLocalMsg("NEW");
+        graph.setProvenance(Provenance.construction());
         
         if (scafVertex instanceof Template
                 && !((Template) scafVertex).getContractLevel().equals(

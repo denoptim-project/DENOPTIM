@@ -134,12 +134,11 @@ public class DGraph implements Cloneable
     private List<SymmetricVertexes> symVertices;
 
     /**
-     * A free-format string used to record simple properties in the graph. For
-     * instance, whether this graph comes from a given initial population or
-     * is generated anew from scratch, or from mutation/crossover.
+     * How this graph was produced, including its nearest parents when it was
+     * derived from existing candidates. {@code null} when no provenance has
+     * been recorded.
      */
-    //TODO: rename to Provenance
-    String localMsg;
+    private Provenance provenance;
 
     /**
      * Reference to the candidate entity owning this graph, or null
@@ -190,7 +189,6 @@ public class DGraph implements Cloneable
         gRings = new ArrayList<>();
         closableChains = new ArrayList<>();
         symVertices = new ArrayList<>();
-        localMsg = "";
     }
 
 //------------------------------------------------------------------------------
@@ -201,7 +199,6 @@ public class DGraph implements Cloneable
         this.gRings = gRings;
         closableChains = new ArrayList<>();
         symVertices = new ArrayList<>();
-        localMsg = "";
     }
 
 //------------------------------------------------------------------------------
@@ -212,7 +209,6 @@ public class DGraph implements Cloneable
         this(gVertices, gEdges, gRings);
         closableChains = new ArrayList<>();
         this.symVertices = symSets;
-        localMsg = "";
     }
 
 //------------------------------------------------------------------------------
@@ -223,7 +219,6 @@ public class DGraph implements Cloneable
     {
         this(gVertices, gEdges, gRings, symVertices);
         this.closableChains = closableChains;
-        localMsg = "";
     }
 
 //------------------------------------------------------------------------------
@@ -235,7 +230,6 @@ public class DGraph implements Cloneable
         gRings = new ArrayList<>();
         closableChains = new ArrayList<>();
         symVertices = new ArrayList<>();
-        localMsg = "";
     }
     
 //------------------------------------------------------------------------------
@@ -277,18 +271,24 @@ public class DGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    //TODO-gg: rename to Provenance
-    public void setLocalMsg(String msg)
+    /**
+     * @param provenance how this graph was produced, or {@code null} to clear
+     * it.
+     */
+    public void setProvenance(Provenance provenance)
     {
-        localMsg = msg;
+        this.provenance = provenance;
     }
 
 //------------------------------------------------------------------------------
 
-    //TODO-gg: rename to Provenance
-    public String getLocalMsg()
+    /**
+     * @return how this graph was produced, or {@code null} when none has been
+     * recorded.
+     */
+    public Provenance getProvenance()
     {
-        return localMsg;
+        return provenance;
     }
 
 //------------------------------------------------------------------------------
@@ -3622,7 +3622,7 @@ public class DGraph implements Cloneable
         clone.setSymmetricVertexSets(cSymVertices);
         
         clone.setGraphId(graphId);
-        clone.setLocalMsg(localMsg);
+        clone.setProvenance(provenance);
 
         return clone;
     }
@@ -5086,7 +5086,7 @@ public class DGraph implements Cloneable
         subGraph.setSymmetricVertexSets(cSymVertices);
         
         subGraph.setGraphId(graphId);
-        subGraph.setLocalMsg(localMsg);
+        subGraph.setProvenance(provenance);
         return subGraph;
     }
 

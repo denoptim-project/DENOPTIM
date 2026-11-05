@@ -26,6 +26,7 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Insets;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -41,15 +42,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
+import javax.swing.AbstractButton;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -77,6 +81,7 @@ import org.jfree.chart.labels.XYToolTipGenerator;
 import org.jfree.chart.plot.DatasetRenderingOrder;
 import org.jfree.chart.plot.SeriesRenderingOrder;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.ui.RectangleEdge;
 import org.jfree.data.xy.DefaultXYDataset;
@@ -88,6 +93,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
 import denoptim.graph.CandidateLW;
+import denoptim.graph.Provenance;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.CounterID;
 import denoptim.utils.GeneralUtils;
@@ -126,6 +132,13 @@ public class GUIInspectGARun extends GUICardPanel
 	private File srcFolder;
 	
 	private List<CandidateLW> allIndividuals;
+	
+	/**
+	 * Candidates that can be named by a {@link Provenance.ParentLink}:
+	 * generation, then candidate name.
+	 */
+	private Map<Integer,Map<String,CandidateLW>> candidatesByGenerationAndName;
+	
 	private int molsWithFitness = 0;
 	private boolean warnedAboutMissingCandFiles = false;
 	private JLabel lblTotItems;
@@ -143,12 +156,67 @@ public class GUIInspectGARun extends GUICardPanel
 	private DefaultXYDataset datasetPopMax = new DefaultXYDataset();
 	private DefaultXYDataset datasetPopMean = new DefaultXYDataset();	
 	private DefaultXYDataset datasetPopMedian = new DefaultXYDataset();
+	
+	/**
+	 * One series per parent-child segment of the selected candidate's lineage.
+	 */
+	private DefaultXYDataset datasetLineage = new DefaultXYDataset();
+	private final XYLineAndShapeRenderer lineageRenderer =
+	        new XYLineAndShapeRenderer(true, false);
+	
+	/**
+	 * Direct offspring of the selected candidate. Mutations and crossovers are
+	 * separate datasets so each can keep its own color.
+	 */
+	private DefaultXYDataset datasetPosterityMutation = new DefaultXYDataset();
+	private final XYLineAndShapeRenderer posterityMutationRenderer =
+	        new XYLineAndShapeRenderer(true, false);
+	private DefaultXYDataset datasetPosterityCrossover = new DefaultXYDataset();
+	private final XYLineAndShapeRenderer posterityCrossoverRenderer =
+	        new XYLineAndShapeRenderer(true, false);
+	
+	/**
+	 * Dataset and renderer slot of each evolution-plot series, in draw order.
+	 * With {@link DatasetRenderingOrder#REVERSE}, smaller numbers are painted
+	 * in front. A series that occupies a dataset by itself is series
+	 * {@link #SOLE_SERIES} inside that slot.
+	 */
+	private final Map<String,Integer> evoSeriesNumber =
+	        new LinkedHashMap<String,Integer>();
+	
+	private static final String SERIES_SELECTED = "Selected_candidates";
+	private static final String SERIES_ALL_FIT = "Candidates_with_fitness";
+	private static final String SERIES_LINEAGE = "Lineage";
+	private static final String SERIES_POSTERITY_MUTATION = "Posterity by Mutation";
+	private static final String SERIES_POSTERITY_CROSSOVER =
+	        "Posterity by Crossover";
+	private static final String SERIES_POP_MIN = "Minimum Fitness in Population";
+	private static final String SERIES_POP_MAX = "Maximum Fitness in Population";
+	private static final String SERIES_POP_MEAN = "Mean of Fitness in Population";
+	private static final String SERIES_POP_MEDIAN =
+	        "Median of Fitness in Population";
+	
+	private static final Color LINEAGE_COLOR = Color.decode("#F07518");
+	private static final Color POSTERITY_MUTATION_COLOR = Color.decode("#9D52E3");
+	private static final Color POSTERITY_CROSSOVER_COLOR = Color.decode("#399936");
+	private static final Color POP_MIN_COLOR = Color.blue;
+	private static final Color POP_MAX_COLOR = Color.blue;
+	private static final Color POP_MEAN_COLOR = Color.red;
+	private static final Color POP_MEDIAN_COLOR = Color.decode("#22BB22");
+	
+	/**
+	 * Series index inside a dataset that holds only one series.
+	 */
+	private static final int SOLE_SERIES = 0;
+	
 	private XYPlot evoPlot;
 	private JFreeChart evoChart;
 	private ChartPanel evoChartPanel;
 	
     private JPopupMenu evoSeriesCheckList;
     private JButton evoSeriesBtn;
+    private JPopupMenu familyTreeCheckList;
+    private JButton familyTreeBtn;
 	
 	private Map<CounterID,DefaultXYDataset> monitorDatasets = 
 	        new HashMap<CounterID,DefaultXYDataset>();
@@ -187,6 +255,37 @@ public class GUIInspectGARun extends GUICardPanel
      * population.
      */
     private JButton openFinalPopGraphs;
+    
+    /**
+     * Exports the candidates joined by the lineage lines of the selection.
+     * Enabled only while those lines are displayed.
+     */
+    private JButton exportLineage;
+    
+    /**
+     * Exports the selected candidate and the offspring joined by the posterity
+     * lines that are currently visible.
+     */
+    private JButton exportPosterity;
+    
+    /**
+     * Candidate currently drawn in the evolution plot, or {@code null}.
+     */
+    private CandidateLW selectedCandidate;
+    
+    /**
+     * Candidates that are endpoints of the displayed lineage lines.
+     */
+    private final List<CandidateLW> displayedLineage =
+            new ArrayList<CandidateLW>();
+    
+    /**
+     * Direct offspring drawn by the mutation and crossover posterity lines.
+     */
+    private final List<CandidateLW> displayedMutationPosterity =
+            new ArrayList<CandidateLW>();
+    private final List<CandidateLW> displayedCrossoverPosterity =
+            new ArrayList<CandidateLW>();
     
     /**
      * Pathways of population members collected by generation id. This info
@@ -263,6 +362,41 @@ public class GUIInspectGARun extends GUICardPanel
 //-----------------------------------------------------------------------------
 
 	/**
+	 * Text baseline of a toolbar row. Buttons define the line when the row
+	 * mixes buttons and labels, so a label in the neighbouring panel can
+	 * share it.
+	 */
+	private static int toolbarBaseline(JPanel panel)
+	{
+	    Component anchor = null;
+	    int rowHeight = 0;
+	    for (Component c : panel.getComponents())
+	    {
+	        if (!c.isVisible())
+	            continue;
+	        rowHeight = Math.max(rowHeight, c.getPreferredSize().height);
+	        if (anchor == null || (c instanceof AbstractButton
+	                && !(anchor instanceof AbstractButton)))
+	            anchor = c;
+	    }
+	    if (anchor == null || rowHeight <= 0)
+	        return -1;
+	    Dimension pref = anchor.getPreferredSize();
+	    int base = anchor.getBaseline(Math.max(pref.width, 1),
+	            Math.max(pref.height, 1));
+	    if (base < 0)
+	        return -1;
+	    Insets insets = panel.getInsets();
+	    int vgap = 0;
+	    if (panel.getLayout() instanceof FlowLayout)
+	        vgap = ((FlowLayout) panel.getLayout()).getVgap();
+	    int yInRow = Math.max(0, (rowHeight - pref.height) / 2);
+	    return insets.top + vgap + yInRow + base;
+	}
+
+//-----------------------------------------------------------------------------
+
+	/**
 	 * Initialize the panel and add buttons.
 	 */
 	private void initialize() 
@@ -277,10 +411,18 @@ public class GUIInspectGARun extends GUICardPanel
 		//    |-> plots (RIGHT)
 		
 		// Creating local tool bar
-		ctrlPanelRow1Left = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		
+		ctrlPanelRow1Left = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0)) {
+		    @Override
+		    public int getBaseline(int width, int height)
+		    {
+		        return toolbarBaseline(this);
+		    }
+		};
+
+        ctrlPanelRow1Left.add(new JLabel("Show/Hide Series:"));
+
 	    evoSeriesCheckList = new JPopupMenu();
-        evoSeriesBtn = new JButton("Show/Hide Population Stats");
+        evoSeriesBtn = new JButton("Population Stats");
         evoSeriesBtn.setComponentPopupMenu(evoSeriesCheckList);
         evoSeriesBtn.setToolTipText(String.format(
                 "<html><body width='%1s'>Click to select which population "
@@ -292,8 +434,21 @@ public class GUIInspectGARun extends GUICardPanel
         });
         ctrlPanelRow1Left.add(evoSeriesBtn);
 		
+	    familyTreeCheckList = new JPopupMenu();
+        familyTreeBtn = new JButton("Family Tree");
+        familyTreeBtn.setComponentPopupMenu(familyTreeCheckList);
+        familyTreeBtn.setToolTipText(String.format(
+                "<html><body width='%1s'>Click to select which lineage and "
+                + "posterity lines to plot in the top plot.",300));
+        familyTreeBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                familyTreeCheckList.show(familyTreeBtn, 0, 0);
+            }
+        });
+        ctrlPanelRow1Left.add(familyTreeBtn);
+		
 		monitorSeriesCheckList = new ScrollableJPupupMenu();
-        monitorSeriesBtn = new JButton("Show/Hide Monitor Series");
+        monitorSeriesBtn = new JButton("Monitor");
         monitorSeriesBtn.setToolTipText(String.format(
                 "<html><body width='%1s'>Click to select which monitored event "
                 + "counts to plot in the bottom plot.",300));
@@ -308,7 +463,9 @@ public class GUIInspectGARun extends GUICardPanel
         });
 		ctrlPanelRow1Left.add(monitorSeriesBtn);
 		
-	    JButton rstView = new JButton("Reset Charts");
+        ctrlPanelRow1Left.add(new JLabel("Charts:"));
+
+	    JButton rstView = new JButton("Reset Axis");
         rstView.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 evoPlot.getDomainAxis().setAutoRange(true);
@@ -321,18 +478,24 @@ public class GUIInspectGARun extends GUICardPanel
                     if (c instanceof JCheckBoxMenuItem)
                     {
                         // NB: this sets the default series displayed upon reset
-                        if (((JCheckBoxMenuItem) c).getText().startsWith("Max")
-                            || ((JCheckBoxMenuItem) c).getText().startsWith("Min"))
-                            ((JCheckBoxMenuItem) c).setSelected(true);
-                        else
-                            ((JCheckBoxMenuItem) c).setSelected(false);
+                        String text = ((JCheckBoxMenuItem) c).getText();
+                        ((JCheckBoxMenuItem) c).setSelected(
+                                SERIES_POP_MIN.equals(text)
+                                || SERIES_POP_MAX.equals(text));
                     }
+                }
+                for (int iItem=0; iItem<familyTreeCheckList.getComponentCount();
+                        iItem++)
+                {
+                    Component c = familyTreeCheckList.getComponent(iItem);
+                    if (c instanceof JCheckBoxMenuItem)
+                        ((JCheckBoxMenuItem) c).setSelected(true);
                 }
                 
                 monitorPlot.getDomainAxis().setAutoRange(true);
                 monitorPlot.getRangeAxis().setAutoRange(true);
                 monitorPlot.getDomainAxis().setLowerBound(-0.5);
-                for (JCheckBox cb : monitorSeriesCheckList.getAllBChekBoxes())
+                for (JCheckBoxMenuItem cb : monitorSeriesCheckList.getAllBChekBoxes())
                 {
                     // NB: this sets the default series displayed upon reset
                     if (cb.getText().startsWith(nameFirstMonitorSeries))
@@ -346,13 +509,28 @@ public class GUIInspectGARun extends GUICardPanel
 		
 		// Done with left part of bar, not the right-hand part...
 	
-		ctrlPanelRow1Right = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		ctrlPanelRow1Right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0)) {
+		    @Override
+		    public int getBaseline(int width, int height)
+		    {
+		        return toolbarBaseline(this);
+		    }
+
+		    @Override
+		    public Dimension getMaximumSize()
+		    {
+		        Dimension max = getPreferredSize();
+		        max.width = Integer.MAX_VALUE;
+		        return max;
+		    }
+		};
 		lblTotItems = new JLabel("No item loaded");
 		lblTotItems.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblTotItems.setPreferredSize(new Dimension(300,28));
+		lblTotItems.setPreferredSize(new Dimension(300,
+		        lblTotItems.getPreferredSize().height));
 		ctrlPanelRow1Right.add(lblTotItems);
 		
-        ctrlPanelRow2Left = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        ctrlPanelRow2Left = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         
         openSingleGraph = new JButton("Open Candidate's Graph");
         openSingleGraph.setEnabled(false); //Enables only upon selection of an item
@@ -531,31 +709,72 @@ public class GUIInspectGARun extends GUICardPanel
         });
         ctrlPanelRow2Left.add(openFinalPopGraphs);
         
+        exportLineage = new JButton("Export Lineage");
+        exportLineage.setEnabled(false);
+        exportLineage.setToolTipText(String.format(
+                "<html><body width='%1s'>Write the selected candidate and its "
+                + "displayed ancestors into one SDF file.", 300));
+        exportLineage.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                exportCandidates(new ArrayList<CandidateLW>(displayedLineage));
+            }
+        });
+        ctrlPanelRow2Left.add(exportLineage);
+        
+        exportPosterity = new JButton("Export Posterity");
+        exportPosterity.setEnabled(false);
+        exportPosterity.setToolTipText(String.format(
+                "<html><body width='%1s'>Write the selected candidate and the "
+                + "offspring of the visible posterity lines into one SDF "
+                + "file.", 300));
+        exportPosterity.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                List<CandidateLW> toExport = new ArrayList<CandidateLW>();
+                if (selectedCandidate != null)
+                    toExport.add(selectedCandidate);
+                if (isFamilySeriesShown(SERIES_POSTERITY_MUTATION))
+                    toExport.addAll(displayedMutationPosterity);
+                if (isFamilySeriesShown(SERIES_POSTERITY_CROSSOVER))
+                    toExport.addAll(displayedCrossoverPosterity);
+                exportCandidates(toExport);
+            }
+        });
+        ctrlPanelRow2Left.add(exportPosterity);
+        
 
         ctrlPanelRow1 = new JPanel();
         GroupLayout lyoCtrlPanelRow1 = new GroupLayout(ctrlPanelRow1);
         ctrlPanelRow1.setLayout(lyoCtrlPanelRow1);
-        lyoCtrlPanelRow1.setAutoCreateGaps(true);
-        lyoCtrlPanelRow1.setAutoCreateContainerGaps(true);
+        lyoCtrlPanelRow1.setAutoCreateGaps(false);
+        lyoCtrlPanelRow1.setAutoCreateContainerGaps(false);
         lyoCtrlPanelRow1.setHorizontalGroup(
                 lyoCtrlPanelRow1.createSequentialGroup()
                     .addComponent(ctrlPanelRow1Left)
                     .addComponent(ctrlPanelRow1Right));
-        lyoCtrlPanelRow1.setVerticalGroup(lyoCtrlPanelRow1.createParallelGroup()
+        lyoCtrlPanelRow1.setVerticalGroup(lyoCtrlPanelRow1.createParallelGroup(
+                GroupLayout.Alignment.BASELINE, false)
                     .addComponent(ctrlPanelRow1Left)
                     .addComponent(ctrlPanelRow1Right));
         
         ctrlPanel =  new JPanel();
         GroupLayout lyoCtrlPanel = new GroupLayout(ctrlPanel);
         ctrlPanel.setLayout(lyoCtrlPanel);
-        lyoCtrlPanel.setAutoCreateGaps(true);
-        lyoCtrlPanel.setAutoCreateContainerGaps(true);
+        lyoCtrlPanel.setAutoCreateGaps(false);
+        lyoCtrlPanel.setAutoCreateContainerGaps(false);
         lyoCtrlPanel.setHorizontalGroup(lyoCtrlPanel.createParallelGroup()
                     .addComponent(ctrlPanelRow1)
                     .addComponent(ctrlPanelRow2Left));
         lyoCtrlPanel.setVerticalGroup(lyoCtrlPanel.createSequentialGroup()
-                    .addComponent(ctrlPanelRow1)
-                    .addComponent(ctrlPanelRow2Left));
+                    .addComponent(ctrlPanelRow1, GroupLayout.PREFERRED_SIZE,
+                            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addGap(2)
+                    .addComponent(ctrlPanelRow2Left, GroupLayout.PREFERRED_SIZE,
+                            GroupLayout.DEFAULT_SIZE,
+                            GroupLayout.PREFERRED_SIZE));
         
         this.add(ctrlPanel,BorderLayout.NORTH);
 		
@@ -721,6 +940,7 @@ public class GUIInspectGARun extends GUICardPanel
 		        largestGenId = genId;
 		}
 		
+		indexCandidatesByGenerationAndName();
 		System.out.println("Imported "+allIndividuals.size()+" individuals.");
 		
 		lblTotItems.setText("Found "+allIndividuals.size()+" candidates ("
@@ -748,7 +968,7 @@ public class GUIInspectGARun extends GUICardPanel
         	candsWithFitnessData[0][j] = item.getGeneration();
         	candsWithFitnessData[1][j] = item.getFitness();
         }
-		datasetAllFit.addSeries("Candidates_with_fitness", candsWithFitnessData);
+		datasetAllFit.addSeries(SERIES_ALL_FIT, candsWithFitnessData);
 		
 		// We sort the list of individuals by fitness and generation so that we 
 		// can quickly identify overlapping items
@@ -806,6 +1026,7 @@ public class GUIInspectGARun extends GUICardPanel
 		// item from datasetAllFit, thus preventing to display the molecular
 		// representation of that item.
 		evoPlot.setDatasetRenderingOrder(DatasetRenderingOrder.REVERSE);
+		evoSeriesNumber.clear();
 		
 		// dataset of selected items
         Shape shape0 = new Ellipse2D.Double(
@@ -815,14 +1036,13 @@ public class GUIInspectGARun extends GUICardPanel
                  GUIPreferences.chartPointSize*1.1);
         XYLineAndShapeRenderer renderer0 = 
                 new XYLineAndShapeRenderer(false, true);
-        //NB: here is where we define that the selected ones are at '0'
-        // Search for the 'HERE@HERE' string to find where I use this assumption
-        evoPlot.setDataset(0, datasetSelected); 
-        evoPlot.setRenderer(0, renderer0);
-        renderer0.setSeriesShape(0, shape0);
-        renderer0.setSeriesPaint(0, Color.red);
-        renderer0.setSeriesFillPaint(0, Color.red);
-        renderer0.setSeriesOutlinePaint(0, Color.BLACK);
+        // The selected series keeps the front-most slot. Search for
+        // 'HERE@HERE' where that slot is reused.
+        bindEvoSeries(SERIES_SELECTED, datasetSelected, renderer0);
+        renderer0.setSeriesShape(SOLE_SERIES, shape0);
+        renderer0.setSeriesPaint(SOLE_SERIES, Color.red);
+        renderer0.setSeriesFillPaint(SOLE_SERIES, Color.red);
+        renderer0.setSeriesOutlinePaint(SOLE_SERIES, Color.BLACK);
         renderer0.setUseOutlinePaint(true);
         renderer0.setUseFillPaint(true);
         
@@ -834,124 +1054,95 @@ public class GUIInspectGARun extends GUICardPanel
 	             GUIPreferences.chartPointSize);
 		XYLineAndShapeRenderer renderer1 = 
 		        new XYLineAndShapeRenderer(false, true);
-        evoPlot.setDataset(1, datasetAllFit);
-        evoPlot.setRenderer(1, renderer1);
-        renderer1.setSeriesShape(0, shape1);
-        renderer1.setSeriesPaint(0, new Color(192, 192, 192, 60));
-        renderer1.setSeriesFillPaint(0, new Color(192, 192, 192, 60));
-        renderer1.setSeriesOutlinePaint(0, Color.GRAY);
+        bindEvoSeries(SERIES_ALL_FIT, datasetAllFit, renderer1);
+        renderer1.setSeriesShape(SOLE_SERIES, shape1);
+        renderer1.setSeriesPaint(SOLE_SERIES, new Color(192, 192, 192, 60));
+        renderer1.setSeriesFillPaint(SOLE_SERIES, new Color(192, 192, 192, 60));
+        renderer1.setSeriesOutlinePaint(SOLE_SERIES, Color.GRAY);
         renderer1.setUseOutlinePaint(true);
         renderer1.setUseFillPaint(true);
         
+        // Parent-child lines for the selected candidate. Bound after the
+        // candidate points, so those points stay in front and a click still
+        // hits a candidate, and before the population statistics, so the
+        // lines paint above those curves.
+        lineageRenderer.setAutoPopulateSeriesPaint(false);
+        lineageRenderer.setDefaultPaint(LINEAGE_COLOR);
+        lineageRenderer.setAutoPopulateSeriesStroke(false);
+        lineageRenderer.setDefaultStroke(new BasicStroke(2.0f,
+                BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        lineageRenderer.setDefaultSeriesVisibleInLegend(false);
+        bindEvoSeries(SERIES_LINEAGE, datasetLineage, lineageRenderer);
+        
+        // Direct offspring of the selected candidate, in later generations.
+        // Same layering as the lineage: under the points, above the statistics.
+        posterityMutationRenderer.setAutoPopulateSeriesPaint(false);
+        posterityMutationRenderer.setDefaultPaint(POSTERITY_MUTATION_COLOR);
+        posterityMutationRenderer.setAutoPopulateSeriesStroke(false);
+        posterityMutationRenderer.setDefaultStroke(new BasicStroke(2.0f,
+                BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        posterityMutationRenderer.setDefaultSeriesVisibleInLegend(false);
+        bindEvoSeries(SERIES_POSTERITY_MUTATION, datasetPosterityMutation,
+                posterityMutationRenderer);
+        posterityCrossoverRenderer.setAutoPopulateSeriesPaint(false);
+        posterityCrossoverRenderer.setDefaultPaint(POSTERITY_CROSSOVER_COLOR);
+        posterityCrossoverRenderer.setAutoPopulateSeriesStroke(false);
+        posterityCrossoverRenderer.setDefaultStroke(new BasicStroke(2.0f,
+                BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        posterityCrossoverRenderer.setDefaultSeriesVisibleInLegend(false);
+        bindEvoSeries(SERIES_POSTERITY_CROSSOVER, datasetPosterityCrossover,
+                posterityCrossoverRenderer);
 
-        // Collect the ooptional series for an easy selection in the menu list
+        familyTreeCheckList = new JPopupMenu();
+        addEvoSeriesCheckBox(familyTreeCheckList, SERIES_LINEAGE,
+                LINEAGE_COLOR, true);
+        addEvoSeriesCheckBox(familyTreeCheckList, SERIES_POSTERITY_MUTATION,
+                POSTERITY_MUTATION_COLOR, true);
+        addEvoSeriesCheckBox(familyTreeCheckList, SERIES_POSTERITY_CROSSOVER,
+                POSTERITY_CROSSOVER_COLOR, true);
+        
+        // Collect the optional series for an easy selection in the menu list
         evoSeriesCheckList = new JPopupMenu();
         
         // min fitness in the population
         XYLineAndShapeRenderer renderer2 = 
         		new XYLineAndShapeRenderer(true, false);
-        evoPlot.setDataset(2, datasetPopMin);
-        evoPlot.setRenderer(2, renderer2);
-        renderer2.setSeriesPaint(0, Color.blue);
-        //NB: 'rstView' button assumes this item string begins with "Min"
-        JCheckBoxMenuItem cbmiMin = new JCheckBoxMenuItem(
-                "Minimum Fitness in Population");
-        cbmiMin.setForeground(Color.blue);
-        cbmiMin.setSelected(true);
-        cbmiMin.addItemListener(new ItemListener(){
-            @Override
-            public void itemStateChanged(ItemEvent e)
-            {
-                if (cbmiMin.isSelected())
-                {
-                    renderer2.setSeriesVisible(0, true);
-                } else {
-                    renderer2.setSeriesVisible(0, false);
-                }                    
-            }
-        });
-        evoSeriesCheckList.add(cbmiMin);
+        bindEvoSeries(SERIES_POP_MIN, datasetPopMin, renderer2);
+        renderer2.setSeriesPaint(SOLE_SERIES, POP_MIN_COLOR);
+        addEvoSeriesCheckBox(evoSeriesCheckList, SERIES_POP_MIN,
+                POP_MIN_COLOR, true);
         
         // max fitness in the population
         XYLineAndShapeRenderer renderer3 = 
         		new XYLineAndShapeRenderer(true, false);
-        evoPlot.setDataset(3, datasetPopMax);
-        evoPlot.setRenderer(3, renderer3);
-        renderer3.setSeriesPaint(0, Color.blue);
-        //NB: 'rstView' button assumes this item string begins with "Max"
-        JCheckBoxMenuItem cbmiMax = new JCheckBoxMenuItem(
-                "Maximum Fitness in Population");
-        cbmiMax.setForeground(Color.blue);
-        cbmiMax.setSelected(true);
-        cbmiMax.addItemListener(new ItemListener(){
-            @Override
-            public void itemStateChanged(ItemEvent e)
-            {
-                if (cbmiMax.isSelected())
-                {
-                    renderer3.setSeriesVisible(0, true);
-                } else {
-                    renderer3.setSeriesVisible(0, false);
-                }                    
-            }
-        });
-        evoSeriesCheckList.add(cbmiMax);
+        bindEvoSeries(SERIES_POP_MAX, datasetPopMax, renderer3);
+        renderer3.setSeriesPaint(SOLE_SERIES, POP_MAX_COLOR);
+        addEvoSeriesCheckBox(evoSeriesCheckList, SERIES_POP_MAX,
+                POP_MAX_COLOR, true);
         
         // mean fitness in the population
         XYLineAndShapeRenderer renderer4 = 
         		new XYLineAndShapeRenderer(true, false);
-        evoPlot.setDataset(4, datasetPopMean);
-        evoPlot.setRenderer(4, renderer4);
-        renderer4.setSeriesPaint(0, Color.red);
-        renderer4.setSeriesStroke(0, new BasicStroke(
+        bindEvoSeries(SERIES_POP_MEAN, datasetPopMean, renderer4);
+        renderer4.setSeriesPaint(SOLE_SERIES, POP_MEAN_COLOR);
+        renderer4.setSeriesStroke(SOLE_SERIES, new BasicStroke(
                 2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 
                 1.0f, new float[] {10.0f, 6.0f}, 0.0f));
-        renderer4.setSeriesVisible(0, false);
-        JCheckBoxMenuItem cbmiMean = new JCheckBoxMenuItem(
-                "Mean of Fitness in Population");
-        cbmiMean.setForeground(Color.red);
-        cbmiMean.setSelected(false);
-        cbmiMean.addItemListener(new ItemListener(){
-            @Override
-            public void itemStateChanged(ItemEvent e)
-            {
-                if (cbmiMean.isSelected())
-                {
-                    renderer4.setSeriesVisible(0, true);
-                } else {
-                    renderer4.setSeriesVisible(0, false);
-                }                    
-            }
-        });
-        evoSeriesCheckList.add(cbmiMean);
+        setEvoSeriesVisible(SERIES_POP_MEAN, false);
+        addEvoSeriesCheckBox(evoSeriesCheckList, SERIES_POP_MEAN,
+                POP_MEAN_COLOR, false);
         
         // median fitness in the population
         XYLineAndShapeRenderer renderer5 = 
         		new XYLineAndShapeRenderer(true, false);
-        evoPlot.setDataset(5, datasetPopMedian);
-        evoPlot.setRenderer(5, renderer5);
-        renderer5.setSeriesPaint(0, Color.decode("#22BB22"));   
-        renderer5.setSeriesStroke(0, new BasicStroke(
+        bindEvoSeries(SERIES_POP_MEDIAN, datasetPopMedian, renderer5);
+        renderer5.setSeriesPaint(SOLE_SERIES, POP_MEDIAN_COLOR);
+        renderer5.setSeriesStroke(SOLE_SERIES, new BasicStroke(
                     2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 
                     1.0f, new float[] {3.0f, 6.0f}, 0.0f));
-        renderer5.setSeriesVisible(0, false);
-        JCheckBoxMenuItem cbmiMedian = new JCheckBoxMenuItem(
-                "Median of Fitness in Population");
-        cbmiMedian.setForeground(Color.decode("#22BB22"));
-        cbmiMedian.setSelected(false);
-        cbmiMedian.addItemListener(new ItemListener(){
-            @Override
-            public void itemStateChanged(ItemEvent e)
-            {
-                if (cbmiMedian.isSelected())
-                {
-                    renderer5.setSeriesVisible(0, true);
-                } else {
-                    renderer5.setSeriesVisible(0, false);
-                }                    
-            }
-        });
-        evoSeriesCheckList.add(cbmiMedian);
+        setEvoSeriesVisible(SERIES_POP_MEDIAN, false);
+        addEvoSeriesCheckBox(evoSeriesCheckList, SERIES_POP_MEDIAN,
+                POP_MEDIAN_COLOR, false);
         
         
 		// Create the actual panel that contains the chart
@@ -1013,7 +1204,7 @@ public class GUIInspectGARun extends GUICardPanel
 					}
 					
 					int serId = ((XYItemEntity)e.getEntity()).getSeriesIndex();
-					if (serId == 0)
+					if (serId == SOLE_SERIES)
 					{
 						int itemId = ((XYItemEntity) e.getEntity()).getItem();
 						CandidateLW item = candsWithFitnessMap.get(itemId);
@@ -1334,9 +1525,10 @@ public class GUIInspectGARun extends GUICardPanel
         int iStroke = 0;
         for (int iSeries=0; iSeries<headers.length; iSeries++)
         {
+            CounterID counter = CounterID.valueOf(headers[iSeries]);
             DefaultXYDataset dataset = new DefaultXYDataset();
-            dataset.addSeries(headers[iSeries], xyData.get(iSeries));
-            monitorDatasets.put(CounterID.valueOf(headers[iSeries]), dataset);
+            dataset.addSeries(counter.getPrettyName(), xyData.get(iSeries));
+            monitorDatasets.put(counter, dataset);
             
             boolean renderPoints = false;
             if (iRecordsKept<2)
@@ -1349,19 +1541,19 @@ public class GUIInspectGARun extends GUICardPanel
             serierRenderer.setSeriesPaint(0, colors[iColor]);
             serierRenderer.setSeriesStroke(0, strokes[iStroke]);
             
-            //Form here New with JCheckBox
-            JCheckBox cbi = new JCheckBox(
-                    CounterID.valueOf(headers[iSeries]).getPrettyName());
+            JCheckBoxMenuItem cbi = new ScrollableJPupupMenu.StayOpenCheckBoxMenuItem(
+                    counter.getPrettyName());
             cbi.setForeground(colors[iColor]);
             cbi.setToolTipText(String.format("<html><body width='%1s'>"
-                    + CounterID.valueOf(headers[iSeries]).getDescription()
+                    + counter.getDescription()
                     + ".</html>", 300));
 
             // We do this before setting the listener to avoid having to bypass
-            if (iSeries!=0)
+            boolean showSeries = iSeries==0;
+            serierRenderer.setSeriesVisible(0, showSeries);
+            serierRenderer.setSeriesVisibleInLegend(0, showSeries);
+            if (showSeries)
             {
-                serierRenderer.setSeriesVisible(0, false);
-            } else {
                 nameFirstMonitorSeries = cbi.getText();
                 cbi.setSelected(true);
             }
@@ -1370,12 +1562,9 @@ public class GUIInspectGARun extends GUICardPanel
                 @Override
                 public void itemStateChanged(ItemEvent e)
                 {
-                    if (cbi.isSelected())
-                    {
-                        serierRenderer.setSeriesVisible(0, true);
-                    } else {
-                        serierRenderer.setSeriesVisible(0, false);
-                    }                    
+                    boolean selected = cbi.isSelected();
+                    serierRenderer.setSeriesVisible(0, selected);
+                    serierRenderer.setSeriesVisibleInLegend(0, selected);
                 }
             });
             monitorSeriesCheckList.addCheckBox(cbi);
@@ -1545,10 +1734,14 @@ public class GUIInspectGARun extends GUICardPanel
         	selectedCandsData[0][j] = item.getGeneration();
         	selectedCandsData[1][j] = item.getFitness();
         }
-        datasetSelected.removeSeries("Selected_candidates");
-        datasetSelected.addSeries("Selected_candidates", selectedCandsData);
-        // NB the '0' is determined by initialization at HERE@HERE
-		evoPlot.setDataset(0, datasetSelected);
+        datasetSelected.removeSeries(SERIES_SELECTED);
+        datasetSelected.addSeries(SERIES_SELECTED, selectedCandsData);
+        // NB the slot is the one recorded for SERIES_SELECTED (HERE@HERE)
+		evoPlot.setDataset(evoSeriesNumber.get(SERIES_SELECTED),
+		        datasetSelected);
+		selectedCandidate = item;
+		showLineage(item);
+		showPosterity(item);
         
 		// Update the molecular viewer
         IAtomContainer mol;
@@ -1574,9 +1767,485 @@ public class GUIInspectGARun extends GUICardPanel
 	
 	private void renderViewWithoutSelectedItems()
 	{
-		datasetSelected.removeSeries("Selected_candidates");
+		datasetSelected.removeSeries(SERIES_SELECTED);
+		selectedCandidate = null;
+		clearLineage();
+		clearPosterity();
         molViewer.clear();
 		openSingleGraph.setEnabled(false);
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Indexes loaded candidates by the generation and name stored in a
+	 * {@link Provenance.ParentLink}.
+	 */
+	private void indexCandidatesByGenerationAndName()
+	{
+	    candidatesByGenerationAndName =
+	            new HashMap<Integer,Map<String,CandidateLW>>();
+	    for (CandidateLW candidate : allIndividuals)
+	    {
+	        if (candidate.getName() == null)
+	            continue;
+	        Map<String,CandidateLW> inGeneration =
+	                candidatesByGenerationAndName.computeIfAbsent(
+	                        candidate.getGeneration(),
+	                        key -> new HashMap<String,CandidateLW>());
+	        CandidateLW existing = inGeneration.get(candidate.getName());
+	        if (existing == null
+	                || (!existing.hasFitness() && candidate.hasFitness()))
+	        {
+	            inGeneration.put(candidate.getName(), candidate);
+	        }
+	    }
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Draws orange segments from the selected candidate back through every
+	 * parent named by {@link CandidateLW#getGeneratingSource()}, and through
+	 * the parents of those parents, until a candidate has no parent links.
+	 */
+	private void showLineage(CandidateLW selected)
+	{
+	    clearLineage();
+	    if (selected == null)
+	        return;
+	    displayedLineage.addAll(lineageMembers(selected,
+	            candidatesByGenerationAndName));
+	    int seriesIndex = 0;
+	    for (double[][] segment : lineageSegments(selected,
+	            candidatesByGenerationAndName))
+	    {
+	        datasetLineage.addSeries("Lineage_" + seriesIndex, segment);
+	        seriesIndex++;
+	    }
+	    updateFamilyExportButtons();
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Draws segments from the selected candidate to each later candidate whose
+	 * generating source names it as a direct parent. Mutations use one color
+	 * and crossovers another. Offspring of those offspring are not included.
+	 */
+	private void showPosterity(CandidateLW selected)
+	{
+	    clearPosterity();
+	    if (selected == null)
+	        return;
+	    PosterityLines lines = posteritySegments(selected,
+	            candidatesByGenerationAndName);
+	    displayedMutationPosterity.addAll(lines.mutationCandidates);
+	    displayedCrossoverPosterity.addAll(lines.crossoverCandidates);
+	    int seriesIndex = 0;
+	    for (double[][] segment : lines.mutations)
+	    {
+	        datasetPosterityMutation.addSeries(
+	                "PosterityMutation_" + seriesIndex, segment);
+	        seriesIndex++;
+	    }
+	    seriesIndex = 0;
+	    for (double[][] segment : lines.crossovers)
+	    {
+	        datasetPosterityCrossover.addSeries(
+	                "PosterityCrossover_" + seriesIndex, segment);
+	        seriesIndex++;
+	    }
+	    updateFamilyExportButtons();
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Assigns the next evolution-plot slot to {@code series} and attaches
+	 * both the dataset and its renderer at that slot.
+	 */
+	private void bindEvoSeries(String series, XYDataset dataset,
+	        XYItemRenderer renderer)
+	{
+	    int number = evoSeriesNumber.size();
+	    evoSeriesNumber.put(series, number);
+	    evoPlot.setDataset(number, dataset);
+	    evoPlot.setRenderer(number, renderer);
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Shows or hides the plot slot registered under {@code series}. A slot
+	 * that holds one series toggles that series. Lineage and posterity hold
+	 * one series per segment, so the whole slot is toggled.
+	 */
+	private void setEvoSeriesVisible(String series, boolean visible)
+	{
+	    int number = evoSeriesNumber.get(series);
+	    XYItemRenderer renderer = evoPlot.getRenderer(number);
+	    if (SERIES_LINEAGE.equals(series)
+	            || SERIES_POSTERITY_MUTATION.equals(series)
+	            || SERIES_POSTERITY_CROSSOVER.equals(series))
+	        renderer.setDefaultSeriesVisible(visible);
+	    else
+	        renderer.setSeriesVisible(SOLE_SERIES, visible);
+	    updateFamilyExportButtons();
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Adds a Show/Hide entry whose label color is the color of {@code series}.
+	 */
+	private void addEvoSeriesCheckBox(JPopupMenu menu, String series,
+	        Color color, boolean selected)
+	{
+	    JCheckBoxMenuItem item = new JCheckBoxMenuItem(series);
+	    item.setForeground(color);
+	    item.setSelected(selected);
+	    item.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e)
+            {
+                setEvoSeriesVisible(series, item.isSelected());
+            }
+        });
+	    menu.add(item);
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private void clearLineage()
+	{
+	    clearDataset(datasetLineage);
+	    displayedLineage.clear();
+	    updateFamilyExportButtons();
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private void clearPosterity()
+	{
+	    clearDataset(datasetPosterityMutation);
+	    clearDataset(datasetPosterityCrossover);
+	    displayedMutationPosterity.clear();
+	    displayedCrossoverPosterity.clear();
+	    updateFamilyExportButtons();
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private static void clearDataset(DefaultXYDataset dataset)
+	{
+	    List<Comparable<?>> keys = new ArrayList<Comparable<?>>();
+	    for (int i=0; i<dataset.getSeriesCount(); i++)
+	        keys.add(dataset.getSeriesKey(i));
+	    for (Comparable<?> key : keys)
+	        dataset.removeSeries(key);
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Parent-child segments of the phylogenetic tree rooted at
+	 * {@code selected}. Each segment is {@code double[2][2]}: row 0 is
+	 * generation, row 1 is fitness, and the two columns are the child and
+	 * one parent. A member without a fitness is kept in the walk but makes
+	 * no segment.
+	 */
+	static List<double[][]> lineageSegments(CandidateLW selected,
+	        Map<Integer,Map<String,CandidateLW>> index)
+	{
+	    List<double[][]> segments = new ArrayList<double[][]>();
+	    if (selected == null || index == null)
+	        return segments;
+	    collectLineage(selected, index, new HashSet<String>(), segments, null);
+	    return segments;
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Candidates joined by the lineage lines of {@code selected}, from the
+	 * earliest generation to {@code selected} itself.
+	 */
+	static List<CandidateLW> lineageMembers(CandidateLW selected,
+	        Map<Integer,Map<String,CandidateLW>> index)
+	{
+	    List<CandidateLW> members = new ArrayList<CandidateLW>();
+	    if (selected == null || index == null)
+	        return members;
+	    collectLineage(selected, index, new HashSet<String>(), null, members);
+	    members.sort(new Comparator<CandidateLW>() {
+            @Override
+            public int compare(CandidateLW a, CandidateLW b)
+            {
+                int byGeneration = Integer.compare(a.getGeneration(),
+                        b.getGeneration());
+                if (byGeneration != 0)
+                    return byGeneration;
+                return a.getName().compareTo(b.getName());
+            }
+        });
+	    return members;
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private static void collectLineage(CandidateLW candidate,
+	        Map<Integer,Map<String,CandidateLW>> index, Set<String> visited,
+	        List<double[][]> segments, List<CandidateLW> members)
+	{
+	    if (candidate == null || candidate.getName() == null)
+	        return;
+	    if (!visited.add(candidate.getGeneration() + "\0" + candidate.getName()))
+	        return;
+	    Provenance.Summary summary = Provenance.parseSummary(
+	            candidate.getGeneratingSource());
+	    if (summary == null)
+	        return;
+	    for (Provenance.ParentLink link : summary.getParents())
+	    {
+	        CandidateLW parent = findCandidate(index, link.getGenerationId(),
+	                link.getCandidateId());
+	        if (parent == null)
+	            continue;
+	        if (candidate.hasFitness() && parent.hasFitness())
+	        {
+	            if (segments != null)
+	            {
+	                double[][] segment = new double[2][2];
+	                segment[0][0] = candidate.getGeneration();
+	                segment[1][0] = candidate.getFitness();
+	                segment[0][1] = parent.getGeneration();
+	                segment[1][1] = parent.getFitness();
+	                segments.add(segment);
+	            }
+	            addOnce(members, candidate);
+	            addOnce(members, parent);
+	        }
+	        collectLineage(parent, index, visited, segments, members);
+	    }
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Direct mutation and crossover offspring of {@code selected}. Each
+	 * segment is {@code double[2][2]}: row 0 is generation, row 1 is fitness,
+	 * column 0 is the offspring, and column 1 is {@code selected}. Only
+	 * candidates in a later generation are considered, and only when their
+	 * summary names {@code selected} as a parent.
+	 */
+	static PosterityLines posteritySegments(CandidateLW selected,
+	        Map<Integer,Map<String,CandidateLW>> index)
+	{
+	    PosterityLines lines = new PosterityLines();
+	    if (selected == null || selected.getName() == null || index == null
+	            || !selected.hasFitness())
+	        return lines;
+	    List<Integer> generations = new ArrayList<Integer>(index.keySet());
+	    Collections.sort(generations);
+	    for (int generation : generations)
+	    {
+	        if (generation <= selected.getGeneration())
+	            continue;
+	        Map<String,CandidateLW> inGeneration = index.get(generation);
+	        if (inGeneration == null)
+	            continue;
+	        List<String> names = new ArrayList<String>(inGeneration.keySet());
+	        Collections.sort(names);
+	        for (String name : names)
+	        {
+	            CandidateLW child = inGeneration.get(name);
+	            if (child == null || !child.hasFitness())
+	                continue;
+	            Provenance.Summary summary = Provenance.parseSummary(
+	                    child.getGeneratingSource());
+	            if (summary == null)
+	                continue;
+	            if (summary.getSource() != Provenance.Source.MUTATION
+	                    && summary.getSource() != Provenance.Source.CROSSOVER)
+	                continue;
+	            if (!namesParent(summary, selected))
+	                continue;
+	            double[][] segment = new double[2][2];
+	            segment[0][0] = child.getGeneration();
+	            segment[1][0] = child.getFitness();
+	            segment[0][1] = selected.getGeneration();
+	            segment[1][1] = selected.getFitness();
+	            if (summary.getSource() == Provenance.Source.MUTATION)
+	            {
+	                lines.mutations.add(segment);
+	                lines.mutationCandidates.add(child);
+	            }
+	            else
+	            {
+	                lines.crossovers.add(segment);
+	                lines.crossoverCandidates.add(child);
+	            }
+	        }
+	    }
+	    return lines;
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Mutation and crossover segments returned by
+	 * {@link #posteritySegments(CandidateLW, Map)}.
+	 */
+	static final class PosterityLines
+	{
+	    final List<double[][]> mutations = new ArrayList<double[][]>();
+	    final List<double[][]> crossovers = new ArrayList<double[][]>();
+	    final List<CandidateLW> mutationCandidates =
+	            new ArrayList<CandidateLW>();
+	    final List<CandidateLW> crossoverCandidates =
+	            new ArrayList<CandidateLW>();
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private static boolean namesParent(Provenance.Summary summary,
+	        CandidateLW parent)
+	{
+	    for (Provenance.ParentLink link : summary.getParents())
+	    {
+	        if (link.getGenerationId() == parent.getGeneration()
+	                && parent.getName().equals(link.getCandidateId()))
+	            return true;
+	    }
+	    return false;
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private static void addOnce(List<CandidateLW> members, CandidateLW candidate)
+	{
+	    if (members == null || candidate == null || candidate.getName() == null)
+	        return;
+	    for (CandidateLW existing : members)
+	    {
+	        if (existing.getGeneration() == candidate.getGeneration()
+	                && candidate.getName().equals(existing.getName()))
+	            return;
+	    }
+	    members.add(candidate);
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private void updateFamilyExportButtons()
+	{
+	    if (exportLineage == null || exportPosterity == null)
+	        return;
+	    exportLineage.setEnabled(isFamilySeriesShown(SERIES_LINEAGE)
+	            && !displayedLineage.isEmpty());
+	    boolean mutationShown = isFamilySeriesShown(SERIES_POSTERITY_MUTATION)
+	            && !displayedMutationPosterity.isEmpty();
+	    boolean crossoverShown = isFamilySeriesShown(SERIES_POSTERITY_CROSSOVER)
+	            && !displayedCrossoverPosterity.isEmpty();
+	    exportPosterity.setEnabled(mutationShown || crossoverShown);
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * @return whether the family-tree slot is currently drawn. A slot with no
+	 * explicit per-series flag follows its default visibility.
+	 */
+	private boolean isFamilySeriesShown(String series)
+	{
+	    if (evoPlot == null || !evoSeriesNumber.containsKey(series))
+	        return false;
+	    XYItemRenderer renderer = evoPlot.getRenderer(
+	            evoSeriesNumber.get(series));
+	    if (renderer == null)
+	        return false;
+	    Boolean visible = renderer.getSeriesVisible(SOLE_SERIES);
+	    if (visible == null)
+	        visible = renderer.getDefaultSeriesVisible();
+	    return visible == null || visible.booleanValue();
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Asks for an SDF file and writes {@code candidates} into it, in
+	 * generation order, by concatenating their candidate files.
+	 */
+	private void exportCandidates(List<CandidateLW> candidates)
+	{
+	    if (candidates == null || candidates.isEmpty())
+	        return;
+	    denoptim.files.FileAndFormat destination =
+	            GUIFileSaver.pickFileForSavingCandidates(exportLineage);
+	    if (destination == null)
+	        return;
+	    List<CandidateLW> ordered = new ArrayList<CandidateLW>();
+	    for (CandidateLW candidate : candidates)
+	        addOnce(ordered, candidate);
+	    ordered.sort(new Comparator<CandidateLW>() {
+            @Override
+            public int compare(CandidateLW a, CandidateLW b)
+            {
+                int byGeneration = Integer.compare(a.getGeneration(),
+                        b.getGeneration());
+                if (byGeneration != 0)
+                    return byGeneration;
+                return a.getName().compareTo(b.getName());
+            }
+        });
+	    List<String> paths = new ArrayList<String>();
+	    for (CandidateLW candidate : ordered)
+	    {
+	        String path = candidate.getPathToFile();
+	        if (path == null || !new File(path).isFile())
+	        {
+	            JOptionPane.showMessageDialog(exportLineage,
+	                    "Cannot export. Candidate file not found for "
+	                    + candidate.getName() + " in generation "
+	                    + candidate.getGeneration() + ".",
+	                    "Error", JOptionPane.ERROR_MESSAGE);
+	            return;
+	        }
+	        paths.add(path);
+	    }
+	    File output = destination.file;
+	    if (output.exists() && !output.delete())
+	    {
+	        JOptionPane.showMessageDialog(exportLineage,
+	                "Cannot overwrite " + output.getAbsolutePath() + ".",
+	                "Error", JOptionPane.ERROR_MESSAGE);
+	        return;
+	    }
+	    try
+	    {
+	        FileUtils.mergeIntoOneFile(output.getAbsolutePath(), paths);
+	    } catch (IOException e)
+	    {
+	        JOptionPane.showMessageDialog(exportLineage,
+	                "Could not write " + output.getAbsolutePath() + ". "
+	                + e.getMessage(),
+	                "Error", JOptionPane.ERROR_MESSAGE);
+	    }
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private static CandidateLW findCandidate(
+	        Map<Integer,Map<String,CandidateLW>> index, int generation,
+	        String name)
+	{
+	    if (index == null || name == null)
+	        return null;
+	    Map<String,CandidateLW> inGeneration = index.get(generation);
+	    if (inGeneration == null)
+	        return null;
+	    return inGeneration.get(name);
 	}
 	
 //-----------------------------------------------------------------------------

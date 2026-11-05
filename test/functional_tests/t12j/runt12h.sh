@@ -37,7 +37,7 @@ exec 2>&1
 exec 1>&6 6>&- 
 
 #Check outcome
-nFromFragmentation=$(grep -l "INITIAL_MOL_FRAGMENTED" "$wrkDir/"RUN*/Gen*/*.sdf | wc -l)
+nFromFragmentation=$(grep -l '"attribute":"fragmented"' "$wrkDir/"RUN*/Gen*/*.sdf | wc -l)
 
 if [[ 7 -ne "$nFromFragmentation" ]]; then
    echo " "
