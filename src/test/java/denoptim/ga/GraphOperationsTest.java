@@ -845,11 +845,11 @@ public class GraphOperationsTest {
         HashSet<APClass> forbEnds = new HashSet<APClass>();
         
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
-        FragmentSpace fs = new FragmentSpace(fsp,
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(), 
-                cpMap, capMap, forbEnds, cpMap);
+        FragmentSpace fs = fsp.getFragmentSpace();
+        fs.setCompatibilityMatrix(cpMap);
+        fs.setCappingMap(capMap);
+        fs.setForbiddenEndList(forbEnds);
+        fs.setRCCompatibilityMatrix(cpMap);
         fs.setAPclassBasedApproach(true);
         
         return fs;
@@ -954,14 +954,9 @@ public class GraphOperationsTest {
         lstA.add(apc);
         cpMap.put(apc, lstA);
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
-        FragmentSpace fs = new FragmentSpace(fsp,
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(), 
-                cpMap, 
-                new HashMap<APClass,APClass>(), 
-                new HashSet<APClass>(),
-                cpMap);
+        FragmentSpace fs = fsp.getFragmentSpace();
+        fs.setCompatibilityMatrix(cpMap);
+        fs.setRCCompatibilityMatrix(cpMap);
         fs.setAPclassBasedApproach(true);
         
         // Then, settings of ring-closing machinery
@@ -1055,14 +1050,11 @@ public class GraphOperationsTest {
         rcCpMap.put(apcA, new ArrayList<APClass>(Arrays.asList(APC4EL)));
         
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
-        FragmentSpace fs = new FragmentSpace(fsp,
-                new ArrayList<Vertex>(),
-                libFrags,
-                cappingGroups, 
-                new HashMap<APClass,List<APClass>>(), 
-                cappingRules, 
-                new HashSet<APClass>(),
-                rcCpMap); 
+        FragmentSpace fs = fsp.getFragmentSpace();
+        fs.setFragmentLibrary(libFrags);
+        fs.setCappingLibrary(cappingGroups);
+        fs.setCappingMap(cappingRules);
+        fs.setRCCompatibilityMatrix(rcCpMap);
         //NB: a non-empty rcCpMap is enough to trigger the automated recognition
         // that we are within the class-based approach.
         
@@ -1274,15 +1266,9 @@ public class GraphOperationsTest {
         cpMap.put(APCB, lstB);
         
         FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
-        FragmentSpace fs = new FragmentSpace(fsParams,
-                new ArrayList<Vertex>(),
-                fragments,
-                new ArrayList<Vertex>(), 
-                cpMap, 
-                new HashMap<APClass,APClass>(),
-                new HashSet<APClass>(),
-                new HashMap<APClass,List<APClass>>());
-        fs.setAPclassBasedApproach(true);
+        FragmentSpace fs = fsParams.getFragmentSpace();
+        fs.setFragmentLibrary(fragments);
+        fs.setCompatibilityMatrix(cpMap);
         
         GAParameters gaParams = new GAParameters();
         gaParams.setParameters(fsParams);

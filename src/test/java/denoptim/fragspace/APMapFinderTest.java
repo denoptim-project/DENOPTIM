@@ -36,7 +36,6 @@ import denoptim.graph.AttachmentPoint;
 import denoptim.graph.DGraph;
 import denoptim.graph.Edge;
 import denoptim.graph.EmptyVertex;
-import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 
 /**
@@ -103,11 +102,11 @@ public class APMapFinderTest
         HashSet<APClass> forbEnds = new HashSet<APClass>();
         
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
-        FragmentSpace fs = new FragmentSpace(fsp,
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(), 
-                cpMap, capMap, forbEnds, cpMap);
+        FragmentSpace fs = fsp.getFragmentSpace();
+        fs.setCompatibilityMatrix(cpMap);
+        fs.setCappingMap(capMap);
+        fs.setForbiddenEndList(forbEnds);
+        fs.setRCCompatibilityMatrix(cpMap);
         fs.setAPclassBasedApproach(true);
         
         return fs;
@@ -340,11 +339,7 @@ public class APMapFinderTest
                 new HashMap<APClass,List<APClass>>();
         
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
-        FragmentSpace fs = new FragmentSpace(fsp,
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(), 
-                cpMap, capMap, forbEnds, cpMap);
+        FragmentSpace fs = fsp.getFragmentSpace();
         
         LinkedHashMap<AttachmentPoint,List<AttachmentPoint>> apCompatilities =
                 APMapFinder.findMappingCompatibileAPs(
@@ -510,11 +505,11 @@ public class APMapFinderTest
          */
         
         fsp = new FragmentSpaceParameters();
-        fs = new FragmentSpace(fsp,
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(), 
-                cpMap, capMap, forbEnds, cpMap);
+        fs = fsp.getFragmentSpace();
+        fs.setCompatibilityMatrix(cpMap);
+        fs.setCappingMap(capMap);
+        fs.setForbiddenEndList(forbEnds);
+        fs.setRCCompatibilityMatrix(cpMap);
         
         apCompatilities = APMapFinder.findMappingCompatibileAPs(
                 v0.getAttachmentPoints(), 
@@ -588,11 +583,11 @@ public class APMapFinderTest
          */
         
         fsp = new FragmentSpaceParameters();
-        fs = new FragmentSpace(fsp,
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(), 
-                cpMap, capMap, forbEnds, cpMap);
+        fs = fsp.getFragmentSpace();
+        fs.setCompatibilityMatrix(cpMap);
+        fs.setCappingMap(capMap);
+        fs.setForbiddenEndList(forbEnds);
+        fs.setRCCompatibilityMatrix(cpMap);
         
         apCompatilities = APMapFinder.findMappingCompatibileAPs(
                 v0.getAttachmentPoints(), 
@@ -685,14 +680,8 @@ public class APMapFinderTest
          */        
         
         fsp = new FragmentSpaceParameters();
-        fs = new FragmentSpace(fsp,
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(), 
-                cpMap, 
-                new HashMap<APClass,APClass>(), 
-                new HashSet<APClass>(), 
-                new HashMap<APClass,List<APClass>>());
+        fs = fsp.getFragmentSpace();
+        fs.setCompatibilityMatrix(cpMap);
         
         // Both fragment have only one AP and has SRC role, 
         // but CPMap says incompatible
@@ -751,14 +740,8 @@ public class APMapFinderTest
          */
         
         fsp = new FragmentSpaceParameters();
-        fs = new FragmentSpace(fsp,
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(), 
-                cpMap, 
-                new HashMap<APClass,APClass>(), 
-                new HashSet<APClass>(), 
-                new HashMap<APClass,List<APClass>>());
+        fs = fsp.getFragmentSpace();
+        fs.setCompatibilityMatrix(cpMap);
         
         // Both fragment have only one AP and has SRC role, 
         // but CPMap says incompatible
@@ -819,14 +802,8 @@ public class APMapFinderTest
          */
         
         fsp = new FragmentSpaceParameters();
-        fs = new FragmentSpace(fsp,
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(), 
-                cpMap, 
-                new HashMap<APClass,APClass>(), 
-                new HashSet<APClass>(), 
-                new HashMap<APClass,List<APClass>>());
+        fs = fsp.getFragmentSpace();
+        fs.setCompatibilityMatrix(cpMap);
         
         // Both fragment have only one AP and has SRC role, 
         // and CPMap says they are compatible
@@ -922,14 +899,8 @@ public class APMapFinderTest
          */
         
         fsp = new FragmentSpaceParameters();
-        fs = new FragmentSpace(fsp,
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(), 
-                cpMap, 
-                new HashMap<APClass,APClass>(), 
-                new HashSet<APClass>(), 
-                new HashMap<APClass,List<APClass>>());
+        fs = fsp.getFragmentSpace();
+        fs.setCompatibilityMatrix(cpMap);
         
         // Both fragment have only one AP and has SRC role, 
         // and CPMap says they are compatible

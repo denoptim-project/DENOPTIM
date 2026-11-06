@@ -42,6 +42,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.UndetectedFileFormatException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.DGraph;
@@ -794,7 +795,13 @@ public class FragmenterTools
                     innerFrgParams.setRandomizer(frgParams.getRandomizer());
                     innerFrgParams.setNextCutIdGenerator(frgParams.getNextCutIdGenerator());
 
-                    DGraph innerGraph = makeGraphFromFragmentationOfMol(innerMol, innerFrgParams, new FragmentSpace(), false);
+                    //TODO-gg consider whether fragspace should be ficen to fragmentation, since it must be used here to
+                    // identify capping groups.
+                    FragmentSpaceParameters innerFsp = new FragmentSpaceParameters();
+                    FragmentSpace innerFragSpace = innerFsp.getFragmentSpace();
+
+                    DGraph innerGraph = makeGraphFromFragmentationOfMol(innerMol, innerFrgParams, 
+                        innerFragSpace, false);
 
                     Template replacingTemplate = new Template(matchedVrtx.getBuildingBlockType());
                     replacingTemplate.setInnerGraph(innerGraph);

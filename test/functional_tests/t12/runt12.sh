@@ -64,8 +64,15 @@ fi
 # generated candidates differ from version to version. For example, when
 # introducing new or modifying existing genetic operators.
 prepare_expected=false
-# The lines beginning with M00... should then be processed to remove duplicates 
-# and written into the data/expected_results file
+# The lines beginning with M00... should then be processed to remove duplicates
+# and written into the data/expected_results file:
+#
+# awk '!seen[$2]++' log > data/expected_results
+#
+# BUT: keep M00000002, which is imported from initial population but is the same 
+# molecular content of M00000001 even if the UID is set to be different (tests 
+# that UID is taken from input and not recomputed)
+#
 
 for genFolder in Gen0 Gen1 Gen2 Gen3 Final
 do

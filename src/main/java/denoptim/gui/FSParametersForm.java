@@ -45,6 +45,7 @@ import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 
 import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.rings.RingClosureParameters;
 
 /**
@@ -543,7 +544,8 @@ public class FSParametersForm extends ParametersForm
         		Object[] allAPClasses = new Object[]{};
         		try
         		{
-        		    FragmentSpace fs = new FragmentSpace();
+                    FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+                    FragmentSpace fs = fsp.getFragmentSpace();
         			fs.importCompatibilityMatrixFromFile(txtCPMat.getText());
         			allAPClasses = new Object[fs.getAllAPClassesFromCPMap().size()];
         			fs.getAllAPClassesFromCPMap().toArray(allAPClasses);

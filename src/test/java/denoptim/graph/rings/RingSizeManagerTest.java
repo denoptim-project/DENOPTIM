@@ -280,14 +280,7 @@ public class RingSizeManagerTest
         // First case: no APClass compatibility. Cannot close any ring!
         //
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
-        FragmentSpace fs = new FragmentSpace(fsp,
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(), 
-                new HashMap<APClass,List<APClass>>(),
-                new HashMap<APClass,APClass>(), 
-                new HashSet<APClass>(), 
-                new HashMap<APClass,List<APClass>>());
+        FragmentSpace fs = fsp.getFragmentSpace();
         fs.setAPclassBasedApproach(true);
         
         RingClosureParameters rcParams = new RingClosureParameters();
@@ -321,14 +314,9 @@ public class RingSizeManagerTest
         List<APClass> lstA = new ArrayList<APClass>();
         lstA.add(apcA);
         cpMap.put(apcA, lstA);
-        fs = new FragmentSpace(fsp,
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(), 
-                cpMap, 
-                new HashMap<APClass,APClass>(), 
-                new HashSet<APClass>(), 
-                cpMap);
+
+        fs.setCompatibilityMatrix(cpMap);
+        fs.setRCCompatibilityMatrix(cpMap);
         fs.setAPclassBasedApproach(true);
         
         rsm = new RingSizeManager(fs, rcParams);

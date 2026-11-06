@@ -105,11 +105,18 @@ public class FragmentSpaceTest
 	private static APClass APCC2;
 
 //------------------------------------------------------------------------------
+    
+    private FragmentSpace buildFragmentSpace() throws DENOPTIMException
+    {
+        FragmentSpaceParameters fsp = buildFragmentSpaceParameters();
+        return fsp.getFragmentSpace();
+    }
+
+//------------------------------------------------------------------------------
 	
-	private FragmentSpaceParameters buildFragmentSpace() throws DENOPTIMException
+	private FragmentSpaceParameters buildFragmentSpaceParameters() throws DENOPTIMException
 	{
 	    assertTrue(tempDir.isDirectory(),"Should be a directory ");
-	    
         try
         {
             APCS = APClass.make(RULAPCS, APSUBRULE, BondType.SINGLE);
@@ -266,8 +273,14 @@ public class FragmentSpaceTest
     	*/
     	
     	FragmentSpaceParameters fsp = new FragmentSpaceParameters();
-    	new FragmentSpace(fsp, scaffLibFile, fragLibFile, 
-    	        capLibFile, cpmFile);
+        FragmentSpace fs = fsp.getFragmentSpace();
+        fs.setScaffoldLibrary(scaffLib);
+        fs.setFragmentLibrary(fragLib);
+        fs.setCappingLibrary(cappLib);
+        fs.setCompatibilityMatrix(cpMap);
+        fs.setCappingMap(capMap);
+        fs.setForbiddenEndList(ends);
+
     	return fsp;
 	}
 	
@@ -276,11 +289,10 @@ public class FragmentSpaceTest
     @Test
     public void testSymmetry() throws Exception
     {
-        FragmentSpaceParameters fsp = buildFragmentSpace();
-        assertTrue(fsp.getFragmentSpace().isDefined(),"FragmentSpace is defined");
+        FragmentSpace fs = buildFragmentSpace();
         Vertex v = Vertex.newVertexFromLibrary(
                 GraphUtils.getUniqueVertexIndex(),3,BBType.FRAGMENT,
-                fsp.getFragmentSpace());
+                fs);
         
         assertEquals(2,v.getSymmetricAPSets().size(),
                 "Number of symmetric sets of APs");
@@ -301,9 +313,7 @@ public class FragmentSpaceTest
     @Test
     public void testGetFragsWithAPClass() throws Exception
     {
-        FragmentSpaceParameters fsp = buildFragmentSpace();
-        FragmentSpace fs = fsp.getFragmentSpace();
-        assertTrue(fs.isDefined(),"FragmentSpace is defined");
+        FragmentSpace fs = buildFragmentSpace();
     	List<IdFragmentAndAP> l = fs.getFragsWithAPClass(APC2);
     	assertEquals(4,l.size(),"Wrong size of AP IDs with given APClass.");
 
@@ -323,9 +333,7 @@ public class FragmentSpaceTest
     @Test
     public void testGetVerticesWithAPClass() throws Exception
     {
-        FragmentSpaceParameters fsp = buildFragmentSpace();
-        FragmentSpace fs = fsp.getFragmentSpace();
-        assertTrue(fs.isDefined(),"FragmentSpace is defined");
+        FragmentSpace fs = buildFragmentSpace();
         List<Vertex> lst = fs.getVerticesWithAPClass(APC2);
         assertEquals(4,lst.size(),"Wrong size of AP IDs with given APClass.");
 
@@ -340,9 +348,7 @@ public class FragmentSpaceTest
     @Test
     public void testGetVerticesWithAPClasses() throws Exception
     {
-        FragmentSpaceParameters fsp = buildFragmentSpace();
-        FragmentSpace fs = fsp.getFragmentSpace();
-        assertTrue(fs.isDefined(),"FragmentSpace is defined");
+        FragmentSpace fs = buildFragmentSpace();
         
         Set<APClass> query = new HashSet<APClass>();
         query.add(APC2);
@@ -363,9 +369,7 @@ public class FragmentSpaceTest
     @Test
     public void testGetVerticesWithAPFingerprint() throws Exception
     {
-        FragmentSpaceParameters fsp = buildFragmentSpace();
-        FragmentSpace fs = fsp.getFragmentSpace();
-        assertTrue(fs.isDefined(),"FragmentSpace is defined");
+        FragmentSpace fs = buildFragmentSpace();
         
         // Add vertex to get more results
         Fragment frg1b = new Fragment();
@@ -439,9 +443,7 @@ public class FragmentSpaceTest
     @Test
     public void testGetFragsWithAPClassStartingWith() throws Exception
     {
-        FragmentSpaceParameters fsp = buildFragmentSpace();
-        FragmentSpace fs = fsp.getFragmentSpace();
-        assertTrue(fs.isDefined(),"FragmentSpace is defined");
+        FragmentSpace fs = buildFragmentSpace();
         List<Vertex> lst = fs.getVerticesWithAPClassStartingWith(
                 RULAPC5.substring(0, 4));
         assertEquals(1, lst.size(),"Wrong size of AP IDs with given APClass.");
@@ -464,9 +466,7 @@ public class FragmentSpaceTest
     public void testGetFragAPsCompatibleWithClass() throws Exception
     {
 
-        FragmentSpaceParameters fsp = buildFragmentSpace();
-        FragmentSpace fs = fsp.getFragmentSpace();
-        assertTrue(fs.isDefined(),"FragmentSpace is defined");
+        FragmentSpace fs = buildFragmentSpace();
     	List<IdFragmentAndAP> lst = fs.getFragAPsCompatibleWithClass(APC1);
     	
     	assertEquals(4,lst.size(),"Size of compatible APs list is wrong.");
@@ -488,9 +488,7 @@ public class FragmentSpaceTest
     @Test
     public void testGetFragAPsCompatibleWithTheseAPs() throws Exception
     {
-        FragmentSpaceParameters fsp = buildFragmentSpace();
-        FragmentSpace fs = fsp.getFragmentSpace();
-        assertTrue(fs.isDefined(),"FragmentSpace is defined");
+        FragmentSpace fs = buildFragmentSpace();
     	IdFragmentAndAP src1 = new IdFragmentAndAP(-1,2,BBTFRAG,0,-1,-1);
     	IdFragmentAndAP src2 = new IdFragmentAndAP(-1,2,BBTFRAG,1,-1,-1);
     	List<IdFragmentAndAP> srcAPs = new ArrayList<IdFragmentAndAP>();
@@ -538,9 +536,7 @@ public class FragmentSpaceTest
     @Test
     public void testGetFragmentsCompatibleWithTheseAPs() throws Exception
     {
-        FragmentSpaceParameters fsp = buildFragmentSpace();
-        FragmentSpace fs = fsp.getFragmentSpace();
-        assertTrue(fs.isDefined(),"FragmentSpace is defined");
+        FragmentSpace fs = buildFragmentSpace();
     	IdFragmentAndAP src1 = new IdFragmentAndAP(-1,2,BBTFRAG,0,-1,-1);
     	IdFragmentAndAP src2 = new IdFragmentAndAP(-1,2,BBTFRAG,1,-1,-1);
     	List<IdFragmentAndAP> srcAPs = new ArrayList<IdFragmentAndAP>();
@@ -619,13 +615,12 @@ public class FragmentSpaceTest
         HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
         HashSet<APClass> forbEnds = new HashSet<APClass>();
         
-        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
-        FragmentSpace fs = new FragmentSpace(fsp,
-                new ArrayList<Vertex>(), // scaffolds
-                fragments,
-                new ArrayList<Vertex>(), // caps
-                cpMap, capMap, forbEnds, cpMap);
-        fs.setAPclassBasedApproach(true);
+        FragmentSpace fs = buildFragmentSpace();
+        fs.setFragmentLibrary(fragments);
+        fs.setCompatibilityMatrix(cpMap);
+        fs.setCappingMap(capMap);
+        fs.setForbiddenEndList(forbEnds);
+        fs.setRCCompatibilityMatrix(cpMap);
         
         List<Vertex> rcvs1 = fs.getRCVsForAPClass(apcA); 
         assertEquals(1, rcvs1.size());
@@ -705,13 +700,12 @@ public class FragmentSpaceTest
         HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
         HashSet<APClass> forbEnds = new HashSet<APClass>();
         
-        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
-        FragmentSpace fs = new FragmentSpace(fsp,
-                new ArrayList<Vertex>(), // scaffolds
-                fragments,
-                new ArrayList<Vertex>(), // caps
-                cpMap, capMap, forbEnds, cpMap);
-        fs.setAPclassBasedApproach(true);
+        FragmentSpace fs = buildFragmentSpace();
+        fs.setFragmentLibrary(fragments);
+        fs.setCompatibilityMatrix(cpMap);
+        fs.setCappingMap(capMap);
+        fs.setForbiddenEndList(forbEnds);
+        fs.setRCCompatibilityMatrix(cpMap);
         
         List<Vertex> rcvs1 = fs.getRCVsWithAPClass(rcvP); 
         assertEquals(1, rcvs1.size());
@@ -737,7 +731,7 @@ public class FragmentSpaceTest
     @Test
     public void testFusedRingAddedToFragmentLibrary() throws Exception 
     {
-        FragmentSpaceParameters fsp = buildFragmentSpace();
+        FragmentSpaceParameters fsp = buildFragmentSpaceParameters();
         fsp.fragmentLibFile = "dummyFilename_DenoptimTest_Frag";
         fsp.scaffoldLibFile = "dummyFilename_DenoptimTest_Scaff";
         FragmentSpace fs = fsp.getFragmentSpace();
@@ -770,7 +764,7 @@ public class FragmentSpaceTest
     @Test
     public void testFusedRingAddedToScaffoldLibrary() throws Exception 
     {
-        FragmentSpaceParameters fsp = buildFragmentSpace();
+        FragmentSpaceParameters fsp = buildFragmentSpaceParameters();
         fsp.fragmentLibFile = "dummyFilename_DenoptimTest_Frag";
         fsp.scaffoldLibFile = "dummyFilename_DenoptimTest_Scaff";
         FragmentSpace fs = fsp.getFragmentSpace();
@@ -800,7 +794,7 @@ public class FragmentSpaceTest
     @Test
     public void testFusedRingOnlyAddedOnce() throws DENOPTIMException
     {
-        FragmentSpaceParameters fsp = buildFragmentSpace();
+        FragmentSpaceParameters fsp = buildFragmentSpaceParameters();
         fsp.fragmentLibFile = "dummyFilename_DenoptimTest_Frag";
         fsp.scaffoldLibFile = "dummyFilename_DenoptimTest_Scaff";
         FragmentSpace fs = fsp.getFragmentSpace();
@@ -976,9 +970,7 @@ public class FragmentSpaceTest
     @Test
     public void testUseWholeMolGeometryForExtractedTemplates() throws Exception
     {   
-        FragmentSpaceParameters fsp = buildFragmentSpace();
-        fsp.fragmentLibFile = "dummyFilename_DenoptimTest_Frag";
-        fsp.scaffoldLibFile = "dummyFilename_DenoptimTest_Scaff";
+        FragmentSpaceParameters fsp = buildFragmentSpaceParameters();
         FragmentSpace fs = fsp.getFragmentSpace();
         Fragment scaf = new Fragment();
         IAtom s1 = new Atom("C", new Point3d(0,0,0));
@@ -1095,11 +1087,6 @@ public class FragmentSpaceTest
         
         int szScafLibPre = fs.getScaffoldLibrary().size();
         int szFragLibPre = fs.getFragmentLibrary().size();
-        
-        String scafFile = tempDir.getAbsolutePath() + SEP + "newScaf.sdf";
-        String fragFile = tempDir.getAbsolutePath() + SEP + "newFrag.sdf";
-        fsp.scaffoldLibFile = scafFile;
-        fsp.fragmentLibFile = fragFile;
 
         fs.addFusedRingsToFragmentLibrary(wholeGraph, true, true, wholeMol);
         

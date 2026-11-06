@@ -5937,7 +5937,12 @@ public class DGraph implements Cloneable
             boolean permissive, RingClosureParameters rcSettings,
             FragmentSpaceParameters fsSettings) throws DENOPTIMException
     {
-        if (fsSettings.getFragmentSpace().useAPclassBasedApproach())
+        boolean useAPClassCompatibility = false;
+        if (fsSettings.getFragmentSpace() != null)
+        {
+            useAPClassCompatibility = fsSettings.getFragmentSpace().useAPclassBasedApproach();
+        }
+        if (useAPClassCompatibility)
         {
             if (hasForbiddenEnd(fsSettings))
             {

@@ -692,12 +692,15 @@ public class FragmenterToolsTest
         cuttingRules.add(new CuttingRule("NC", "[N]", "[C]", "-", 5, 
                 new ArrayList<String>()));
         
+        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+        FragmentSpace fragSpace = fsp.getFragmentSpace();
+
         FragmenterParameters frgParams = new FragmenterParameters();
         frgParams.setCuttingRules(cuttingRules);
         frgParams.setScaffoldingPolicy(ScaffoldingPolicy.LARGEST_FRAGMENT);
         
         DGraph graph = FragmenterTools.makeGraphFromFragmentationOfMol(mol,
-                frgParams, new FragmentSpace(), true);
+                frgParams, fragSpace, true);
         
         assertEquals(16, graph.getVertexCount());
         assertEquals(15, graph.getEdgeCount());
@@ -708,7 +711,7 @@ public class FragmenterToolsTest
                 .count());
         
         DGraph graphWithTemplate = graph.embedPatternsInTemplates(
-                GraphPattern.RING, new FragmentSpace(), ContractLevel.FIXED);
+                GraphPattern.RING, fragSpace, ContractLevel.FIXED);
         
         assertEquals(7, graphWithTemplate.getVertexCount());
         assertEquals(6, graphWithTemplate.getEdgeCount());
@@ -741,12 +744,15 @@ public class FragmenterToolsTest
         cuttingRules.add(new CuttingRule("Ru-Any", "[Ru]", "[$([*])]", "~", 5, 
                 new ArrayList<String>()));
         
+        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+        FragmentSpace fragSpace = fsp.getFragmentSpace();
+
         FragmenterParameters frgParams = new FragmenterParameters();
         frgParams.setCuttingRules(cuttingRules);
         frgParams.setScaffoldingPolicy(ScaffoldingPolicy.LARGEST_FRAGMENT);
         
         DGraph graph1 = FragmenterTools.makeGraphFromFragmentationOfMol(mol,
-                frgParams, new FragmentSpace(), true);
+                frgParams, fragSpace, true);
         
         assertEquals(10, graph1.getVertexCount());
         assertEquals(9, graph1.getEdgeCount());
@@ -765,7 +771,7 @@ public class FragmenterToolsTest
         
         frgParams.setScaffoldingPolicy(policy);
         DGraph graph2 = FragmenterTools.makeGraphFromFragmentationOfMol(mol,
-                frgParams, new FragmentSpace(), true);
+                frgParams, fragSpace, true);
         
         assertEquals(10, graph2.getVertexCount());
         assertEquals(9, graph2.getEdgeCount());
@@ -800,12 +806,15 @@ public class FragmenterToolsTest
         cuttingRules.add(new CuttingRule("Ru-Any", "[Ru]", "[$([*])]", "~", 5, 
                 new ArrayList<String>()));
         
+        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+        FragmentSpace fragSpace = fsp.getFragmentSpace();
+
         FragmenterParameters frgParams = new FragmenterParameters();
         frgParams.setCuttingRules(cuttingRules);
         frgParams.setScaffoldingPolicy(ScaffoldingPolicy.LARGEST_FRAGMENT);
 
         DGraph graph1 = FragmenterTools.makeGraphFromFragmentationOfMol(mol,
-                frgParams, new FragmentSpace(), true);
+                frgParams, fragSpace, true);
         
         assertEquals(14, graph1.getVertexCount());
         assertEquals(13, graph1.getEdgeCount());
@@ -832,7 +841,7 @@ public class FragmenterToolsTest
         frgParams.setScaffoldingPolicy(policy);
 
         DGraph graph2 = FragmenterTools.makeGraphFromFragmentationOfMol(mol,
-                frgParams, new FragmentSpace(), true);
+                frgParams, fragSpace, true);
         
         assertEquals(14, graph2.getVertexCount());
         assertEquals(13, graph2.getEdgeCount());
@@ -860,7 +869,7 @@ public class FragmenterToolsTest
         frgParams.setScaffoldingPolicy(policy);
 
         DGraph graph3 = FragmenterTools.makeGraphFromFragmentationOfMol(mol,
-                frgParams, new FragmentSpace(), true);
+                frgParams, fragSpace, true);
 
         assertEquals(14, graph3.getVertexCount());
         assertEquals(13, graph3.getEdgeCount());
@@ -901,6 +910,9 @@ public class FragmenterToolsTest
         cuttingRules.add(new CuttingRule("C-X", "[#6]", "[#9,#17,#35,#53]", "~",
                 3, new ArrayList<String>()));
         
+        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+        FragmentSpace fragSpace = fsp.getFragmentSpace();
+
         // Must add du on linearities
         FragmenterParameters frgParams = new FragmenterParameters();
         frgParams.setCuttingRules(cuttingRules);
@@ -908,7 +920,7 @@ public class FragmenterToolsTest
         frgParams.setLinearAngleLimit(170);
 
         DGraph graph = FragmenterTools.makeGraphFromFragmentationOfMol(mol,
-                frgParams, new FragmentSpace(), true);
+                frgParams, fragSpace, true);
         
         assertEquals(3, graph.getVertexCount());
         assertEquals(2, graph.getEdgeCount());
@@ -932,7 +944,7 @@ public class FragmenterToolsTest
         
         frgParams.setLinearAngleLimit(160);
         DGraph graph1 = FragmenterTools.makeGraphFromFragmentationOfMol(molNonLinear,
-                frgParams, new FragmentSpace(), true);
+                frgParams, fragSpace, true);
         
         assertEquals(4, graph1.getVertexCount());
         assertEquals(3, graph1.getEdgeCount());
@@ -955,7 +967,7 @@ public class FragmenterToolsTest
         frgParams.setScaffoldingPolicy(ScaffoldingPolicy.LARGEST_FRAGMENT);
         frgParams.setLinearAngleLimit(190);
         DGraph graph2 = FragmenterTools.makeGraphFromFragmentationOfMol(mol,
-                frgParams, new FragmentSpace(), true);
+                frgParams, fragSpace, true);
         
         assertEquals(3, graph2.getVertexCount());
         assertEquals(2, graph2.getEdgeCount());
@@ -1008,13 +1020,16 @@ public class FragmenterToolsTest
         ScaffoldingPolicy scaffoldOnP = ScaffoldingPolicy.ELEMENT;
         scaffoldOnP.label = "P";
 
+        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+        FragmentSpace fragSpace = fsp.getFragmentSpace();
+
         FragmenterParameters frgParams = new FragmenterParameters();
         frgParams.setCuttingRules(cuttingRules);
         frgParams.setScaffoldingPolicy(scaffoldOnP);
         frgParams.setLinearAngleLimit(170);
 
         DGraph graph = FragmenterTools.makeGraphFromFragmentationOfMol(mol,
-                frgParams, new FragmentSpace(), true);
+                frgParams, fragSpace, true);
         
         assertEquals(6, graph.getSymmetricSetCount());
         List<List<Integer>> expected = new ArrayList<List<Integer>>();
@@ -1057,7 +1072,7 @@ public class FragmenterToolsTest
         frgParams.setLinearAngleLimit(170);
 
         graph = FragmenterTools.makeGraphFromFragmentationOfMol(mol2,
-                frgParams, new FragmentSpace(), true);
+                frgParams, fragSpace, true);
         
         assertEquals(5, graph.getSymmetricSetCount());
         expected = new ArrayList<List<Integer>>();
@@ -1077,10 +1092,8 @@ public class FragmenterToolsTest
                         graph.getVertexWithId(vrtxIDs.get(i)));
                 assertTrue(sv0 == svI);
             }
-        }
-        
+        }   
     }
-    
     
 //------------------------------------------------------------------------------
     
@@ -1119,14 +1132,8 @@ public class FragmenterToolsTest
         capMap.put(ox0, hyd1);
         
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
-        FragmentSpace fragSpace = new FragmentSpace(fsp,
-                new ArrayList<Vertex>(), //no scaffolds
-                new ArrayList<Vertex>(), //no fragments
-                cappingGroups, //H as capping
-                new HashMap<APClass,List<APClass>>(), 
-                capMap, 
-                new HashSet<APClass>(), 
-                new HashMap<APClass,List<APClass>>());
+        FragmentSpace fragSpace = fsp.getFragmentSpace();
+        fragSpace.setCappingLibrary(cappingGroups);
         fragSpace.setAPclassBasedApproach(true);
         
         settings.setParameters(fsp);
@@ -1138,11 +1145,14 @@ public class FragmenterToolsTest
 
         // Without a fragment space we do not identify capping groups
         DGraph graph = FragmenterTools.makeGraphFromFragmentationOfMol(mol,
-                frgParams, new FragmentSpace(), true);
+                frgParams, fragSpace, true);
         assertEquals(7, graph.getVertexCount());
         graph.removeCappingGroups();
         assertEquals(7, graph.getVertexCount());
         
+        // Now we enable identification of the capping groups
+        fragSpace.setCappingMap(capMap);
+
         graph = FragmenterTools.makeGraphFromFragmentationOfMol(mol,
                 frgParams, fragSpace, true);
 

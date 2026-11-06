@@ -117,11 +117,11 @@ public class DGraphTest
         HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
         HashSet<APClass> forbEnds = new HashSet<APClass>();
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
-        FragmentSpace fs = new FragmentSpace(fsp,
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(), 
-                cpMap, capMap, forbEnds, cpMap);
+        FragmentSpace fs = fsp.getFragmentSpace();
+        fs.setCompatibilityMatrix(cpMap);
+        fs.setCappingMap(capMap);
+        fs.setForbiddenEndList(forbEnds);
+        fs.setRCCompatibilityMatrix(cpMap);
         fs.setAPclassBasedApproach(true);
         
         EmptyVertex s0 = new EmptyVertex();
@@ -1400,8 +1400,14 @@ public class DGraphTest
         caps.add(cap);
         
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
-        FragmentSpace fs = new FragmentSpace(fsp, scaff, frags, caps,
-                cpMap, capMap, forbEnds, cpMap);
+        FragmentSpace fs = fsp.getFragmentSpace();
+        fs.setScaffoldLibrary(scaff);
+        fs.setFragmentLibrary(frags);
+        fs.setCappingLibrary(caps);
+        fs.setCompatibilityMatrix(cpMap);
+        fs.setCappingMap(capMap);
+        fs.setForbiddenEndList(forbEnds);
+        fs.setRCCompatibilityMatrix(cpMap);
         fs.setAPclassBasedApproach(true);
         
         DGraph dg = new DGraph();

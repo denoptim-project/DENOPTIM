@@ -335,24 +335,34 @@ class RingSizeManager
         APClass parentAPClsJ = edgeJ.getSrcAPClass();
         
         // exclude if no entry in RC-Compatibility map
-        if (!fragSpace.getRCCompatibilityMatrix().containsKey(parentAPClsI))
+        if (fragSpace.getRCCompatibilityMatrix()!=null 
+            &&!fragSpace.getRCCompatibilityMatrix().containsKey(parentAPClsI))
         {
             logger.log(Level.FINE, s + "RC-CPMap does not contain class (I) "
                         + parentAPClsI + " " + parentAPClsI.hashCode());
             return false;
         }
-        List<APClass> compatClassesI = fragSpace.getRCCompatibilityMatrix()
+        List<APClass> compatClassesI = new ArrayList<APClass>();
+        if (fragSpace.getRCCompatibilityMatrix()!=null) 
+        {
+            compatClassesI = fragSpace.getRCCompatibilityMatrix()
                 .get(parentAPClsI);
+        }
 
         // exclude if no entry in RC-Compatibility map
-        if (!fragSpace.getRCCompatibilityMatrix().containsKey(parentAPClsJ))
+        if (fragSpace.getRCCompatibilityMatrix()!=null 
+            &&!fragSpace.getRCCompatibilityMatrix().containsKey(parentAPClsJ))
         {
             logger.log(Level.FINE, s + "RC-CPMap does not contain class (J) "
                         + parentAPClsJ + " " + parentAPClsJ.hashCode());
             return false;
         }
-        List<APClass> compatClassesJ = fragSpace.getRCCompatibilityMatrix()
+        List<APClass> compatClassesJ = new ArrayList<APClass>();
+        if (fragSpace.getRCCompatibilityMatrix()!=null) 
+        {
+            compatClassesJ = fragSpace.getRCCompatibilityMatrix()
                 .get(parentAPClsJ);
+        }
 
         // exclude loops included within a single vertex 
         if (vI == vJ)

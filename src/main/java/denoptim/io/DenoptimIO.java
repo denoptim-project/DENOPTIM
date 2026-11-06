@@ -1207,9 +1207,9 @@ public class DenoptimIO
      * @param ends     container for the definition of forbidden ends
      */
     public static void writeCompatibilityMatrix(String fileName, 
-            HashMap<APClass, List<APClass>> cpMap,
-            HashMap<APClass, APClass> capMap,
-            HashSet<APClass> ends) throws DENOPTIMException {
+            Map<APClass, List<APClass>> cpMap,
+            Map<APClass, APClass> capMap,
+            Set<APClass> ends) throws DENOPTIMException {
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
         Date date = new Date();
         String dateStr = dateFormat.format(date);
@@ -1268,9 +1268,9 @@ public class DenoptimIO
      * @param forbiddenEndList     container for the definition of forbidden ends
      * @throws DENOPTIMException
      */
-    public static void readCompatibilityMatrix(String fileName,HashMap<APClass, 
+    public static void readCompatibilityMatrix(String fileName, Map<APClass, 
             List<APClass>> compatMap, 
-            HashMap<APClass, APClass> cappingMap, Set<APClass> forbiddenEndList)
+            Map<APClass, APClass> cappingMap, Set<APClass> forbiddenEndList)
             throws DENOPTIMException {
 
         BufferedReader br = null;
@@ -1363,7 +1363,7 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void readRCCompatibilityMatrix(String fileName, 
-            HashMap<APClass, List<APClass>> rcCompatMap)
+            Map<APClass, List<APClass>> rcCompatMap)
             throws DENOPTIMException {
         BufferedReader br = null;
         String line = null;

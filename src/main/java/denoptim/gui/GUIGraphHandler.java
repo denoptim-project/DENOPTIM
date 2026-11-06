@@ -67,6 +67,7 @@ import denoptim.files.FileUtils;
 import denoptim.files.UndetectedFileFormatException;
 import denoptim.fragmenter.FragmenterTools;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.ga.EAUtils;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.DGraph;
@@ -1625,7 +1626,8 @@ public class GUIGraphHandler extends GUICardPanel
                 try {
                     if (fragSpace == null)
                     {
-                        fragSpace = new FragmentSpace();
+                        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+                        fragSpace = fsp.getFragmentSpace();
                     }
                     DGraph modGraph = graph.embedPatternsInTemplates(
                             GraphPattern.RING, 

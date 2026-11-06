@@ -102,11 +102,11 @@ public class PopulationTest
         HashSet<APClass> forbEnds = new HashSet<APClass>();
         
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
-        FragmentSpace fs = new FragmentSpace(fsp,
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(), 
-                cpMap, capMap, forbEnds, cpMap);
+        FragmentSpace fs = fsp.getFragmentSpace();
+        fs.setCompatibilityMatrix(cpMap);
+        fs.setCappingMap(capMap);
+        fs.setForbiddenEndList(forbEnds);
+        fs.setRCCompatibilityMatrix(cpMap);
         fs.setAPclassBasedApproach(true);
         
         GAParameters gaSettings = new GAParameters();

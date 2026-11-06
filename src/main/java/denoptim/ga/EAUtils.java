@@ -1148,7 +1148,10 @@ public class EAUtils
     public static DGraph makeGraphFromFragmentationOfMol(IAtomContainer mol,
         FragmenterParameters frgParams) throws DENOPTIMException
     {
-        return FragmenterTools.makeGraphFromFragmentationOfMol(mol, frgParams, new FragmentSpace(), true);
+        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+        FragmentSpace fragSpace = fsp.getFragmentSpace();
+        return FragmenterTools.makeGraphFromFragmentationOfMol(mol, frgParams, 
+            fragSpace, true);
     }
 
 //------------------------------------------------------------------------------  
@@ -1163,7 +1166,8 @@ public class EAUtils
      * @throws DENOPTIMException 
      */
     public static DGraph makeGraphFromFragmentationOfMol(IAtomContainer mol,
-        FragmenterParameters frgParams, boolean cleanupAPProperties) throws DENOPTIMException
+        FragmenterParameters frgParams, boolean cleanupAPProperties) 
+        throws DENOPTIMException
     {
         FragmentSpace fragSpace = null;
         if (frgParams.containsParameters(ParametersType.FS_PARAMS))
@@ -1171,9 +1175,11 @@ public class EAUtils
             fragSpace = ((FragmentSpaceParameters) frgParams.getParameters(
                     ParametersType.FS_PARAMS)).getFragmentSpace();
         } else {
-            fragSpace = new FragmentSpace();
+            FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+            fragSpace = fsp.getFragmentSpace();
         }
-        return FragmenterTools.makeGraphFromFragmentationOfMol(mol, frgParams, fragSpace, cleanupAPProperties);
+        return FragmenterTools.makeGraphFromFragmentationOfMol(mol, frgParams, 
+            fragSpace, cleanupAPProperties);
     }
 
 //------------------------------------------------------------------------------  

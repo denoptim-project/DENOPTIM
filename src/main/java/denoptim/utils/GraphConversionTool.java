@@ -146,7 +146,10 @@ public class GraphConversionTool
                     Integer.parseInt(s3[2]));
 	            
             Vertex dv;
-            if (fragSpace.isDefined())
+            if (fragSpace.getFragmentLibrary() != null 
+                && !fragSpace.getFragmentLibrary().isEmpty()
+                && fragSpace.getScaffoldLibrary() != null
+                && !fragSpace.getScaffoldLibrary().isEmpty())
             {
                 dv = Vertex.newVertexFromLibrary(vid, molid, fragtype,
                         fragSpace);

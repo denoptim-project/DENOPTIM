@@ -19,13 +19,22 @@
 package denoptim.fragspace;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
+import denoptim.files.UndetectedFileFormatException;
 import denoptim.graph.APClass;
+import denoptim.graph.Vertex;
+import denoptim.graph.Vertex.BBType;
+import denoptim.io.DenoptimIO;
 import denoptim.programs.RunTimeParameters;
 
 
@@ -110,6 +119,9 @@ public class FragmentSpaceParameters extends RunTimeParameters
     private HashMap<APClass, Double> symmConstraintsMap = 
             new HashMap<APClass, Double>();
     
+    /**
+     * Fragment space linked to these parameters.
+     */
     private FragmentSpace buildingBlocksSpace = null;
     
 //------------------------------------------------------------------------------
@@ -120,6 +132,7 @@ public class FragmentSpaceParameters extends RunTimeParameters
     private FragmentSpaceParameters(ParametersType paramType)
     {
         super(paramType);
+        buildingBlocksSpace = new FragmentSpace(this);
     }
     
 //------------------------------------------------------------------------------
@@ -130,19 +143,6 @@ public class FragmentSpaceParameters extends RunTimeParameters
     public FragmentSpaceParameters()
     {
         this(ParametersType.FS_PARAMS);
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Constructor of a default set of parameters coupled with a given fragment 
-     * space.
-     * @param fs
-     */
-    public FragmentSpaceParameters(FragmentSpace fs)
-    {
-        this(ParametersType.FS_PARAMS);
-        buildingBlocksSpace = fs;
     }
     
 //------------------------------------------------------------------------------
@@ -212,6 +212,14 @@ public class FragmentSpaceParameters extends RunTimeParameters
     
 //------------------------------------------------------------------------------
     
+    /**
+     * This is the only way to get the {@link FragmentSpace} instance. 
+     * This constraint ensure that the {@link FragmentSpaceParameters} are
+     * associated with a single {@link FragmentSpace} instance, even if the 
+     * content of the fragment space, may be altered (usually for testing 
+     * purposes only).
+     * @return the fragment space linked to these parameters.
+     */
     public FragmentSpace getFragmentSpace()
     {
         return buildingBlocksSpace;
@@ -429,10 +437,91 @@ public class FragmentSpaceParameters extends RunTimeParameters
      */
     public void processParameters() throws DENOPTIMException
     {
-        buildingBlocksSpace = new FragmentSpace(this, 
-                scaffoldLibFile, fragmentLibFile, cappingLibFile, 
-                compMatrixFile, rcCompMatrixFile, 
-                symmConstraintsMap);
+        HashMap<APClass, List<APClass>> cpMap = 
+                new HashMap<APClass, List<APClass>>();
+        HashMap<APClass, APClass> capMap = new HashMap<APClass, APClass>();
+        HashSet<APClass> forbEnds = new HashSet<APClass>();
+        if (compMatrixFile.length() > 0)
+        {
+            DenoptimIO.readCompatibilityMatrix(compMatrixFile, cpMap, capMap,
+                    forbEnds);
+        }
+
+        HashMap<APClass, List<APClass>> rcCpMap = 
+                new HashMap<APClass, List<APClass>>();
+        if (rcCompMatrixFile != null && rcCompMatrixFile.length() > 0)
+        {
+            DenoptimIO.readRCCompatibilityMatrix(rcCompMatrixFile, rcCpMap);
+        }
+        
+        List<Vertex> cappLib = new ArrayList<Vertex>();
+        if (cappingLibFile.length() > 0)
+        {
+            try
+            {
+                cappLib = DenoptimIO.readVertexes(new File(cappingLibFile),
+                        BBType.CAP);
+                for (int i=0; i<cappLib.size(); i++)
+                {
+                    cappLib.get(i).setBuildingBlockId(i);
+                }
+            } catch (IllegalArgumentException | UndetectedFileFormatException
+                    | IOException | DENOPTIMException e)
+            {
+                throw new DENOPTIMException("Cound not read library of capping "
+                        + "groups from file '" + cappingLibFile + "'.", e);
+            }
+        }
+        
+        List<Vertex> fragLib = new ArrayList<Vertex>();
+        if (fragmentLibFile != null && fragmentLibFile.length() > 0)
+        {
+            try
+            {
+                fragLib = DenoptimIO.readVertexes(new File(fragmentLibFile),
+                        BBType.FRAGMENT);
+                for (int i=0; i<fragLib.size(); i++)
+                {
+                    fragLib.get(i).setBuildingBlockId(i);
+                }
+            } catch (IllegalArgumentException | UndetectedFileFormatException
+                    | IOException | DENOPTIMException e)
+            {
+                throw new DENOPTIMException("Cound not read library of fragments "
+                        + "from file '" + fragmentLibFile + "'.", e);
+            }
+        }
+        
+        List<Vertex> scaffLib = new ArrayList<Vertex>();
+        if (scaffoldLibFile != null && scaffoldLibFile.length() > 0)
+        {
+            try
+            {
+                scaffLib = DenoptimIO.readVertexes(new File(scaffoldLibFile),
+                        BBType.SCAFFOLD);
+                for (int i=0; i<scaffLib.size(); i++)
+                {
+                    scaffLib.get(i).setBuildingBlockId(i);
+                }
+            } catch (IllegalArgumentException | UndetectedFileFormatException
+                    | IOException | DENOPTIMException e)
+            {
+                throw new DENOPTIMException("Cound not read library of scaffolds "
+                        + "from file '" + scaffoldLibFile + "'.", e);
+            }
+        }
+
+        Map<APClass, Double> isolatedSymCnstrMap = new HashMap<APClass, Double>();
+        if (!symmConstraintsMap.isEmpty())
+        {
+            for (APClass apClass : symmConstraintsMap.keySet())
+            {
+                isolatedSymCnstrMap.put(apClass, symmConstraintsMap.get(apClass));
+            }
+        }
+
+        buildingBlocksSpace.define(scaffLib, fragLib, cappLib, cpMap, capMap, forbEnds, 
+                rcCpMap, isolatedSymCnstrMap);
         processOtherParameters();
     }
     
@@ -467,19 +556,6 @@ public class FragmentSpaceParameters extends RunTimeParameters
             sb.append(otherCollector.getPrintedList());
         }
         return sb.toString();
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Sets the fragment space linked to these parameters. This method should 
-     * be used only in unit test to by-pass the creation of a
-     * {@link FragmentSpace} from parameters.
-     * @param fragmentSpace
-     */
-    public void setFragmentSpace(FragmentSpace fragmentSpace)
-    {
-        buildingBlocksSpace = fragmentSpace;
     }
 
 //------------------------------------------------------------------------------

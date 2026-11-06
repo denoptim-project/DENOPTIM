@@ -1499,9 +1499,9 @@ public class FragmenterParameters extends RunTimeParameters
         if (isMaster)
             createWorkingDirectory();
         
-        cuttingRules = new ArrayList<CuttingRule>();
         if (cutRulesFile!=null && !cutRulesFile.isBlank())
         {
+            cuttingRules = new ArrayList<CuttingRule>();
             DenoptimIO.readCuttingRules(new File(cutRulesFile), cuttingRules);
         }
         if (formulaeFile!=null && !formulaeFile.isBlank())

@@ -199,14 +199,9 @@ public class RandomCombOfRingIteratorTest
         lstA.add(apc);
         cpMap.put(apc, lstA);
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
-        FragmentSpace fs = new FragmentSpace(fsp,
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(), 
-                cpMap, 
-                new HashMap<APClass,APClass>(), 
-                new HashSet<APClass>(),
-                cpMap);
+        FragmentSpace fs = fsp.getFragmentSpace();
+        fs.setCompatibilityMatrix(cpMap);
+        fs.setRCCompatibilityMatrix(cpMap);
         fs.setAPclassBasedApproach(true);
         
         // Allow formation of 5- to 7-membered rings

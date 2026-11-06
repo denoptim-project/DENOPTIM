@@ -175,14 +175,8 @@ public class ReinventServerClientTest
             throws DENOPTIMException
     {
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
-        new FragmentSpace(fsp,
-                scaffolds,
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(),
-                new HashMap<APClass,List<APClass>>(),
-                new HashMap<APClass,APClass>(),
-                new HashSet<APClass>(),
-                new HashMap<APClass,List<APClass>>());
+        FragmentSpace fragmentSpace = fsp.getFragmentSpace();
+        fragmentSpace.setScaffoldLibrary(scaffolds);
         GAParameters settings = new GAParameters();
         settings.setParameters(fsp);
         settings.setRandomizer(new Randomizer(1L));
@@ -345,9 +339,11 @@ public class ReinventServerClientTest
     private static ReinventServerClient clientReadyToFragment() throws Exception
     {
         ReinventServerClient client = newClient();
+
         GAParameters settings = new GAParameters();
-        FragmentSpace fragmentSpace = new FragmentSpace();
-        settings.setParameters(new FragmentSpaceParameters(fragmentSpace));
+
+        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+        settings.setParameters(fsp);
 
         FragmenterParameters frgParams = new FragmenterParameters();
         List<CuttingRule> rules = new ArrayList<CuttingRule>();

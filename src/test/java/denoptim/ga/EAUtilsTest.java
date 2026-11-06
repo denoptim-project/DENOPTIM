@@ -123,12 +123,11 @@ public class EAUtilsTest
         HashSet<APClass> forbEnds = new HashSet<APClass>();
         
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
-        FragmentSpace fs = new FragmentSpace(fsp,
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(), 
-                cpMap, capMap, forbEnds, cpMap);
-        fs.setAPclassBasedApproach(true);
+        FragmentSpace fs = fsp.getFragmentSpace();
+        fs.setCompatibilityMatrix(cpMap);
+        fs.setCappingMap(capMap);
+        fs.setForbiddenEndList(forbEnds);
+        fs.setRCCompatibilityMatrix(cpMap);
         
         EmptyVertex v1 = new EmptyVertex();
         v1.setBuildingBlockType(BBType.FRAGMENT);
@@ -794,14 +793,10 @@ public class EAUtilsTest
         // NB: apcNotFusable is intentionally not added to RC-CPMap!
         
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
-        FragmentSpace fragSpace = new FragmentSpace(fsp,
-                new ArrayList<Vertex>(), //no scaffolds
-                new ArrayList<Vertex>(), //no fragments
-                cappingGroups, //H as capping
-                new HashMap<APClass,List<APClass>>(), 
-                capMap, new HashSet<APClass>(), 
-                rcCMap);
-        fragSpace.setAPclassBasedApproach(true);
+        FragmentSpace fragSpace = fsp.getFragmentSpace();
+        fragSpace.setCappingMap(capMap);
+        fragSpace.setCappingLibrary(cappingGroups);
+        fragSpace.setRCCompatibilityMatrix(rcCMap);
         
         RingClosureParameters rcParams = new RingClosureParameters();
         
@@ -1769,14 +1764,10 @@ public class EAUtilsTest
         // NB: apcNotFusable is intentionally not added to RC-CPMap!
         
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
-        FragmentSpace fragSpace = new FragmentSpace(fsp,
-                new ArrayList<Vertex>(), //no scaffolds
-                new ArrayList<Vertex>(), //no fragments
-                cappingGroups, //H as capping
-                new HashMap<APClass,List<APClass>>(), 
-                capMap, new HashSet<APClass>(), 
-                rcCMap);
-        fragSpace.setAPclassBasedApproach(true);
+        FragmentSpace fragSpace = fsp.getFragmentSpace();
+        fragSpace.setCappingMap(capMap);
+        fragSpace.setCappingLibrary(cappingGroups);
+        fragSpace.setRCCompatibilityMatrix(rcCMap);
         
         /*
         HashMap<APClass, Double> symmetryConstraints = 
@@ -1915,14 +1906,9 @@ public class EAUtilsTest
         cpMap.put(apcA, new ArrayList<APClass>());
         
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
-        FragmentSpace fs = new FragmentSpace(fsp,
-                new ArrayList<Vertex>(),
-                libFrags,
-                new ArrayList<Vertex>(), 
-                cpMap, 
-                new HashMap<APClass,APClass>(), 
-                new HashSet<APClass>(),
-                new HashMap<APClass,List<APClass>>()); 
+        FragmentSpace fs = fsp.getFragmentSpace();
+        fs.setFragmentLibrary(libFrags);
+        fs.setCompatibilityMatrix(cpMap);
         
         // Wrong size is enough to find no match
         List<EAUtils.BridgeOption> lst = EAUtils.getUsableAromaticBridges("4el",
@@ -2005,14 +1991,9 @@ public class EAUtilsTest
         cpMap.put(apcC, new ArrayList<APClass>(Arrays.asList(apcD)));
         
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
-        FragmentSpace fs = new FragmentSpace(fsp,
-                new ArrayList<Vertex>(),
-                libFrags,
-                new ArrayList<Vertex>(), 
-                cpMap, 
-                new HashMap<APClass,APClass>(), 
-                new HashSet<APClass>(),
-                new HashMap<APClass,List<APClass>>()); 
+        FragmentSpace fs = fsp.getFragmentSpace();
+        fs.setFragmentLibrary(libFrags);
+        fs.setCompatibilityMatrix(cpMap);
         
         // Same class on both ends
         List<EAUtils.BridgeOption> lst = EAUtils.getUsableAliphaticBridges(apcB,

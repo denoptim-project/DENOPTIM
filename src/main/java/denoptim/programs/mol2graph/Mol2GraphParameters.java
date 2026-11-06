@@ -156,7 +156,7 @@ public class Mol2GraphParameters extends RunTimeParameters
     
     public FragmentSpace getFragmentSpace()
     {
-        ensureFragSpareParams();
+        ensureFragSpaceParams();
         FragmentSpaceParameters fsParams = (FragmentSpaceParameters) 
                 getParameters(ParametersType.FS_PARAMS);
         return fsParams.getFragmentSpace();
@@ -174,11 +174,12 @@ public class Mol2GraphParameters extends RunTimeParameters
     
 //-----------------------------------------------------------------------------
     
-    private void ensureFragSpareParams()
+//TODO-gg replace with better strategy to ensure we have a fragment space defined.
+    private void ensureFragSpaceParams()
     {
         if (!containsParameters(ParametersType.FS_PARAMS))
         {
-            setParameters(new FragmentSpaceParameters(new FragmentSpace()));
+            setParameters(new FragmentSpaceParameters());
         }
     }
     
@@ -329,7 +330,7 @@ public class Mol2GraphParameters extends RunTimeParameters
         processOtherParameters();
         
         ensureFragmenterParams();
-        ensureFragSpareParams();
+        ensureFragSpaceParams();
     }
     
 //-----------------------------------------------------------------------------

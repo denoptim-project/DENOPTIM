@@ -108,12 +108,11 @@ public class GraphLinkFinderTest
         HashSet<APClass> forbEnds = new HashSet<APClass>();
         
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
-        FragmentSpace fs = new FragmentSpace(fsp,
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(),
-                new ArrayList<Vertex>(), 
-                cpMap, capMap, forbEnds, cpMap);
-        fs.setAPclassBasedApproach(true);
+        FragmentSpace fs = fsp.getFragmentSpace();
+        fs.setCompatibilityMatrix(cpMap);
+        fs.setCappingMap(capMap);
+        fs.setForbiddenEndList(forbEnds);
+        fs.setRCCompatibilityMatrix(cpMap);
         
         EmptyVertex s = new EmptyVertex();
         s.setBuildingBlockType(BBType.SCAFFOLD);
