@@ -19,6 +19,7 @@
 package denoptim.gui;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -43,14 +44,14 @@ import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IStereoElement;
 import org.openscience.cdk.layout.StructureDiagramGenerator;
 import org.openscience.cdk.renderer.AtomContainerRenderer;
-import org.openscience.cdk.renderer.RendererModel;
+import org.openscience.cdk.renderer.color.CDK2DAtomColors;
 import org.openscience.cdk.renderer.color.IAtomColorer;
 import org.openscience.cdk.renderer.font.AWTFontManager;
-import org.openscience.cdk.renderer.generators.BasicAtomGenerator;
-import org.openscience.cdk.renderer.generators.BasicBondGenerator;
 import org.openscience.cdk.renderer.generators.BasicSceneGenerator;
 import org.openscience.cdk.renderer.generators.IGenerator;
+import org.openscience.cdk.renderer.generators.standard.StandardGenerator;
 import org.openscience.cdk.renderer.visitor.AWTDrawVisitor;
+import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.AttachmentPoint;
@@ -104,9 +105,13 @@ MouseListener, MouseMotionListener
 //-----------------------------------------------------------------------------
 
     /**
-     * Constructor for a viewer that may ignore H atoms is requested.
+     * Constructor for a viewer that may collapse hydrogens into the parent
+     * atom symbol (for example <code>NH2</code>) instead of drawing them as
+     * separate atoms.
      * @param extendenMol the atom container, possibly extended to include 
      * {@link AttachmentPoint}s as pseudoatoms.
+     * @param showHydrogens when <code>false</code>, explicit hydrogens that
+     * can be stored as a count are removed and drawn on the parent symbol.
      */
 
     public TwoDimStructurePanel(IAtomContainer extendedMol, boolean showHydrogens) 
@@ -121,18 +126,9 @@ MouseListener, MouseMotionListener
         }
         if (!showHydrogens)
         {
-            List<IAtom> atomsToRemove = new ArrayList<IAtom>();
-            for (IAtom atom : inputMol.atoms())
-            {
-                if (MoleculeUtils.getSymbolOrLabel(atom).equals("H"))
-                {
-                    atomsToRemove.add(atom);
-                }
-            }
-            for (IAtom atom : atomsToRemove)
-            {
-                inputMol.removeAtom(atom);
-            }
+            // Counts must come only from the explicit atoms being removed.
+            MoleculeUtils.setZeroImplicitHydrogensToAllAtoms(inputMol);
+            AtomContainerManipulator.suppressHydrogens(inputMol);
         }
         Logger logger = Logger.getLogger(GUI.GUILOGGER);
         StructureDiagramGenerator sdg = new StructureDiagramGenerator();
@@ -156,13 +152,16 @@ MouseListener, MouseMotionListener
         }
         this.mol = sdg.getMolecule();
 
-        // These generate the graphical components
+        // These generate the graphical components. StandardGenerator draws
+        // implicit hydrogen counts as part of the atom symbol.
         List<IGenerator<IAtomContainer>> generators = 
               new ArrayList<IGenerator<IAtomContainer>>();
         generators.add(new BasicSceneGenerator());
-        generators.add(new BasicBondGenerator());
-        generators.add(new AtomOrAPGenerator());
+        generators.add(new StandardGenerator(
+                new Font(Font.SANS_SERIF, Font.PLAIN, 18)));
         renderer = new AtomContainerRenderer(generators, new AWTFontManager());
+        renderer.getRenderer2DModel().set(StandardGenerator.AtomColor.class,
+                new AttachmentPointAtomColorer());
         
         addMouseWheelListener(this);
         addMouseListener(this);
@@ -312,43 +311,26 @@ MouseListener, MouseMotionListener
 //-----------------------------------------------------------------------------
     
     /**
-     * Generator that chooses default colors from CDK2DAtomColor for all but 
-     * {@link PseudoAtom}s which we expect to be placeholders for
-     * {@link AttachmentPoint}s. Such atoms are colored magenta.
+     * Element colors from CDK, with attachment-point pseudoatoms in magenta.
      */
-    class AtomOrAPGenerator extends BasicAtomGenerator
+    private static class AttachmentPointAtomColorer implements IAtomColorer
     {
-        /**
-         * Chooses default colors from CDK2DAtomColor for all but 
-         * {@link PseudoAtom}s which we expect to be placeholder for
-         * {@link AttachmentPoint}s. Such atoms are colored .
-         */
+        private final IAtomColorer elementColors = new CDK2DAtomColors();
+        private static final Color ATTACHMENT_POINT = new Color(0xFF00FF);
+
         @Override
-        protected Color getAtomColor(IAtom atom, RendererModel model) 
+        public Color getAtomColor(IAtom atom)
         {
-            Color atomColor = model.get(AtomColor.class);
-            if ((Boolean) model.get(ColorByType.class)) 
+            IAtom resolved = atom;
+            if (atom instanceof AtomRef)
             {
-                boolean changeColor = false;
-                IAtom a = null;
-                if (atom instanceof AtomRef) 
-                {
-                    a = ((AtomRef) atom).deref();
-                    if (a instanceof PseudoAtom)
-                        changeColor = true;
-                } else if (atom instanceof PseudoAtom)
-                {
-                    changeColor = true;
-                }
-                if (changeColor)
-                {
-                    atomColor = new Color(0xFF00FF);
-                } else {
-                    atomColor = ((IAtomColorer) model.get(AtomColorer.class))
-                            .getAtomColor(atom);
-                }
+                resolved = ((AtomRef) atom).deref();
             }
-            return atomColor;
+            if (resolved instanceof PseudoAtom)
+            {
+                return ATTACHMENT_POINT;
+            }
+            return elementColors.getAtomColor(atom);
         }
     }
 

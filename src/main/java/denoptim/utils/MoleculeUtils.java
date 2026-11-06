@@ -190,6 +190,39 @@ public class MoleculeUtils
 //------------------------------------------------------------------------------
 
     /**
+     * Check if the given atom is a hydrogen atom that can be omitted from the
+     * 2D representation of the molecule.
+     * @param atom the atom to check
+     * @param mol the molecule containing the atom to check.
+     * @return <code>true</code> if the atom is a hydrogen atom that can be 
+     * omitted from the 2D representation of the molecule.
+     */
+    public static boolean isTerminalHydrogenOnCarbon(IAtom atom, IAtomContainer mol)
+    {
+        if (MoleculeUtils.getSymbolOrLabel(atom).equals("H"))
+        {
+            // Special H that are bridging or multiply connected
+            List<IAtom> nbrs = mol.getConnectedAtomsList(atom);
+            if (nbrs.size() != 1)
+            {
+                return false;
+            }
+
+            // H connected to (only ONE) atom other than C
+            if (!MoleculeUtils.getSymbolOrLabel(nbrs.get(0)).equals("C"))
+            {
+                return false;
+            }
+
+            // Any other H can by hidden in 2D
+            return true;
+        }
+        return false;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
      * Replace any <code>PseudoAtom</code>s representing ring closing attractors
      * with H. No change in coordinates, but any reference to the original
      * atom, beyond those managed internally to the CDK library, will be broken.

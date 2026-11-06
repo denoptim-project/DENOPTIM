@@ -38,6 +38,7 @@ import javax.vecmath.Point3d;
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.Bond;
+import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
@@ -956,6 +957,92 @@ public class MoleculeUtilsTest
         List<List<Map<IAtom,IAtom>>> overall = MoleculeUtils.findUniqueAtomMappings(
                 substructure, mol, logger);
         assertTrue(overall.isEmpty());
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testIsTerminalHydrogenOnCarbon() throws Exception
+    {
+        IAtomContainer methyl = builder.newAtomContainer();
+        IAtom carbon = new Atom("C");
+        IAtom methylH = new Atom("H");
+        methyl.addAtom(carbon);
+        methyl.addAtom(methylH);
+        methyl.addBond(new Bond(carbon, methylH));
+        assertTrue(MoleculeUtils.isTerminalHydrogenOnCarbon(methylH, methyl));
+        assertFalse(MoleculeUtils.isTerminalHydrogenOnCarbon(carbon, methyl));
+
+        IAtomContainer hydroxyl = builder.newAtomContainer();
+        IAtom oxygen = new Atom("O");
+        IAtom hydroxylH = new Atom("H");
+        hydroxyl.addAtom(oxygen);
+        hydroxyl.addAtom(hydroxylH);
+        hydroxyl.addBond(new Bond(oxygen, hydroxylH));
+        assertFalse(MoleculeUtils.isTerminalHydrogenOnCarbon(hydroxylH, hydroxyl));
+        assertFalse(MoleculeUtils.isTerminalHydrogenOnCarbon(oxygen, hydroxyl));
+
+        IAtomContainer amine = builder.newAtomContainer();
+        IAtom nitrogen = new Atom("N");
+        IAtom amineH = new Atom("H");
+        amine.addAtom(nitrogen);
+        amine.addAtom(amineH);
+        amine.addBond(new Bond(nitrogen, amineH));
+        assertFalse(MoleculeUtils.isTerminalHydrogenOnCarbon(amineH, amine));
+
+        IAtomContainer hydrogenChloride = builder.newAtomContainer();
+        IAtom chlorine = new Atom("Cl");
+        IAtom chlorideH = new Atom("H");
+        hydrogenChloride.addAtom(chlorine);
+        hydrogenChloride.addAtom(chlorideH);
+        hydrogenChloride.addBond(new Bond(chlorine, chlorideH));
+        assertFalse(MoleculeUtils.isTerminalHydrogenOnCarbon(chlorideH,
+                hydrogenChloride));
+
+        IAtomContainer hydrogenDummy = builder.newAtomContainer();
+        IAtom dummy = new PseudoAtom("FooBar");
+        IAtom dummyH = new Atom("H");
+        hydrogenDummy.addAtom(dummy);
+        hydrogenDummy.addAtom(dummyH);
+        hydrogenDummy.addBond(new Bond(dummy, dummyH));
+        assertFalse(MoleculeUtils.isTerminalHydrogenOnCarbon(dummyH, hydrogenDummy));
+
+        IAtomContainer dihydrogen = builder.newAtomContainer();
+        IAtom hA = new Atom("H");
+        IAtom hB = new Atom("H");
+        dihydrogen.addAtom(hA);
+        dihydrogen.addAtom(hB);
+        dihydrogen.addBond(new Bond(hA, hB));
+        assertFalse(MoleculeUtils.isTerminalHydrogenOnCarbon(hA, dihydrogen));
+        assertFalse(MoleculeUtils.isTerminalHydrogenOnCarbon(hB, dihydrogen));
+
+        IAtomContainer loneHydrogen = builder.newAtomContainer();
+        IAtom loneH = new Atom("H");
+        loneHydrogen.addAtom(loneH);
+        assertFalse(MoleculeUtils.isTerminalHydrogenOnCarbon(loneH, loneHydrogen));
+
+        IAtomContainer bridging = builder.newAtomContainer();
+        IAtom bridgeC = new Atom("C");
+        IAtom bridgeH = new Atom("H");
+        IAtom bridgeO = new Atom("O");
+        bridging.addAtom(bridgeC);
+        bridging.addAtom(bridgeH);
+        bridging.addAtom(bridgeO);
+        bridging.addBond(new Bond(bridgeC, bridgeH));
+        bridging.addBond(new Bond(bridgeH, bridgeO));
+        assertFalse(MoleculeUtils.isTerminalHydrogenOnCarbon(bridgeH, bridging));
+
+        IAtomContainer pseudoOnOxygen = builder.newAtomContainer();
+        IAtom pseudoO = new Atom("O");
+        IAtom pseudoH = new PseudoAtom("H");
+        IAtom dummy2 = new PseudoAtom("Du");
+        pseudoOnOxygen.addAtom(pseudoO);
+        pseudoOnOxygen.addAtom(pseudoH);
+        pseudoOnOxygen.addAtom(dummy2);
+        pseudoOnOxygen.addBond(new Bond(pseudoO, pseudoH));
+        pseudoOnOxygen.addBond(new Bond(pseudoO, dummy2));
+        assertFalse(MoleculeUtils.isTerminalHydrogenOnCarbon(pseudoH, pseudoOnOxygen));
+        assertFalse(MoleculeUtils.isTerminalHydrogenOnCarbon(dummy2, pseudoOnOxygen));
     }
 
 //------------------------------------------------------------------------------
