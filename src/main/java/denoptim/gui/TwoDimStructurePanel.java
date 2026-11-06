@@ -92,6 +92,17 @@ MouseListener, MouseMotionListener
 //-----------------------------------------------------------------------------
 
     /**
+     * Empty viewer. Call {@link #loadStructure(IAtomContainer, boolean)} to
+     * depict a structure without replacing this panel.
+     */
+    public TwoDimStructurePanel()
+    {
+        installRenderer();
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
      * Constructor for a viewer that ignores H atoms.
      * @param extendenMol the atom container, possibly extended to include 
      * {@link AttachmentPoint}s as pseudoatoms.
@@ -116,13 +127,79 @@ MouseListener, MouseMotionListener
 
     public TwoDimStructurePanel(IAtomContainer extendedMol, boolean showHydrogens) 
     {
+        installRenderer();
+        loadStructure(extendedMol, showHydrogens);
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Replaces the depicted structure. Zoom and pan are reset so the new
+     * structure is shown in the default view.
+     * @param extendedMol the atom container, possibly extended to include
+     * {@link AttachmentPoint}s as pseudoatoms.
+     * @param showHydrogens when <code>false</code>, explicit hydrogens that
+     * can be stored as a count are removed and drawn on the parent symbol.
+     */
+    public void loadStructure(IAtomContainer extendedMol, boolean showHydrogens)
+    {
+        resetView();
+        mol = layoutStructure(extendedMol, showHydrogens);
+        repaint();
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Removes the depicted structure and restores the default view.
+     */
+    public void clearStructure()
+    {
+        resetView();
+        mol = null;
+        repaint();
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Builds the renderer once. Replacing the molecule must not replace the
+     * panel, so the renderer and mouse listeners stay installed.
+     */
+    private void installRenderer()
+    {
+        // These generate the graphical components. StandardGenerator draws
+        // implicit hydrogen counts as part of the atom symbol.
+        List<IGenerator<IAtomContainer>> generators =
+              new ArrayList<IGenerator<IAtomContainer>>();
+        generators.add(new BasicSceneGenerator());
+        generators.add(new StandardGenerator(
+                new Font(Font.SANS_SERIF, Font.PLAIN, 18)));
+        renderer = new AtomContainerRenderer(generators, new AWTFontManager());
+        renderer.getRenderer2DModel().set(StandardGenerator.AtomColor.class,
+                new AttachmentPointAtomColorer());
+
+        addMouseWheelListener(this);
+        addMouseListener(this);
+        addMouseMotionListener(this);
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Prepares a copy of the given container for depiction.
+     * @return the laid-out container, or <code>null</code> when it cannot be
+     * drawn.
+     */
+    private IAtomContainer layoutStructure(IAtomContainer extendedMol,
+            boolean showHydrogens)
+    {
         IAtomContainer inputMol;
         try {
             inputMol = MoleculeUtils.makeSameAs(extendedMol);
         } catch (DENOPTIMException e) {
             e.printStackTrace();
-            renderer = null;
-            return;
+            return null;
         }
         if (!showHydrogens)
         {
@@ -138,34 +215,28 @@ MouseListener, MouseMotionListener
             sdg.generateCoordinates();
         } catch (Exception e)
         {
-            logger.warning("Inconsistent stereochemistry in the molecule. " 
+            logger.warning("Inconsistent stereochemistry in the molecule. "
                 + "Ignoring stereochemistry.");
-                mol.setStereoElements(new ArrayList<IStereoElement>());
+            inputMol.setStereoElements(new ArrayList<IStereoElement>());
             try {
-                sdg.setMolecule(mol);
+                sdg.setMolecule(inputMol);
                 sdg.generateCoordinates();
             } catch (Exception e2) {
                 e2.printStackTrace();
-                renderer = null;
-                return;
+                return null;
             }
         }
-        this.mol = sdg.getMolecule();
+        return sdg.getMolecule();
+    }
 
-        // These generate the graphical components. StandardGenerator draws
-        // implicit hydrogen counts as part of the atom symbol.
-        List<IGenerator<IAtomContainer>> generators = 
-              new ArrayList<IGenerator<IAtomContainer>>();
-        generators.add(new BasicSceneGenerator());
-        generators.add(new StandardGenerator(
-                new Font(Font.SANS_SERIF, Font.PLAIN, 18)));
-        renderer = new AtomContainerRenderer(generators, new AWTFontManager());
-        renderer.getRenderer2DModel().set(StandardGenerator.AtomColor.class,
-                new AttachmentPointAtomColorer());
-        
-        addMouseWheelListener(this);
-        addMouseListener(this);
-        addMouseMotionListener(this);
+//-----------------------------------------------------------------------------
+
+    private void resetView()
+    {
+        zoom = 1;
+        zoomingOrPanning = false;
+        translateX = 0;
+        translateY = 0;
     }
 
 //-----------------------------------------------------------------------------
@@ -209,14 +280,14 @@ MouseListener, MouseMotionListener
     @Override
     public void paint(Graphics graphics) 
     {
-        if (renderer==null)
-            return;
-        
-        renderer.setup(mol, new Rectangle(getWidth(), getHeight()));
-
         // paint the background
         graphics.setColor(Color.WHITE);
         graphics.fillRect(0, 0, getWidth(), getHeight());
+
+        if (renderer == null || mol == null)
+            return;
+
+        renderer.setup(mol, new Rectangle(getWidth(), getHeight()));
         
         Graphics2D g2d = (Graphics2D) graphics;
 

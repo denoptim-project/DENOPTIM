@@ -18,8 +18,6 @@
 
 package denoptim.gui;
 
-import javax.swing.JPanel;
-
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 
@@ -36,7 +34,11 @@ public class Mol2DViewPanel extends MolAndPropTableViewPanel
 	 */
 	private static final long serialVersionUID = 912850110991449553L;
 	
-    private JPanel emptyTopPanel = new JPanel();
+    /**
+     * Installed once so that loading another structure does not replace a
+     * child of this split pane. Replacing the child resets the divider.
+     */
+    private TwoDimStructurePanel structurePanel;
 
 //-----------------------------------------------------------------------------
 	
@@ -51,10 +53,22 @@ public class Mol2DViewPanel extends MolAndPropTableViewPanel
 //-----------------------------------------------------------------------------
 
     @Override
+    protected void initializeViewer()
+    {
+        structurePanel = new TwoDimStructurePanel();
+        this.setTopComponent(structurePanel);
+    }
+
+//-----------------------------------------------------------------------------
+
+    @Override
     public void clearAll(boolean dataIsComing)
     {
         clearDataTable();
-        this.setTopComponent(emptyTopPanel);
+        // Blanking the drawing is cheap. When new data is about to be loaded,
+        // leave the current depiction until it is overwritten.
+        if (!dataIsComing)
+            structurePanel.clearStructure();
     }
 	
 //-----------------------------------------------------------------------------
@@ -62,9 +76,7 @@ public class Mol2DViewPanel extends MolAndPropTableViewPanel
     @Override
     protected void displayLoadedStructure(IAtomContainer mol)
 	{
-        this.setTopComponent(new TwoDimStructurePanel(mol, 
-            GUIPreferences.show2DHydrogens));
-        fillDataTable(mol);
+        structurePanel.loadStructure(mol, GUIPreferences.show2DHydrogens);
 	}
 
 //-----------------------------------------------------------------------------
