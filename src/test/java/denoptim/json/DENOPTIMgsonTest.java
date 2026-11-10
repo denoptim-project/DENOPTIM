@@ -65,6 +65,7 @@ public class DENOPTIMgsonTest
     	a1.setPoint3d(new Point3d(2.624, -4.243, 6.465));
         IAtom a2 = new Atom("Ru");
         a2.setPoint3d(new Point3d(-0.001, 23.943, -0.115));
+        a2.setFormalCharge(2);
         IAtom a3 = new PseudoAtom("RCA");
         a3.setPoint3d(new Point3d(0.0, 0.0, 0.0));
     	iac.addAtom(a1);
@@ -95,6 +96,8 @@ public class DENOPTIMgsonTest
             double distance = MoleculeUtils.getPoint3d(atmOri).distance(
                     MoleculeUtils.getPoint3d(atmJsn));
             assertTrue(areCloseEnough(0.0,distance), "Coordinates atom "+i);
+            assertEquals(atmOri.getFormalCharge(), atmJsn.getFormalCharge(),
+                    "Formal charge atom "+i);
         }
         for (int i=0; i<iac.getBondCount(); i++)
         {

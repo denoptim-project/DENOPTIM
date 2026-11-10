@@ -44,18 +44,38 @@ public class LWAtom
      * Cartesian coordinates of this center
      */
     protected Point3d p3d = null;
+
+    /**
+     * Formal charge of this center. Kept at 0 when the JSON field is absent,
+     * so older files that predate this attribute still deserialise.
+     */
+    protected int formalCharge = 0;
     
 //------------------------------------------------------------------------------
     
     /**
-     * Constructor
+     * Constructor for a center with formal charge 0.
      * @param elSymbol the elemental symbol
      * @param p3d the Cartesian coordinated of this center
      */
     public LWAtom(String elSymbol, Point3d p3d)
     {
+        this(elSymbol, p3d, 0);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Constructor
+     * @param elSymbol the elemental symbol
+     * @param p3d the Cartesian coordinated of this center
+     * @param formalCharge the formal charge of this center
+     */
+    public LWAtom(String elSymbol, Point3d p3d, int formalCharge)
+    {
         this.elSymbol = elSymbol;
         this.p3d = p3d;
+        this.formalCharge = formalCharge;
     }
     
 //------------------------------------------------------------------------------
@@ -74,6 +94,7 @@ public class LWAtom
             atm = new PseudoAtom(elSymbol);
         }
         atm.setPoint3d(new Point3d(p3d));
+        atm.setFormalCharge(formalCharge);
         return atm;
     }
     

@@ -64,8 +64,11 @@ public class IAtomContainerSerializer implements JsonSerializer<IAtomContainer>
         List<LWAtom> atoms = new ArrayList<LWAtom>();
         for (IAtom atm : iac.atoms())
         {
+            int formalCharge = 0;
+            if (atm.getFormalCharge() != null)
+                formalCharge = atm.getFormalCharge();
             atoms.add(new LWAtom(MoleculeUtils.getSymbolOrLabel(atm),
-                    MoleculeUtils.getPoint3d(atm)));
+                    MoleculeUtils.getPoint3d(atm), formalCharge));
         }
         List<LWBond> bonds = new ArrayList<LWBond>();
         for (IBond bnd : iac.bonds())
