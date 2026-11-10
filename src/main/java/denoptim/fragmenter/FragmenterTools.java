@@ -451,7 +451,7 @@ public class FragmenterTools
                     // that information.
                     for (Vertex v : fragments)
                     {
-                        v.clearAttachmentPoints();
+                        v.clearAttachmentPointProps();
                     }
                 }
                 totalProd += fragments.size();
@@ -686,7 +686,7 @@ public class FragmenterTools
                         cloneOfMaster.setBuildingBlockType(BBType.UNDEFINED);
                         for (AttachmentPoint ap : cloneOfMaster.getAttachmentPoints())
                         {
-                            Object objProp = ap.getProperty("DENOPTIM_ORIGINAL_AP");
+                            Object objProp = ap.getProperty(AttachmentPoint.APPROPMATCHEDAP);
                             if (objProp != null)
                             {
                                 cloneOfMaster.setBuildingBlockType(
@@ -747,7 +747,7 @@ public class FragmenterTools
                 Vertex matchedVrtx = null;
                 for (AttachmentPoint ap : fragToReplace.getAttachmentPoints())
                 {
-                    Object originalAPObj = ap.getProperty("DENOPTIM_ORIGINAL_AP");
+                    Object originalAPObj = ap.getProperty(AttachmentPoint.APPROPMATCHEDAP);
                     if (originalAPObj != null)
                     {
                         AttachmentPoint originalAP = (AttachmentPoint) originalAPObj;
@@ -795,8 +795,6 @@ public class FragmenterTools
                     innerFrgParams.setRandomizer(frgParams.getRandomizer());
                     innerFrgParams.setNextCutIdGenerator(frgParams.getNextCutIdGenerator());
 
-                    //TODO-gg consider whether fragspace should be ficen to fragmentation, since it must be used here to
-                    // identify capping groups.
                     FragmentSpaceParameters innerFsp = new FragmentSpaceParameters();
                     FragmentSpace innerFragSpace = innerFsp.getFragmentSpace();
 
@@ -820,7 +818,7 @@ public class FragmenterTools
                         innerAP.setAPClass(restoredApClass);
 
                         // Map template AP onto the surface AP for edge creation
-                        surfaceAP.setProperty("DENOPTIM_ORIGINAL_AP", 
+                        surfaceAP.setProperty(AttachmentPoint.APPROPMATCHEDAP, 
                             unqApToApOnTmplGraph.get(uniquifiedAPClass));
                         surfaceAP.setCutId(unqApToCutId.get(uniquifiedAPClass));
                     }
@@ -2416,7 +2414,7 @@ public class FragmenterTools
 
         if (cleanupAPProperties)
         {
-            graph.clearAttachmentPoints();
+            graph.clearAttachmentPointProps();
         }
         
         return graph;
@@ -2494,5 +2492,6 @@ public class FragmenterTools
         }
     }
 
+//------------------------------------------------------------------------------
 
 }

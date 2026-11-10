@@ -20,13 +20,13 @@
 package denoptim.ga;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -36,6 +36,7 @@ import org.paukov.combinatorics3.Generator;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileFormat;
 import denoptim.fragmenter.BridgeHeadFindingRule;
 import denoptim.fragspace.APMapFinder;
 import denoptim.fragspace.FragmentSpace;
@@ -61,6 +62,7 @@ import denoptim.graph.rings.PathSubGraph;
 import denoptim.graph.rings.RandomCombOfRingsIterator;
 import denoptim.graph.rings.RingClosingAttractor;
 import denoptim.graph.rings.RingClosureParameters;
+import denoptim.integration.molgenerators.ReinventServerClient;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.CounterID;
 import denoptim.logging.Monitor;
@@ -1593,7 +1595,156 @@ public class GraphOperations
                                          int chosenApId,
                                          GAParameters settings) 
                                                         throws DENOPTIMException
-    {  
+    { 
+        // check if the fragment has available APs
+        if (!curVrtx.hasFreeAP())
+        {
+            return false;
+        }
+        
+        if (settings.useReinventForGrowth())
+        {
+            return extendGraphWithReinvent(curVrtx, settings);
+        } else {
+            return extendGraphWithFragSpace(curVrtx, extend, symmetryOnAps, force, 
+                chosenVrtxIdx, chosenApId, settings);
+        }
+    }
+
+//------------------------------------------------------------------------------
+
+    private static boolean extendGraphWithReinvent(
+        Vertex curVrtx, 
+        GAParameters settings) 
+                       throws DENOPTIMException
+    {
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        if (settings.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsParams = (FragmentSpaceParameters)settings.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
+
+        DGraph graph = curVrtx.getGraphOwner();
+        int initialNumberOfFragments = graph.getVertexCount();
+
+
+        //TODO-gg del
+        DenoptimIO.writeGraphToFile(new File("/tmp/g.json"), FileFormat.GRAPHJSON, graph);
+
+        // Keep a memory of the APs that could hold graph extending subgraphs
+        List<AttachmentPoint> extendableAPs = new ArrayList<>();
+        for (AttachmentPoint apOnInitialGraph : graph.getAttachmentPoints())
+        {
+            if (apOnInitialGraph.isAvailableThroughout())
+            {
+                extendableAPs.add(apOnInitialGraph);
+            }
+        }
+
+        // Estend the molecule with Reinvent
+        ReinventServerClient reinventClient = ReinventServerClient.getInstance(
+            ReinventServerClient.ServiceType.GROWTH, settings);
+        reinventClient.setRecordRequestsFileName(
+            settings.getReinventRequestsPathname());
+        Map<String, DGraph> smilesDGraphMap = new HashMap<>();
+        // NB: this changes the initial graph by adding placeholders!
+        smilesDGraphMap.put(reinventClient.addAPPlaceHoldersAndGetSMILES(
+            graph, settings), graph);
+        List<DGraph> graphs;
+        try {
+            // Hard-coded: to make sure we generate more than needed
+            graphs = reinventClient.generateGraphs(smilesDGraphMap ,5); 
+        } catch (IOException e) {
+            throw new DENOPTIMException(
+                "Error extending graph with Reinvent service", e);
+        }
+
+        // We try any of the results, in random order (they are not sorted)
+        for (DGraph modifiedGraph : graphs)
+        {
+            // Get mapping between APs on original graphand APs on incoming subgraphs
+            Map<AttachmentPoint, AttachmentPoint> apMapInitToIncoming = new HashMap<>();
+            for (AttachmentPoint apOnModifiedGraph : modifiedGraph.getAttachmentPoints())
+            {
+                if (modifiedGraph.getVertexCount() <= initialNumberOfFragments)
+                    continue;
+
+                Object objApOnInitialGraph = apOnModifiedGraph.getProperty(
+                    AttachmentPoint.APPROPMATCHEDAP);
+                if (objApOnInitialGraph == null)
+                {
+                    // apOnModifiedGraph is on the new branch and has no matched AP on original graph to map
+                    continue;
+                }
+                if (!(objApOnInitialGraph instanceof AttachmentPoint))
+                {
+                    throw new DENOPTIMException("Expecting matched AP but got " 
+                        + objApOnInitialGraph.getClass().getName() + ".");
+                }
+                AttachmentPoint apOnInitialGraph = (AttachmentPoint) objApOnInitialGraph;
+                if (extendableAPs.contains(apOnInitialGraph)
+                    && !apOnModifiedGraph.isAvailable()) // No template embedding from Reinvent
+                {
+                    // Records the mapping betweenthe AP on the placeholder vertex and 
+                    // the corresponding AP on the modified graph
+                    apMapInitToIncoming.put(apOnInitialGraph.getLinkedAP(), 
+                        apOnModifiedGraph.getLinkedAP());
+                }
+            }
+
+            // Replace plaveholders with newly-created branched
+            int successes = 0;
+            for (AttachmentPoint apOnLeavingSubGraph : apMapInitToIncoming.keySet())
+            {
+                // NB: we assume we have only the placeholder vertex added to generate 
+                // the SMILES of the initialgraph
+                List<Vertex> placeholderVertexes = new ArrayList<>();
+                placeholderVertexes.add(apOnLeavingSubGraph.getOwner());
+
+                AttachmentPoint apOnIncomingGraph = apMapInitToIncoming.get(
+                    apOnLeavingSubGraph);
+                DGraph incomingSubgraph = modifiedGraph.extractSubgraph(
+                    apOnIncomingGraph.getOwner());
+
+                // The incoming subgraph is a copy of the original modified graph,
+                // so we need to get the reference to the corresponding AP.
+                AttachmentPoint apOnIncomingSubGraph = incomingSubgraph.getVertexWithId(
+                    apOnIncomingGraph.getOwner().getVertexId()).getAP(
+                        apOnIncomingGraph.getIndexInOwner());
+
+                LinkedHashMap<AttachmentPoint, AttachmentPoint> apMapForThisBranch = 
+                    new LinkedHashMap<AttachmentPoint, AttachmentPoint>();
+                apMapForThisBranch.put(apOnLeavingSubGraph, apOnIncomingSubGraph);
+
+                if (graph.replaceSubGraph(placeholderVertexes, incomingSubgraph, 
+                    apMapForThisBranch, fsParams.getFragmentSpace()))
+                {
+                    successes++;
+                }
+            }
+
+            // We can handle more than one extension, but one is eough to signal success
+            if (successes > 0)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+//------------------------------------------------------------------------------
+
+    private static boolean extendGraphWithFragSpace(
+        Vertex curVrtx, 
+        boolean extend, 
+        boolean symmetryOnAps,
+        boolean force,
+        int chosenVrtxIdx,
+        int chosenApId,
+        GAParameters settings) 
+                       throws DENOPTIMException
+    {
         // get settings //TODO: this should happen inside RunTimeParameters
         RingClosureParameters rcParams = new RingClosureParameters();
         if (settings.containsParameters(ParametersType.RC_PARAMS))
@@ -1608,16 +1759,7 @@ public class GraphOperations
                     ParametersType.FS_PARAMS);
         }
         int maxHeavyAtoms = fsParams.getMaxHeavyAtom();
-        
-        // return true if the append has been successful
-        boolean status = false;
 
-        // check if the fragment has available APs
-        if (!curVrtx.hasFreeAP())
-        {
-            return status;
-        }
-        
         DGraph molGraph = curVrtx.getGraphOwner();
         int lvl = molGraph.getLevel(curVrtx);
 
@@ -1872,6 +2014,7 @@ public class GraphOperations
             }
         }
 
+        boolean status = false;
         if (addedVertices.size() > 0)
             status = true;
 
@@ -2723,7 +2866,6 @@ public class GraphOperations
         switch (mType) 
         {
             case CHANGEBRANCH:
-                //TODO-ai: add AI analogue
                 done = rebuildBranch(vertex, force, chosenVrtxIdx, chosenApId, 
                         settings);
                 if (!done)
@@ -2798,7 +2940,6 @@ public class GraphOperations
                 break;
                 
             case EXTEND:
-                //TODO-ai: add AI analogue: just as done for scafold but using the entire graph as scaffold.
                 vertex.getGraphOwner().removeCappingGroupsOn(vertex);
                 done = extendGraph(vertex, false, false, force, chosenVrtxIdx, 
                         chosenApId, settings);

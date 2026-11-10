@@ -3760,11 +3760,11 @@ public class DGraph implements Cloneable
     /**
      * Removes the AP properties of the graph.
      */
-    public void clearAttachmentPoints() 
+    public void clearAttachmentPointProps() 
     {
         for (Vertex v : gVertices)
         {
-            v.clearAttachmentPoints();
+            v.clearAttachmentPointProps();
         }
     }
     

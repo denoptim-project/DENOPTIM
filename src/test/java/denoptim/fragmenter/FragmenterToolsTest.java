@@ -1,7 +1,9 @@
 package denoptim.fragmenter;
 
+import static denoptim.utils.MoleculeUtils.normalizeBondAngleScore;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
@@ -30,9 +32,11 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
 
 import denoptim.constants.DENOPTIMConstants;
+import denoptim.files.FileFormat;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.APClass;
+import denoptim.graph.AttachmentPoint;
 import denoptim.graph.DGraph;
 import denoptim.graph.Fragment;
 import denoptim.graph.GraphPattern;
@@ -1245,6 +1249,69 @@ public class FragmenterToolsTest
         return vertex;
     }
 
+//------------------------------------------------------------------------------
+
+    @Test 
+    public void testFragmentationByTemplate_apIdentifiers() throws Exception
+    {
+        // Create a graph by fragmenting a molecule
+        SmilesParser smilesParser = new SmilesParser(builder);
+        IAtomContainer mol = smilesParser.parseSmiles("CNCC(=O)OC(OC)(OCC)CC1C=CC1");
+        MoleculeUtils.explicitHydrogens(mol);
+
+        List<CuttingRule> cuttingRules = new ArrayList<CuttingRule>();
+        cuttingRules.add(new CuttingRule("C-O", "[#6]", "[O]", "-", 0, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("C-N", "[#6]", "[N]", "-", 1, 
+                new ArrayList<String>()));
+
+        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+        FragmentSpace fragSpace = fsp.getFragmentSpace();
+        fragSpace.setAPclassBasedApproach(true);
+        
+        FragmenterParameters frgParams = new FragmenterParameters();
+        frgParams.setCuttingRules(cuttingRules);
+        frgParams.setScaffoldingPolicy(ScaffoldingPolicy.LARGEST_FRAGMENT);
+        frgParams.setLinearAngleLimit(170);
+
+        DGraph graph = FragmenterTools.makeGraphFromFragmentationOfMol(mol,
+                frgParams, fragSpace, true);
+
+        // Ensure the graph is not trivial
+        assertEquals(9, graph.getVertexCount());
+
+        // No identifiers now, as the AP come from cutting rules
+        int count = 0;
+        for (AttachmentPoint ap : graph.getAttachmentPoints())
+        {
+            if (ap.getProperty(AttachmentPoint.APPROPMATCHEDAP)!=null)
+                count++;
+        }
+        assertEquals(0, count);
+
+        // Make same molecule with a different atom order
+        IAtomContainer otherMol = smilesParser.parseSmiles("CCOC(CC1C=CC1)(OC)OC(=O)CNC");
+        MoleculeUtils.explicitHydrogens(otherMol);
+
+        // Make graph from template
+        frgParams.setFragmentationTmpls(Arrays.asList(graph));
+        DGraph otherGraph = FragmenterTools.makeGraphFromFragmentationOfMol(otherMol,
+                frgParams, fragSpace, false);
+
+        assertEquals(9, otherGraph.getVertexCount());
+
+        Set<AttachmentPoint> matchedAPs = new HashSet<AttachmentPoint>();
+        for (AttachmentPoint ap : otherGraph.getAttachmentPoints())
+        {
+            Object matchedAPObj = ap.getProperty(AttachmentPoint.APPROPMATCHEDAP);
+            assertNotNull(matchedAPObj);
+            assertTrue(matchedAPObj instanceof AttachmentPoint);
+            AttachmentPoint matchedAP = (AttachmentPoint) matchedAPObj;
+            matchedAPs.add(matchedAP);
+        }
+        assertEquals(matchedAPs.size(), graph.getAttachmentPoints().size()); 
+    }
+        
 //------------------------------------------------------------------------------
 
 }

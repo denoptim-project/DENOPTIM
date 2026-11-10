@@ -28,8 +28,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -49,13 +47,11 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
-import denoptim.graph.Candidate;
 import denoptim.graph.DGraph;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
-import denoptim.logging.Monitor;
 import denoptim.programs.denovo.GAParameters;
 import denoptim.programs.fragmenter.CuttingRule;
 import denoptim.programs.fragmenter.FragmenterParameters;
@@ -164,9 +160,12 @@ public class ReinventServerClientTest
     private static ReinventServerClient newClient() throws Exception
     {
         Constructor<ReinventServerClient> ctor = ReinventServerClient.class
-                .getDeclaredConstructor(String.class, Integer.class);
+                .getDeclaredConstructor(
+                    ReinventServerClient.ServiceType.class,
+                        String.class, Integer.class);
         ctor.setAccessible(true);
-        return ctor.newInstance("localhost", 1);
+        return ctor.newInstance(ReinventServerClient.ServiceType.DE_NOVO,
+                "localhost", 1);
     }
 
 //------------------------------------------------------------------------------
@@ -225,34 +224,32 @@ public class ReinventServerClientTest
 //------------------------------------------------------------------------------
 
     @Test
-    public void testParseSmilesToCandidate_invalidSmiles() throws Exception
+    public void testParseSmilesToGraph_invalidSmiles() throws Exception
     {
         ReinventServerClient client = clientReadyToFragment();
 
-        assertNull(client.parseSmilesToCandidate("not a smiles", null, 0));
+        assertNull(client.parseSmilesToGraph("not a smiles", null, 0));
     }
 
 //------------------------------------------------------------------------------
 
     @Test
-    public void testParseSmilesToCandidate_ethane() throws Exception
+    public void testParseSmilesToGraph_ethane() throws Exception
     {
         ReinventServerClient client = clientReadyToFragment();
 
-        Candidate candidate = client.parseSmilesToCandidate("CC", null, 0);
+        DGraph graph = client.parseSmilesToGraph("CC", null, 0);
 
-        assertNotNull(candidate);
-        assertNotNull(candidate.getGraph());
+        assertNotNull(graph);
         // NB: there is a C-C cutting rule in action!
-        assertEquals(2, candidate.getGraph().getVertexCount());
-        assertEquals(1, candidate.getGraph().getEdgeCount());
-        assertFalse(candidate.getSmiles().isBlank());
+        assertEquals(2, graph.getVertexCount());
+        assertEquals(1, graph.getEdgeCount());
     }
 
 //------------------------------------------------------------------------------
 
     @Test
-    public void testParseSmilesToCandidate_w_scaffold() throws Exception
+    public void testParseSmilesToGraph_w_scaffold() throws Exception
     {
         ReinventServerClient client = clientReadyToFragment();
 
@@ -282,18 +279,17 @@ public class ReinventServerClientTest
         scaffoldGraph.addCapOnAllFreeAPs(Arrays.asList(scaffoldFragment), 
             ReinventServerClient.getAPPlaceHolder(0));
 
-        Candidate candidate = client.parseSmilesToCandidate("CC(=O)CCC1C=CC1", scaffoldGraph, 0);
+        DGraph graph = client.parseSmilesToGraph("CC(=O)CCC1C=CC1", scaffoldGraph, 0);
 
-        assertNotNull(candidate);
-        assertNotNull(candidate.getGraph());
+        assertNotNull(graph);
         // NB: there is a C-C cutting rule in action!
-        assertEquals(4, candidate.getGraph().getVertexCount());
-        assertEquals(3, candidate.getGraph().getEdgeCount());
+        assertEquals(4, graph.getVertexCount());
+        assertEquals(3, graph.getEdgeCount());
 
         int numScaffolds = 0;
         int numFragments = 0;
         int numCaps = 0;
-        for (Vertex v : candidate.getGraph().getVertexList())
+        for (Vertex v : graph.getVertexList())
         {
             switch (v.getBuildingBlockType())
             {
@@ -315,7 +311,7 @@ public class ReinventServerClientTest
         int numCCAPClass = 0;
         int numScaffAPClass = 0;
         int numPlaceholderAPClass = 0;
-        for (AttachmentPoint ap : candidate.getGraph().getAttachmentPoints())
+        for (AttachmentPoint ap : graph.getAttachmentPoints())
         {
             if (ap.getAPClass().getRule().equals(CCRULENAME))
             {
@@ -353,7 +349,6 @@ public class ReinventServerClientTest
         settings.setParameters(frgParams);
 
         setField(client, "gaSettings", settings);
-        setField(client, "mnt", new Monitor());
         return client;
     }
 

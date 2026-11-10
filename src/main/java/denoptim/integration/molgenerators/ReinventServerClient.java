@@ -66,13 +66,11 @@ import denoptim.ga.EAUtils;
 import denoptim.graph.APClass;
 import denoptim.graph.APMapping;
 import denoptim.graph.AttachmentPoint;
-import denoptim.graph.Candidate;
 import denoptim.graph.DGraph;
 import denoptim.graph.Fragment;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.io.DenoptimIO;
-import denoptim.logging.Monitor;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
@@ -89,10 +87,23 @@ import denoptim.utils.Randomizer;
 public class ReinventServerClient
 {
     /**
-     * Singleton instance
+     * Kinds of service provided by Reinvent servers.
      */
-    private static ReinventServerClient instance = null;
+    public enum ServiceType {
+        DE_NOVO,
+        GROWTH
+    }
+
+    /**
+     * Singleton instances
+     */
+    private static Map<ServiceType, ReinventServerClient> instances = new HashMap<>();
     
+    /**
+     * Service type
+     */
+    private ServiceType serviceType;
+
     /**
      * Version identifier
      */
@@ -144,11 +155,6 @@ public class ReinventServerClient
         SmiFlavor.Canonical);
 
     /**
-     * Monitor to count events related to ægs run.
-     */
-    private Monitor mnt;
-
-    /**
      * GA parameters to control the generation of molecules
      */
     private GAParameters gaSettings;
@@ -157,7 +163,7 @@ public class ReinventServerClient
      * Template configuration for de novo molecualr generation (i.e., unbiased
      * generation of molecules)
      */
-    private JsonObject deNovoConfig;
+    private JsonObject configurations;
 
     /**
      * APClass for placeholder atoms
@@ -169,7 +175,8 @@ public class ReinventServerClient
     /**
      * Private constructor for singleton pattern.
      */
-    private ReinventServerClient(String hostname, Integer port) {
+    private ReinventServerClient(ServiceType serviceType, String hostname, Integer port) {
+        this.serviceType = serviceType;
         this.hostname = hostname;
         this.port = port;
     }
@@ -188,24 +195,32 @@ public class ReinventServerClient
 
     /**
      * Gets the singleton instance of RCOSocketServerClient.
+     * @param serviceType The service type
      * @param hostname The hostname or IP address of the socket server
      * @param port The port number of the socket server
      * @param randomizer The randomizer to control pseudo-number generation at the Reinvent service
      * @return The singleton instance
      */
-    public static synchronized ReinventServerClient getInstance(GAParameters gaSettings, Monitor mnt)
+    public static synchronized ReinventServerClient getInstance(
+        ServiceType serviceType, GAParameters gaSettings)
     {
-        if (instance == null) {
-            instance = new ReinventServerClient(
+        if (instances.get(serviceType) == null) {
+            ReinventServerClient client = new ReinventServerClient(
+                serviceType,
                 gaSettings.getReinventServerHostname(), 
                 gaSettings.getReinventServerPort());
-            instance.randomizer = gaSettings.getRandomizer();
-            instance.gaSettings = gaSettings;
-            instance.deNovoConfig = readReinventConfigurationFile(
-                gaSettings.getReinventDeNovoConfigPathname());
-            instance.mnt = mnt;
+            client.randomizer = gaSettings.getRandomizer();
+            client.gaSettings = gaSettings;
+            if (serviceType == ServiceType.DE_NOVO) {
+                client.configurations = readReinventConfigurationFile(
+                    gaSettings.getReinventDeNovoConfigPathname());
+            } else if (serviceType == ServiceType.GROWTH) {
+                client.configurations = readReinventConfigurationFile(
+                    gaSettings.getReinventGrowthConfigPathname());
+            }
+            instances.put(serviceType, client);
         }
-        return instance;
+        return instances.get(serviceType);
     }
 
 //------------------------------------------------------------------------------
@@ -236,25 +251,6 @@ public class ReinventServerClient
                 "Failed to parse Reinvent de novo configuration file: " 
                 + pathname, e);
         }
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Gets the singleton instance of {@link ReinventServerClient} 
-     * if it has been initialized.
-     * @return The singleton instance
-     * @throws IllegalStateException if the instance has not been initialized 
-     * yet.
-     */
-    public static ReinventServerClient getInstance() 
-    {
-        if (instance == null) {
-            throw new IllegalStateException(
-                    "ReinventServerClient has not been initialized. "
-                    + "Call getInstance(hostname, port) first.");
-        }
-        return instance;
     }
 
 //------------------------------------------------------------------------------
@@ -301,19 +297,21 @@ public class ReinventServerClient
 //------------------------------------------------------------------------------
 
     /**
-     * Generate molecules from scratch.
+     * Generate graphs from scratch.
      * @param smilesDGraphMap the map of SMILES strings to DGraph objects.
-     * @param n the total number of candidates to generate,
-     * but the result may contain less candidates depending on the hitting of
+     * @param n the total number of graphs to generate,
+     * but the result may contain fewer graphs depending on the hitting of
      * invalid SMILES strings. If the amount of input in smilesDGraphMap is 
      * higher than n, then we randomy pick n results.
-     * @return the list of generated candidates, which may be empty.
+     * @return the list of generated graphs, which may be empty.
      * @throws IOException if an I/O error occurs.
      * @throws JsonSyntaxException if the JSON syntax is invalid.
-     * @throws DENOPTIMException if an error occurs.
      */
-    public List<Candidate> generateCandidates(Map<String, DGraph> smilesDGraphMap, int n)
-        throws IOException, JsonSyntaxException, DENOPTIMException
+
+    // smilesDGraphMap.get(key) is called only if smilesDGraphMap is not null and has keys 
+    @SuppressWarnings("null") 
+    public List<DGraph> generateGraphs(Map<String, DGraph> smilesDGraphMap, int n)
+        throws IOException, JsonSyntaxException
     {
         List<String> inputSmiles = new ArrayList<>();
         if (smilesDGraphMap!=null && !smilesDGraphMap.isEmpty()) {
@@ -335,8 +333,13 @@ public class ReinventServerClient
         gaSettings.getLogger().log(Level.FINE, 
             "Request to the AI Generator socket server: " + requestAsJSONString);
         if (requestFileName != null) {
-            DenoptimIO.writeData(requestFileName, 
-                requestAsJSONString+System.lineSeparator(), true);
+            try {
+                DenoptimIO.writeData(requestFileName, 
+                    requestAsJSONString+System.lineSeparator(), true);
+            } catch (DENOPTIMException e) {
+                // Not handled as meant only to debugging
+                e.printStackTrace();
+            }
         }
 
         /*
@@ -370,14 +373,13 @@ public class ReinventServerClient
         }
 
         JsonArray molecules = answer.get("molecules").getAsJsonArray();
-        JsonArray extraToDelete = new JsonArray();
         while (molecules.size() > n)
         {
             int iii = randomizer.nextInt(molecules.size());
             molecules.remove(iii);
         }
 
-        List<Candidate> candidates = new ArrayList<>();
+        List<DGraph> graphs = new ArrayList<>();
         for (int i = 0; i < molecules.size(); i++)
         {
             JsonObject molecule = molecules.get(i).getAsJsonObject();
@@ -392,13 +394,13 @@ public class ReinventServerClient
                 scaffoldGraph = canonicalSmilesDGraphMap.get(scaffKey);
             }
             
-            Candidate candidate = parseSmilesToCandidate(smiles, scaffoldGraph, i);
-            if (candidate != null) {
-                candidates.add(candidate);
+            DGraph graph = parseSmilesToGraph(smiles, scaffoldGraph, i);
+            if (graph != null) {
+                graphs.add(graph);
             }
         }
         
-        return candidates;
+        return graphs;
     }
 
 //------------------------------------------------------------------------------
@@ -430,14 +432,16 @@ public class ReinventServerClient
 //------------------------------------------------------------------------------
 
     /**
-     * Converts a SMILES string to a {@link Candidate} object. 
+     * Converts a SMILES string to a {@link DGraph}. Conversion of that graph
+     * into a {@link denoptim.graph.Candidate} is left to the caller.
      * @param smiles The SMILES string
      * @param scaffoldGraph The pre-existing scaffold graph structure, if any.
-     * @param index The index of the candidate in the list of candidates. 
+     * @param index The index of the graph in the list of graphs. 
      * This is only meant for logging.
-     * @return The {@link Candidate} object
+     * @return The graph, or <code>null</code> when the SMILES string cannot be
+     * converted.
      */
-    Candidate parseSmilesToCandidate(String smiles, DGraph scaffoldGraph, int index) 
+    DGraph parseSmilesToGraph(String smiles, DGraph scaffoldGraph, int index) 
     {
         // Get a CDK IAtomContainer object from the SMILES string
         IAtomContainer iac = null;
@@ -490,7 +494,7 @@ public class ReinventServerClient
             }
         } else {
             // Run a template-based fragmentation to identify any pre-existing
-            // graph structure (scaffold or warheads) ot build on.
+            // graph structure (scaffold or warheads) to build on.
             try {
                 graph = makeTemplatedGraph(iac, scaffoldGraph);
             } catch (DENOPTIMException e) {
@@ -576,15 +580,7 @@ public class ReinventServerClient
                 }
             }
         }
-
-        Candidate candidate = null;
-        try {
-            candidate = EAUtils.graphToCandidate(graph, mnt, gaSettings);
-        } catch (DENOPTIMException e) {
-            //TODO-ai consider counting events in monitor
-            return null;
-        }
-        return candidate;
+        return graph;
     }
 
 //------------------------------------------------------------------------------
@@ -596,13 +592,23 @@ public class ReinventServerClient
      * @return the graph produced using the scaffoldGraph as a template.
      * @throws DENOPTIMException 
      */
-    private DGraph makeTemplatedGraph(IAtomContainer iac, DGraph scaffoldGraph) throws DENOPTIMException
+    private DGraph makeTemplatedGraph(IAtomContainer iac, DGraph scaffoldGraph) 
+        throws DENOPTIMException
     {
-        //WARNING; here we are ignoring any other fragmentation settings that might be present in the GA settings.
+        // WARNING; here we are ignoring any other fragmentation settings that 
+        // might be present in the GA settings.
         //TODO-gg consider cloning runtime settings
         FragmenterParameters frgParams = new FragmenterParameters();
         frgParams.setFragmentationTmpls(Arrays.asList(scaffoldGraph));
-        DGraph graph = EAUtils.makeGraphFromFragmentationOfMol(iac, frgParams);
+
+        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+        FragmentSpace fragSpace = fsp.getFragmentSpace();
+
+        // NB: we want to retain the AP properties because they give up the
+        // mapping between APs in the template graph and APs in the resulting graph.
+        DGraph graph = FragmenterTools.makeGraphFromFragmentationOfMol(iac, frgParams, 
+            fragSpace, false);
+
         return graph;
     }
 
@@ -621,9 +627,9 @@ public class ReinventServerClient
         // distributed among the scaffolds.
         int totalNumMols = calculateNumMoleculesRequested(inputs, n);
 
-        JsonObject jsonObj = deNovoConfig == null
+        JsonObject jsonObj = configurations == null
                 ? new JsonObject()
-                : deNovoConfig.deepCopy();
+                : configurations.deepCopy();
 
         // The seed for the random number generator: used it for ensuring reproducibility
         overwriteProperty(jsonObj, new JsonPrimitive(randomizer.nextInt(1000000)),
@@ -711,7 +717,7 @@ public class ReinventServerClient
      * @return the answer from the socket server as a JSON object.
      * @throws IOException if an I/O error occurs
      */
-    public JsonObject sendRequest(String requestAsJSONString) 
+    private JsonObject sendRequest(String requestAsJSONString) 
             throws IOException, JsonSyntaxException
     {        
         Socket socket;
@@ -814,7 +820,6 @@ public class ReinventServerClient
         return answer;
     }
 
-
 //------------------------------------------------------------------------------
 
     /**
@@ -851,14 +856,8 @@ public class ReinventServerClient
                 String smiles = null;
                 try {
                     graph.addVertex(scafVertex);
-                    addCapOnAllFreeAPs(Arrays.asList(scafVertex));
-
-                    ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(settings.getLogger(),
-                        settings.getRandomizer());
-                    t3d.setAlignBBsIn3D(false);
-                    IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(graph,true);
-                    
-                   smiles= MoleculeUtils.getSMILESForMolecule(mol, true, settings.getLogger());
+                    smiles = addAPPlaceHoldersAndGetSMILES(graph, settings);
+                    smilesDGraphMap.put(smiles, graph);
                 } catch (Exception e) {
                     settings.getLogger().log(Level.WARNING, 
                         "Scaffold decorated with AP placeholders "
@@ -866,7 +865,6 @@ public class ReinventServerClient
                         + "for de novo generation with Reinvent.");
                     continue;
                 }
-                smilesDGraphMap.put(smiles, graph);
             }
         }
 
@@ -878,10 +876,33 @@ public class ReinventServerClient
 
 //------------------------------------------------------------------------------
 
-    private void addCapOnAllFreeAPs(List<Vertex> vertexes) throws DENOPTIMException
+    /**
+     * Gets the SMILES strings for the corresponding graph.
+     * @param graph the graph to convert to SMILES.
+     * @param settings the GA settings.
+     * @return the scaffolds SMILES strings or null if no scaffolds are available.
+     */
+    public String addAPPlaceHoldersAndGetSMILES(DGraph graph, GAParameters settings)
+        throws DENOPTIMException
+    {
+        addCapOnAllFreeAPs(graph);
+
+        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(settings.getLogger(),
+            settings.getRandomizer());
+        t3d.setAlignBBsIn3D(false);
+        IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(graph,true);
+        
+        return MoleculeUtils.getSMILESForMolecule(mol, true, settings.getLogger());
+    }
+
+//------------------------------------------------------------------------------
+
+    private void addCapOnAllFreeAPs(DGraph graph) throws DENOPTIMException
     {
         int apId = -1;
-        for (Vertex curVertex : vertexes)
+        // NB: we add vertexes, so work on the initial list of vertexes
+        List<Vertex> vertices = new ArrayList<>(graph.getVertexList());
+        for (Vertex curVertex : vertices)
         {
             for (AttachmentPoint curDap : curVertex.getAttachmentPoints())
             {

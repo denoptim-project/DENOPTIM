@@ -499,6 +499,17 @@ public class GAParameters extends RunTimeParameters
      */
     protected String reinventDeNovoConfigPathname = null;
 
+    /**
+     * Flag requesting to use the Reinvent graph growth engine.
+     */
+    protected boolean useReinventForGrowth = false;
+
+    /**
+     * Pathname to file where to store the configuration for the Reinvent graph
+     * growth engine.
+     */
+    protected String reinventGrowthConfigPathname = null;
+
 //------------------------------------------------------------------------------
     
     /**
@@ -993,6 +1004,20 @@ public class GAParameters extends RunTimeParameters
     public String getReinventDeNovoConfigPathname() 
     {
         return reinventDeNovoConfigPathname;
+    } 
+
+//------------------------------------------------------------------------------
+
+    public boolean useReinventForGrowth() 
+    {
+        return useReinventForGrowth;
+    }
+
+//------------------------------------------------------------------------------
+
+    public String getReinventGrowthConfigPathname() 
+    {
+        return reinventGrowthConfigPathname;
     } 
 
 //------------------------------------------------------------------------------
@@ -1606,6 +1631,21 @@ public class GAParameters extends RunTimeParameters
                 if (value.length() > 0)
                 {
                     reinventDeNovoConfigPathname = value;
+                }
+                break;
+            }
+
+            case "USEREINVENTFORGROWTH=":
+            {
+                useReinventForGrowth = readYesNoTrueFalse(value);
+                break;
+            }
+
+            case "REINVENTGROWTHCONFIGFILE=":
+            {
+                if (value.length() > 0)
+                {
+                    reinventGrowthConfigPathname = value;
                 }
                 break;
             }

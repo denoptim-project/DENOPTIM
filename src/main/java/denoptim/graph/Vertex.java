@@ -1565,7 +1565,7 @@ public abstract class Vertex implements Cloneable
     /**
      * Clears the attachment points of the vertex.
      */
-    public void clearAttachmentPoints()
+    public void clearAttachmentPointProps()
     {
         for (AttachmentPoint ap : getAttachmentPoints())
         {

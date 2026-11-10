@@ -561,10 +561,10 @@ public class Template extends Vertex
      * Clears the attachment points of the vertex.
      */
     @Override
-    public void clearAttachmentPoints()
+    public void clearAttachmentPointProps()
     {
-        super.clearAttachmentPoints();
-        innerGraph.clearAttachmentPoints();
+        super.clearAttachmentPointProps();
+        innerGraph.clearAttachmentPointProps();
     }
 
 //-----------------------------------------------------------------------------

@@ -85,7 +85,6 @@ import denoptim.utils.GeneralUtils;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.ManySMARTSQuery;
 import denoptim.utils.MoleculeUtils;
-import denoptim.utils.ObjectPair;
 import denoptim.utils.Randomizer;
 import denoptim.utils.RotationalSpaceUtils;
 import denoptim.utils.SizeControlledSet;
@@ -668,7 +667,6 @@ public class EAUtils
         
         DGraph graph = parent.getGraph().clone();
         graph.renumberGraphVertices();
-        
         graph.setProvenance(Provenance.mutation(new Provenance.Parent(
                 parent.getGeneration(), parent.getName(),
                 parent.getGraph().getGraphId())));
@@ -875,19 +873,35 @@ public class EAUtils
         mnt.increaseBy(CounterID.BUILDANEWATTEMPTS, nextBatchSize);
         mnt.increaseBy(CounterID.NEWCANDIDATEATTEMPTS, nextBatchSize);
         ReinventServerClient reinventClient = ReinventServerClient.getInstance(
-            settings,
-            mnt);
+            ReinventServerClient.ServiceType.DE_NOVO,
+            settings);
         reinventClient.setRecordRequestsFileName(
             settings.getReinventRequestsPathname());
-        List<Candidate> candidates;
+        List<DGraph> graphs;
         try {
-            candidates = reinventClient.generateCandidates(
+            graphs = reinventClient.generateGraphs(
                 reinventClient.getSMILESToDGraphMapForScaffolds(settings), 
                 nextBatchSize);
+            // No more need to do AP-AP mapping, so cleanup to free-up memory
+            graphs.forEach(g -> g.clearAttachmentPointProps());
         } catch (IOException e) {
             mnt.increaseBy(CounterID.FAILEDBUILDATTEMPTS, nextBatchSize);
             throw new DENOPTIMException(
                 "Error generating candidates from Reinvent service", e);
+        }
+        List<Candidate> candidates = new ArrayList<>();
+        for (DGraph graph : graphs)
+        {
+            Candidate candidate = null;
+            try {
+                candidate = graphToCandidate(graph, mnt, settings);
+            } catch (DENOPTIMException e) {
+                //TODO-ai consider counting events in monitor
+            }
+            if (candidate != null)
+            {
+                candidates.add(candidate);
+            }
         }
         candidates.forEach(c -> c.getGraph().setProvenance(
                 Provenance.construction("Reinvent")));
