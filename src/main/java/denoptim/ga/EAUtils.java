@@ -170,7 +170,7 @@ public class EAUtils
         if (initPopFile.length() > 0)
         {
             EAUtils.getPopulationFromFile(initPopFile, population, uniqueIDsSet, 
-                    EAUtils.getPathNameToGenerationFolder(0, settings),
+                    0, EAUtils.getPathNameToGenerationFolder(0, settings),
                     settings);
             numFromInitGraphs = population.size();
             settings.getLogger().log(Level.INFO, "Imported " + numFromInitGraphs
@@ -1572,11 +1572,15 @@ public class EAUtils
      * @param filename the pathname to read in.
      * @param population the collection of population members.
      * @param uniqueIDsSet collection of unique identifiers.
+     * @param genID the generation ID.
+     * @param genDir the generation directory.
+     * @param settings the GA settings.
      * @throws DENOPTIMException
      * @throws IOException 
      */
     protected static void getPopulationFromFile(String filename,
             Population population, SizeControlledSet uniqueIDsSet,
+            int genID,
             String genDir, GAParameters settings) 
                     throws DENOPTIMException, IOException
     {
@@ -1598,6 +1602,7 @@ public class EAUtils
                 
                 String molName = "M" + GeneralUtils.getPaddedString(8, ctr);
                 candidate.setName(molName);
+                candidate.setGeneration(genID);
                 candidate.getGraph().setGraphId(gctr);
                 candidate.getGraph().setProvenance(Provenance.input());
                 String sdfPathName = genDir + System.getProperty("file.separator") 
