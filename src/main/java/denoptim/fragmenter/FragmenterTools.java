@@ -2347,7 +2347,7 @@ public class FragmenterTools
                 case NONE:
                 {
                     firstVertex = fragments.get(0);
-                    //TODO-gg firstVertex.setBuildingBlockType(BBType.FRAGMENT);
+                    firstVertex.setBuildingBlockType(BBType.FRAGMENT);
                     break;
                 }
             }
