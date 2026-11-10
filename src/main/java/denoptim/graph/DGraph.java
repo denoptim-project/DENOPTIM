@@ -1790,6 +1790,11 @@ public class DGraph implements Cloneable
                 // are sorted accordingly to symmetry, which should be the case.
                 int vrtPosOnOld = subGrpVrtxs.indexOf(e.getKey().getOwner());
                 int apPosOnOld = e.getKey().getIndexInOwner();
+                if (vrtPosOnOld == -1 || apPosOnOld == -1)
+                {
+                    throw new DENOPTIMException("Invalid position for attachment point "
+                            + e.getKey().getID() + " in subgraph to remove.");
+                }
                 AttachmentPoint apOnOld = verticesToRemove.get(
                         vrtPosOnOld).getAP(apPosOnOld); 
                 
@@ -3758,13 +3763,24 @@ public class DGraph implements Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Removes the AP properties of the graph.
+     * Removes all the AP properties of the graph.
      */
-    public void clearAttachmentPointProps() 
+    public void clearAPProperties() 
     {
         for (Vertex v : gVertices)
         {
-            v.clearAttachmentPointProps();
+            v.clearAPProperties();
+        }
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Removes the given AP property of the graph.
+     */
+    public void clearAPProperty(Object propertyID) {
+        for (Vertex v : gVertices) {
+            v.clearAPProperty(propertyID);
         }
     }
     

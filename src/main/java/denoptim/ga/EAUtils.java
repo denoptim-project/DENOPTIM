@@ -883,7 +883,7 @@ public class EAUtils
                 reinventClient.getSMILESToDGraphMapForScaffolds(settings), 
                 nextBatchSize);
             // No more need to do AP-AP mapping, so cleanup to free-up memory
-            graphs.forEach(g -> g.clearAttachmentPointProps());
+            graphs.forEach(g -> g.clearAPProperty(AttachmentPoint.APPROPMATCHEDAP));
         } catch (IOException e) {
             mnt.increaseBy(CounterID.FAILEDBUILDATTEMPTS, nextBatchSize);
             throw new DENOPTIMException(

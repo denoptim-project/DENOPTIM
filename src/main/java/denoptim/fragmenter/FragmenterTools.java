@@ -451,7 +451,7 @@ public class FragmenterTools
                     // that information.
                     for (Vertex v : fragments)
                     {
-                        v.clearAttachmentPointProps();
+                        v.clearAPProperty(AttachmentPoint.APPROPMATCHEDAP);
                     }
                 }
                 totalProd += fragments.size();
@@ -2347,6 +2347,7 @@ public class FragmenterTools
                 case NONE:
                 {
                     firstVertex = fragments.get(0);
+                    //TODO-gg firstVertex.setBuildingBlockType(BBType.FRAGMENT);
                     break;
                 }
             }
@@ -2414,7 +2415,7 @@ public class FragmenterTools
 
         if (cleanupAPProperties)
         {
-            graph.clearAttachmentPointProps();
+            graph.clearAPProperty(AttachmentPoint.APPROPMATCHEDAP);
         }
         
         return graph;

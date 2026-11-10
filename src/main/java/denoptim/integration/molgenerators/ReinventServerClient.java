@@ -168,7 +168,7 @@ public class ReinventServerClient
     /**
      * APClass for placeholder atoms
      */
-    public static final String PLACEHOLDERAPCLASSNAME = "PlaceholderAPForReinvent"; 
+    private static final String PLACEHOLDERAPCLASSNAME = "PlaceholderAPForReinvent"; 
 
 //------------------------------------------------------------------------------
     
@@ -502,13 +502,13 @@ public class ReinventServerClient
                 return null;
             } 
 
-            // Since the scaffoldGraph is decorated with placeholder atoms,
+            // Since the scaffoldGraph is decorated with placeholder fragments,
             // we can use the placeholder class to identify attachment points.
             List<AttachmentPoint> placeholdingAPs = new ArrayList<>();
             //TODO-gg consider APClassQuery
             for (AttachmentPoint ap : graph.getAttachmentPoints())
             {
-                if (ap.getAPClass().getRule().startsWith(ReinventServerClient.PLACEHOLDERAPCLASSNAME))
+                if (ap.getAPClass().getRule().startsWith(PLACEHOLDERAPCLASSNAME))
                 {
                     placeholdingAPs.add(ap);
                 }
@@ -552,7 +552,7 @@ public class ReinventServerClient
                 //TODO-gg consider APClassQuery
                 for (AttachmentPoint ap : incomingGraph.getAttachmentPoints())
                 {
-                    if (ap.getAPClass().getRule().startsWith(ReinventServerClient.PLACEHOLDERAPCLASSNAME))
+                    if (ap.getAPClass().getRule().startsWith(PLACEHOLDERAPCLASSNAME))
                     {
                         placeholdingAPsOnIncGraph.add(ap);
                     }
@@ -577,6 +577,34 @@ public class ReinventServerClient
                 } catch (DENOPTIMException e2) {
                     //TODO-ai consider counting events in monitor
                     return null;
+                }
+            }
+
+            // Re-assign APClass to reflect the AP on the scaffold graph.
+            // This is needed to avoid the placeholding APClass to end up
+            // into the final graph and thus pollute future fragmentations
+            // of derived graphs.
+            for (AttachmentPoint ap : graph.getAttachmentPoints())
+            {
+                if (ap.getAPClass().getRule().startsWith(PLACEHOLDERAPCLASSNAME))
+                {
+                    if (ap.getLinkedAP() == null) {
+                        throw new IllegalStateException("Unexpected free placeholding AP.");
+                    }
+                    APClass apcOnScaff = ap.getLinkedAP().getAPClass();
+                    // WARNING: we assume asymmetric cutting rule!
+                    int subClass = 1;
+                    if (apcOnScaff.getSubClass() == 1) {
+                        subClass = 0;
+                    }
+                    // TODO-ai: consider getting APClass from cutting rules.
+                    try {
+                        ap.setAPClass(APClass.make(apcOnScaff.getRule(), subClass));
+                    } catch (DENOPTIMException e2) {
+                        // Not possible
+                        throw new IllegalStateException("Not possible to make APClass: " 
+                            + e2.getMessage());
+                    }
                 }
             }
         }

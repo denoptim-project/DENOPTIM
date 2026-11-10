@@ -1628,10 +1628,6 @@ public class GraphOperations
         DGraph graph = curVrtx.getGraphOwner();
         int initialNumberOfFragments = graph.getVertexCount();
 
-
-        //TODO-gg del
-        DenoptimIO.writeGraphToFile(new File("/tmp/g.json"), FileFormat.GRAPHJSON, graph);
-
         // Keep a memory of the APs that could hold graph extending subgraphs
         List<AttachmentPoint> extendableAPs = new ArrayList<>();
         for (AttachmentPoint apOnInitialGraph : graph.getAttachmentPoints())
@@ -1727,6 +1723,7 @@ public class GraphOperations
             // We can handle more than one extension, but one is eough to signal success
             if (successes > 0)
             {
+                graph.clearAPProperty(AttachmentPoint.APPROPMATCHEDAP);
                 return true;
             }
         }

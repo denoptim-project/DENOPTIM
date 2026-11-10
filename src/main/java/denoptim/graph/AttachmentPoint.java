@@ -1218,6 +1218,16 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
 
 //------------------------------------------------------------------------------
     
+    public void removeProperty(Object key)
+    {
+        if (properties != null)
+        {
+            properties.remove(key);
+        }
+    }
+
+//------------------------------------------------------------------------------
+    
     /**
      * Prepares the two strings that can be used to define 
      * {@link AttachmentPoint}s in SDF files.
