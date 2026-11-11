@@ -4663,7 +4663,36 @@ public class DGraph implements Cloneable
             }
         }
     }
-    
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Creates a new graph that corresponds to the subgraph of this graph that
+     * is complementary to the subgraph of the given seed vertex.
+     * @param seed the vertex from which the complementary subgraph has to start.
+     * @return a new graph that corresponds to the complementary subgraph of this graph.
+     */
+    public DGraph extractComplementarySubgraph(Vertex seed)
+    {
+        // Identify the subgraph with the given seed:
+        // this subgraph is what we do NOT want in the resulting graph
+        List<Vertex> subgraphMembers = new ArrayList<>();
+        subgraphMembers.add(seed);
+        getChildTreeLimited(seed, subgraphMembers, false);
+
+        // Identify the vertexes we DO want in the resulting graph
+        List<Vertex> resultMembers = new ArrayList<>();
+        for (Vertex v : getVertexList())
+        {
+            if (!subgraphMembers.contains(v))
+            {
+                resultMembers.add(v);
+            }
+        }
+
+        return buildSubgraphFromMembers(resultMembers);
+    }
+
 //------------------------------------------------------------------------------
 
     /**
@@ -6398,7 +6427,7 @@ public class DGraph implements Cloneable
         incomingGraph.renumberGraphVertices();
 
         Edge edge = new Edge(apOnThisGraph, apOnIncomingGraph, 
-                bndType);
+                bndType); //TODO-gg remove newline
         addEdge(edge);
         
         //Import vertices

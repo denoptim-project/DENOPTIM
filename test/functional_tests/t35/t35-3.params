@@ -1,0 +1,21 @@
+#
+# This is the parameter file for test t35-3
+#
+TESTGENOPS-OP=MUTATION
+TESTGENOPS-inpFile=graph-3.sdf
+TESTGENOPS-outFile=graph_mut-3.sdf
+# WARNING: Reinvent can only create linkers between two warheads!
+TESTGENOPS-MutationTarget=2566
+TESTGENOPS-MutationType=CHANGELINK
+# Use this to generate a precomputed response file, although to ensure
+# reproducibility you want to edit such file to make it contain
+# repetitions of the same item instead of N different items.
+#TESTGENOPS-RECORDREINVENTANSWERSTOFILE=reinvent_answer.json
+TESTGENOPS-PrecomputedReinventAnswerFile=reinvent_answer-3.json
+
+# Interface with Reinvent
+GA-UseReinventForLinkers=true
+GA-ReinventLinkersConfigFile=dummy_reinvent_config.json
+GA-ReinventServerHostname=localhost
+GA-ReinventServerPort=5974
+

@@ -512,12 +512,7 @@ public class FragmenterTools
      * Chops one chemical structure by applying the given fragmentation templates.
      * @param mol the molecule to fragment
      * @param templates the template graphs to use for fragmentation
-     * @param maxBufferShellSize the maximum number of buffer shells to consider, 
-     * i.e., the number of bonds to consider for including atoms around 
-     * topology-critical atoms when trying to find a unique mapping between the 
-     * template graph and the molecular structure.
-     * @param randomizer the randomizer to use for the fragmentation.
-     * @param logger the logger to use for logging messages.
+     * @param frgParams the parameters controlling the fragmentation
      * @return the list of fragments
      * @throws DENOPTIMException 
      */

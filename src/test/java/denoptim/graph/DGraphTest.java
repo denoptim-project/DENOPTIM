@@ -3200,6 +3200,111 @@ public class DGraphTest
         assertTrue(graph.isIsomorphicTo(graphOriginal), 
                 "Original stays the same");
     }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Graph used here:
+     * <pre>
+     *        v2
+     *       /
+     *  v0-v1
+     *  |    \
+     *  |     v3
+     *  \
+     *   -v4-v5
+     * 
+     * </pre>
+     * v2 and v3 form a ring and a symmetric set.
+     */
+    @Test
+    public void testExtractComplementarySubgraph() throws Exception
+    {
+        DGraph graph = new DGraph();
+        EmptyVertex v0 = new EmptyVertex(0);
+        EmptyVertex v1 = new EmptyVertex(1);
+        EmptyVertex v2 = new EmptyVertex(2);
+        EmptyVertex v3 = new EmptyVertex(3);
+        EmptyVertex v4 = new EmptyVertex(4);
+        EmptyVertex v5 = new EmptyVertex(5);
+        buildVertexAndConnectToGraph(v0, 2, graph);
+        buildVertexAndConnectToGraph(v1, 3, graph);
+        buildVertexAndConnectToGraph(v2, 1, graph);
+        buildVertexAndConnectToGraph(v3, 1, graph);
+        buildVertexAndConnectToGraph(v4, 2, graph);
+        buildVertexAndConnectToGraph(v5, 1, graph);
+        graph.addEdge(new Edge(v0.getAP(0), v1.getAP(0)));
+        graph.addEdge(new Edge(v1.getAP(1), v2.getAP(0)));
+        graph.addEdge(new Edge(v1.getAP(2), v3.getAP(0)));
+        graph.addEdge(new Edge(v0.getAP(1), v4.getAP(0)));
+        graph.addEdge(new Edge(v4.getAP(1), v5.getAP(0)));
+        graph.addRing(v2, v3);
+        SymmetricVertexes sym = new SymmetricVertexes();
+        sym.add(v2);
+        sym.add(v3);
+        graph.addSymmetricSetOfVertices(sym);
+
+        int originalVertexCount = graph.getVertexCount();
+        int originalEdgeCount = graph.getEdgeCount();
+
+        // A leaf is the only vertex removed. Its ring and symmetric partner
+        // stay in the source graph, but the set and the ring do not survive
+        // with a single member.
+        DGraph fromLeaf = graph.extractComplementarySubgraph(v2);
+        assertEquals(5, fromLeaf.getVertexCount());
+        assertNull(fromLeaf.getVertexWithId(2));
+        assertNotNull(fromLeaf.getVertexWithId(0));
+        assertNotNull(fromLeaf.getVertexWithId(1));
+        assertNotNull(fromLeaf.getVertexWithId(3));
+        assertNotNull(fromLeaf.getVertexWithId(4));
+        assertNotNull(fromLeaf.getVertexWithId(5));
+        assertEquals(4, fromLeaf.getEdgeCount());
+        assertEquals(0, fromLeaf.getRingCount());
+        assertEquals(0, fromLeaf.getSymmetricSetCount());
+        assertTrue(fromLeaf.getVertexWithId(1) != v1);
+        assertEquals(originalVertexCount, graph.getVertexCount());
+        assertEquals(originalEdgeCount, graph.getEdgeCount());
+        assertTrue(graph.containsVertex(v2));
+
+        // The seed and every vertex below it are excluded.
+        DGraph fromBranch = graph.extractComplementarySubgraph(v1);
+        assertEquals(3, fromBranch.getVertexCount());
+        assertNull(fromBranch.getVertexWithId(1));
+        assertNull(fromBranch.getVertexWithId(2));
+        assertNull(fromBranch.getVertexWithId(3));
+        assertNotNull(fromBranch.getVertexWithId(0));
+        assertNotNull(fromBranch.getVertexWithId(4));
+        assertNotNull(fromBranch.getVertexWithId(5));
+        assertEquals(2, fromBranch.getEdgeCount());
+        assertEquals(0, fromBranch.getRingCount());
+        assertEquals(0, fromBranch.getSymmetricSetCount());
+
+        // The other branch is removed, so the ring and symmetric set remain.
+        DGraph fromOtherBranch = graph.extractComplementarySubgraph(v4);
+        assertEquals(4, fromOtherBranch.getVertexCount());
+        assertNull(fromOtherBranch.getVertexWithId(4));
+        assertNull(fromOtherBranch.getVertexWithId(5));
+        assertNotNull(fromOtherBranch.getVertexWithId(0));
+        assertNotNull(fromOtherBranch.getVertexWithId(1));
+        assertNotNull(fromOtherBranch.getVertexWithId(2));
+        assertNotNull(fromOtherBranch.getVertexWithId(3));
+        assertEquals(3, fromOtherBranch.getEdgeCount());
+        assertEquals(1, fromOtherBranch.getRingCount());
+        assertEquals(1, fromOtherBranch.getSymmetricSetCount());
+
+        // The whole spanning tree hangs from the root.
+        DGraph fromRoot = graph.extractComplementarySubgraph(v0);
+        assertEquals(0, fromRoot.getVertexCount());
+        assertEquals(0, fromRoot.getEdgeCount());
+        assertEquals(0, fromRoot.getRingCount());
+        assertEquals(0, fromRoot.getSymmetricSetCount());
+
+        assertEquals(originalVertexCount, graph.getVertexCount());
+        assertEquals(originalEdgeCount, graph.getEdgeCount());
+        assertEquals(1, graph.getRingCount());
+        assertEquals(1, graph.getSymmetricSetCount());
+        assertTrue(graph.containsVertex(v0));
+    }
     
 //-----------------------------------------------------------------------------
     

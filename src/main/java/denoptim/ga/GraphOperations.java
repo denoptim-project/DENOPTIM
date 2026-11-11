@@ -22,11 +22,14 @@ package denoptim.ga;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -719,6 +722,239 @@ public class GraphOperations
         }
         return done;
     }
+
+//------------------------------------------------------------------------------
+
+    protected static boolean substituteLink(Vertex vertex,
+            int chosenVrtxIdx, Monitor mnt, FragmentSpace fragSpace, GAParameters settings)
+                    throws DENOPTIMException
+    {
+        if (settings.useReinventForLinkers())
+        {
+            return substituteLinkUsingReinvent(vertex, mnt,settings);
+        } else {
+            return substituteLinkUsingFragSpace(vertex, chosenVrtxIdx, mnt, fragSpace);
+        }
+    }
+
+//------------------------------------------------------------------------------
+
+    protected static boolean substituteLinkUsingReinvent(Vertex vertex,
+            Monitor mnt, GAParameters settings)
+                    throws DENOPTIMException
+    {
+        // Reinvent can only handle links to TWO warheads...
+        if (vertex.getAttachmentPoints().size() != 2)
+        {
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK);
+            return false;
+        }
+        // ...and the warheads must not be void
+        if (vertex.getAttachmentPoints().get(0).isAvailable() 
+            || vertex.getAttachmentPoints().get(1).isAvailable())
+        {
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK);
+            return false;
+        }
+
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        if (settings.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsParams = (FragmentSpaceParameters)settings.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
+
+        DGraph graph = vertex.getGraphOwner();
+
+        // Identify the AP that identify the two warheads
+        AttachmentPoint linkerApToParent = null;
+        AttachmentPoint linkerApToChild = null;
+        for (AttachmentPoint ap : vertex.getAttachmentPoints())
+        {
+            // We have already ensured there are only two APs and both are used
+            if (ap.isSrcInUser())
+            {
+                linkerApToChild = ap;
+            } else {
+                linkerApToParent = ap;
+            }
+        }
+
+        //TODO-ai move this into a dedicated method (from here) to be used for insertLink mutations
+
+        int initialNumberOfFragments = graph.getVertexCount();
+
+        // Define the warheads: the subgraphs to be linked by the linker
+        AttachmentPoint parentSubgraphApToLinker = linkerApToParent.getLinkedAP();
+        DGraph parentSubgraph = graph.extractComplementarySubgraph(linkerApToParent.getOwner());
+        AttachmentPoint childSubgraphApToLinker = linkerApToChild.getLinkedAP();
+        DGraph childSubgraph = graph.extractSubgraph(childSubgraphApToLinker.getOwner());
+
+        //TODO-ai: check what happens with a ring involgins both warheads
+
+        // Configure Reinvent microservice
+        ReinventServerClient reinventClient = ReinventServerClient.getInstance(
+            ReinventServerClient.ServiceType.LINK, settings);
+        reinventClient.setRecordRequestsFileName(
+            settings.getReinventRequestsPathname());
+
+        // Define the SMILES representations for the two warheads
+        // NB: this changes the warheads graph by adding placeholders!
+        String smilesForParentWarhead = reinventClient.addAPPlaceHoldersAndGetSMILES(
+            parentSubgraph, settings);
+        String smilesForChildWarhead = reinventClient.addAPPlaceHoldersAndGetSMILES(
+            childSubgraph, settings);
+        Map<String, List<DGraph>> smilesDGraphMap = new HashMap<>();
+        smilesDGraphMap.put(smilesForParentWarhead + "|" + smilesForChildWarhead, 
+            Arrays.asList(parentSubgraph, childSubgraph));
+
+        // Get the linker subgraphs from Reinvent
+        List<DGraph> linkerSubgraphs;
+        try {
+            // Ask for more than one hoping that at least one survives.
+            linkerSubgraphs = reinventClient.generateGraphs(smilesDGraphMap ,5); 
+        } catch (IOException e) {
+            throw new DENOPTIMException(
+                "Error extending graph with Reinvent service", e);
+        }
+
+        // We identify the APs at the parent/linker and linker/child interfaces
+        // by looking at the matched APs from the input warhead subgraphs.
+        Set<AttachmentPoint> apsOnParentSubgraph = new HashSet<>(
+            parentSubgraph.getAttachmentPoints());
+        Set<AttachmentPoint> apsOnChildSubgraph = new HashSet<>(
+            childSubgraph.getAttachmentPoints());
+        
+        // We try any of the results, in random order 
+        // they are not sorted, so natural order is random order.
+        for (DGraph linkerGraph : linkerSubgraphs)
+        {
+            // Get mapping between APs on original graph and APs on linker 
+            LinkedHashMap<AttachmentPoint, AttachmentPoint> apMapInitToLinker = 
+            new LinkedHashMap<>();
+            for (AttachmentPoint apOnLinkerGraph : linkerGraph.getAttachmentPoints())
+            {
+                Object objApOnLinkerGraph = apOnLinkerGraph.getProperty(
+                    AttachmentPoint.APPROPMATCHEDAP);
+                if (objApOnLinkerGraph != null)
+                {
+                    AttachmentPoint apMatchedByLinkerGraph = (AttachmentPoint) objApOnLinkerGraph;
+                    if (apsOnParentSubgraph.contains(apMatchedByLinkerGraph))
+                    {
+                        apMapInitToLinker.put(linkerApToParent, apOnLinkerGraph);
+                    } else if (apsOnChildSubgraph.contains(apMatchedByLinkerGraph))
+                    {
+                        apMapInitToLinker.put(linkerApToChild, apOnLinkerGraph);
+                    }
+                }
+            }
+
+            // Replace old linker with new one
+            if (graph.replaceSubGraph(Arrays.asList(vertex), linkerGraph, 
+                apMapInitToLinker, fsParams.getFragmentSpace()))
+            {
+                graph.clearAPProperty(AttachmentPoint.APPROPMATCHEDAP);
+                return true;
+            }   
+        }
+
+        /*
+        
+        // Attempt to do it by making the clinet return complete graphs
+        // with parent+linker+child. However, that means that we have to identify 
+        // the APs at the paretn/chail-linker interfaces twice.
+
+
+        // Keep track of the APs holding the placeholders
+        AttachmentPoint apHoldingPlaceholderOnParentSubgraph = null;
+        //TODO-ai: consider APClassQuery
+        for (AttachmentPoint ap : parentSubgraph.getAttachmentPoints())
+        {
+            if (ap.getAPClass().getRule().startsWith(PLACEHOLDERAPCLASSNAME))
+            {
+                // Only one expected
+                apHoldingPlaceholderOnParentSubgraph = ap;
+                break;
+            }
+        }
+        AttachmentPoint apHoldingPlaceholderOnChildSubgraph = null;
+        //TODO-ai: consider APClassQuery
+        for (AttachmentPoint ap : childSubgraph.getAttachmentPoints())
+        {
+            if (ap.getAPClass().getRule().startsWith(PLACEHOLDERAPCLASSNAME))
+            {
+                // Only one expected
+                apHoldingPlaceholderOnChildSubgraph = ap;
+                break;
+            }
+        }
+
+        // Get the modified graphs from Reinvent
+        List<DGraph> graphs;
+        try {
+            // Ask for more than one hoping that at least one survives.
+            graphs = reinventClient.generateGraphs(smilesDGraphMap ,5); 
+        } catch (IOException e) {
+            throw new DENOPTIMException(
+                "Error extending graph with Reinvent service", e);
+        }
+
+        // NB: at this point we got a set of complete graphs with parent+linker+child,
+        // but the parent and child are clones of the 'graph' we are asked to mutate,
+        // so we need to port the linker into the 'graph' instance.
+
+        // We try any of the results, in random order 
+        // they are not sorted, so natural order is random order.
+        for (DGraph modGraph : graphs)
+        {
+            // Get mapping between APs on original graph and APs on incoming 
+            // subgraphs:
+            LinkedHashMap<AttachmentPoint, AttachmentPoint> apMapInitToIncoming = 
+               new LinkedHashMap<>();
+            for (AttachmentPoint apOnModifiedGraph : modGraph.getAttachmentPoints())
+            {
+                Object objApOnModGraph = apOnModifiedGraph.getProperty(
+                    AttachmentPoint.APPROPMATCHEDAP);
+                if (objApOnModGraph == null)
+                {
+                    continue;
+                }
+                AttachmentPoint apMatchedByModGraph = (AttachmentPoint) objApOnModGraph;
+
+                // NB: the AP stored in the property belongs to the parent/child 
+                // subgraph, not to the original 'graph'!
+                if (apMatchedByModGraph == linkerApToChild)
+                {
+                    apMapInitToIncoming.put(linkerApToChild, apOnModifiedGraph);
+                } else {
+                    apMapInitToIncoming.put(linkerApToParent, apOnModifiedGraph);
+                }
+                if (apMapInitToIncoming.size() == 2)
+                {
+                    break;
+                }
+            }
+
+            // Isolate Linker subgraph 
+            // NB: again, we are exploiting assumption of only two warheads
+            List<Vertex> endOfLinker = Arrays.asList(
+                apMapInitToIncoming.get(linkerApToChild).getOwner());
+            DGraph linkerSubgraph = modGraph.extractSubgraph(
+                apMapInitToIncoming.get(linkerApToChild).getOwner(),
+                endOfLinker, false);
+
+            // Replace old linker with new one
+            if (graph.replaceSubGraph(Arrays.asList(vertex), linkerSubgraph, 
+                apMapInitToIncoming, fsParams.getFragmentSpace()))
+            {
+                graph.clearAPProperty(AttachmentPoint.APPROPMATCHEDAP);
+                return true;
+            }            
+        }
+        */
+        
+        return false;
+    }
     
 //------------------------------------------------------------------------------
 
@@ -738,7 +974,7 @@ public class GraphOperations
      * @throws DENOPTIMException
      */
 
-    protected static boolean substituteLink(Vertex vertex,
+    protected static boolean substituteLinkUsingFragSpace(Vertex vertex,
             int chosenVrtxIdx, Monitor mnt, FragmentSpace fragSpace)
                     throws DENOPTIMException
     {
@@ -767,8 +1003,7 @@ public class GraphOperations
                 fragSpace);
         if (!done)
         {
-            mnt.increase(
-                    CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK_EDIT);
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK_EDIT);
         }
         return done;
     }
@@ -1613,8 +1848,7 @@ public class GraphOperations
 
 //------------------------------------------------------------------------------
 
-    private static boolean extendGraphWithReinvent(
-        Vertex curVrtx, 
+    private static boolean extendGraphWithReinvent(Vertex curVrtx, 
         GAParameters settings) 
                        throws DENOPTIMException
     {
@@ -1638,15 +1872,15 @@ public class GraphOperations
             }
         }
 
-        // Estend the molecule with Reinvent
+        // Extend the molecule with Reinvent
         ReinventServerClient reinventClient = ReinventServerClient.getInstance(
             ReinventServerClient.ServiceType.GROWTH, settings);
         reinventClient.setRecordRequestsFileName(
             settings.getReinventRequestsPathname());
-        Map<String, DGraph> smilesDGraphMap = new HashMap<>();
+        Map<String, List<DGraph>> smilesDGraphMap = new HashMap<>();
         // NB: this changes the initial graph by adding placeholders!
         smilesDGraphMap.put(reinventClient.addAPPlaceHoldersAndGetSMILES(
-            graph, settings), graph);
+            graph, settings), Arrays.asList(graph));
         List<DGraph> graphs;
         try {
             // Hard-coded: to make sure we generate more than needed
@@ -2818,6 +3052,7 @@ public class GraphOperations
             int chosenApId, Monitor mnt, GAParameters settings) 
                     throws DENOPTIMException
     {
+        // TODO: benefir for embedding of parameters in GAParameters
         FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
         if (settings.containsParameters(ParametersType.FS_PARAMS))
         {
@@ -2870,9 +3105,8 @@ public class GraphOperations
                 break;
                 
             case CHANGELINK:
-                //TODO-ai: add AI analogue
                 done = substituteLink(vertex, chosenVrtxIdx, mnt, 
-                        fsParams.getFragmentSpace());
+                    fsParams.getFragmentSpace(), settings);
                 if (!done)
                     mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK);
                 break;

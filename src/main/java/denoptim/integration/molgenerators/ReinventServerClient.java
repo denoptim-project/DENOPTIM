@@ -66,7 +66,9 @@ import denoptim.ga.EAUtils;
 import denoptim.graph.APClass;
 import denoptim.graph.APMapping;
 import denoptim.graph.AttachmentPoint;
+import denoptim.graph.AttachmentPointQuery;
 import denoptim.graph.DGraph;
+import denoptim.graph.Edge.BondType;
 import denoptim.graph.Fragment;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
@@ -92,7 +94,8 @@ public class ReinventServerClient
      */
     public enum ServiceType {
         DE_NOVO,
-        GROWTH
+        GROWTH,
+        LINK,
     }
 
     /**
@@ -171,6 +174,16 @@ public class ReinventServerClient
      */
     static final String PLACEHOLDERAPCLASSNAME = "PlaceholderAPForReinvent"; 
 
+    /**
+     * Key for the scaffold SMILES in the Reinvent answer
+     */
+    static final String SCAFFOLD_KEY = "Scaffold";
+    
+    /**
+     * Key for the warheads SMILES in the Reinvent answer
+     */
+    static final String WARHEADS_KEY = "Warheads";
+
 //------------------------------------------------------------------------------
     
     /**
@@ -212,12 +225,19 @@ public class ReinventServerClient
                 gaSettings.getReinventServerPort());
             client.randomizer = gaSettings.getRandomizer();
             client.gaSettings = gaSettings;
-            if (serviceType == ServiceType.DE_NOVO) {
-                client.configurations = readReinventConfigurationFile(
-                    gaSettings.getReinventDeNovoConfigPathname());
-            } else if (serviceType == ServiceType.GROWTH) {
-                client.configurations = readReinventConfigurationFile(
-                    gaSettings.getReinventGrowthConfigPathname());
+            switch (serviceType) {
+                case DE_NOVO:
+                    client.configurations = readReinventConfigurationFile(
+                        gaSettings.getReinventDeNovoConfigPathname());
+                    break;
+                case GROWTH:
+                    client.configurations = readReinventConfigurationFile(
+                        gaSettings.getReinventGrowthConfigPathname());
+                    break;
+                case LINK:
+                    client.configurations = readReinventConfigurationFile(
+                        gaSettings.getReinventLinkersConfigPathname());
+                    break;
             }
             instances.put(serviceType, client);
         }
@@ -298,7 +318,8 @@ public class ReinventServerClient
 //------------------------------------------------------------------------------
 
     /**
-     * Generate graphs from scratch.
+     * Generate graphs from the given mapping of SMILES requests and 
+     * corresponding DGraph objects.
      * @param smilesDGraphMap the map of SMILES strings to DGraph objects.
      * @param n the total number of graphs to generate,
      * but the result may contain fewer graphs depending on the hitting of
@@ -311,7 +332,7 @@ public class ReinventServerClient
 
     // smilesDGraphMap.get(key) is called only if smilesDGraphMap is not null and has keys 
     @SuppressWarnings("null") 
-    public List<DGraph> generateGraphs(Map<String, DGraph> smilesDGraphMap, int n)
+    public List<DGraph> generateGraphs(Map<String, List<DGraph>> smilesDGraphMap, int n)
         throws IOException, JsonSyntaxException
     {
         List<String> inputSmiles = new ArrayList<>();
@@ -321,7 +342,7 @@ public class ReinventServerClient
 
         // Reinvent returns scaffolds SMILES that are not the same as those given as input.
         // So we generate canonical SMILES to use as keys.
-        Map<String, DGraph> canonicalSmilesDGraphMap = new HashMap<>();
+        Map<String, List<DGraph>> canonicalSmilesDGraphMap = new HashMap<>();
         for (String scaffSMI : inputSmiles)
         {
             String scaffKey = getCanonicalSMILES(scaffSMI);
@@ -373,7 +394,7 @@ public class ReinventServerClient
             }
         }
 
-        // Use this to generate pre-computed answers for testing purposes
+        // Utility to generate pre-computed answers for testing purposes
         if (gaSettings.containsParameters(ParametersType.GO_PARAMS))
         {
             GeneOpsRunnerParameters goParams = (GeneOpsRunnerParameters)
@@ -403,16 +424,23 @@ public class ReinventServerClient
             JsonObject molecule = molecules.get(i).getAsJsonObject();
             String smiles = molecule.get("SMILES").getAsString();
 
-            DGraph scaffoldGraph = null;
-            String scaffoldKey = "Scaffold";
-            if (molecule.has(scaffoldKey))
+            DGraph graph = null;
+            if (molecule.has(SCAFFOLD_KEY) || molecule.has(WARHEADS_KEY))
             {
-                String scaffSMIFromReinvent = molecule.get(scaffoldKey).getAsString();
-                String scaffKey = getCanonicalSMILES(scaffSMIFromReinvent);
-                scaffoldGraph = canonicalSmilesDGraphMap.get(scaffKey);
+                String inputSMILES = "unset";
+                if (molecule.has(SCAFFOLD_KEY)) {
+                    inputSMILES = molecule.get(SCAFFOLD_KEY).getAsString();
+                } else if (molecule.has(WARHEADS_KEY))
+                {
+                    inputSMILES = molecule.get(WARHEADS_KEY).getAsString();
+                }
+                String inputKey = getCanonicalSMILES(inputSMILES);
+                graph = parseSmilesToGraph(smiles, 
+                    canonicalSmilesDGraphMap.get(inputKey), i);
+            } else {
+                graph = parseSmilesToGraph(smiles, null, i);
             }
             
-            DGraph graph = parseSmilesToGraph(smiles, scaffoldGraph, i);
             if (graph != null) {
                 graphs.add(graph);
             }
@@ -424,12 +452,20 @@ public class ReinventServerClient
 //------------------------------------------------------------------------------
 
     /**
-     * Gets the canonical SMILES string for a given SMILES string.
+     * Gets the canonical SMILES string for a given SMILES string. Handles also
+     * the combined pair of warheads SMILES (i.e., two smiles separated by '|').
      * @param smiles The SMILES string
      * @return The canonical SMILES string
      */
     private String getCanonicalSMILES(String smiles)
     {
+        if (smiles.contains("|")) {
+            String[] warheadsSmiles = smiles.split("\\|");
+            String canonicalWarheadsSmiles = getCanonicalSMILES(warheadsSmiles[0]) 
+                + "|" + getCanonicalSMILES(warheadsSmiles[1]);
+            return canonicalWarheadsSmiles;
+        }
+
         IAtomContainer iac = null;
         try {
             iac = smilesParser.parseSmiles(smiles);
@@ -450,16 +486,16 @@ public class ReinventServerClient
 //------------------------------------------------------------------------------
 
     /**
-     * Converts a SMILES string to a {@link DGraph}. Conversion of that graph
-     * into a {@link denoptim.graph.Candidate} is left to the caller.
+     * Converts a SMILES string to a {@link DGraph} considering the template 
+     * graph/s, if given.
      * @param smiles The SMILES string
-     * @param scaffoldGraph The pre-existing scaffold graph structure, if any.
+     * @param templateGraphs the template graph/s, if any.
      * @param index The index of the graph in the list of graphs. 
      * This is only meant for logging.
      * @return The graph, or <code>null</code> when the SMILES string cannot be
      * converted.
      */
-    DGraph parseSmilesToGraph(String smiles, DGraph scaffoldGraph, int index) 
+    DGraph parseSmilesToGraph(String smiles, List<DGraph> templateGraphs, int index) 
     {
         // Get a CDK IAtomContainer object from the SMILES string
         IAtomContainer iac = null;
@@ -501,7 +537,7 @@ public class ReinventServerClient
         }
 
         DGraph graph = null;
-        if (scaffoldGraph == null)
+        if (templateGraphs == null)
         {
             try {
                 graph = FragmenterTools.makeGraphFromFragmentationOfMol(
@@ -511,122 +547,430 @@ public class ReinventServerClient
                 return null;
             }
         } else {
-            // Run a template-based fragmentation to identify any pre-existing
-            // graph structure (scaffold or warheads) to build on.
+            if (templateGraphs.size() == 1) {
+                graph =parseAtomContainerToGraph(iac, templateGraphs.get(0), 
+                    index, fragSpace, frgParams);
+            } else if (templateGraphs.size() == 2) {
+                graph = parseAtomContainerToLinkedGraph(iac, 
+                    templateGraphs.get(0), templateGraphs.get(1), 
+                    index, fragSpace, frgParams);
+            } else {
+                throw new IllegalStateException(
+                    "Unexpected number of template graphs: " + templateGraphs.size());
+            }
+        }
+        return graph;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Converts the given {@link IAtomContainer} to a {@link DGraph}.
+     * @param iac The {@link IAtomContainer} to convert
+     * @param scaffoldGraph The pre-existing graph structures (not null!).
+     * @param index The index of the graph in the list of graphs. 
+     * This is only meant for logging.    
+     * @param fragSpace The {@link FragmentSpace} to use
+     * @param frgParams The {@link FragmenterParameters} to use
+     * @return The graph, or <code>null</code> when the {@link IAtomContainer} 
+     * cannot be converted.
+     */
+    private DGraph parseAtomContainerToGraph(IAtomContainer iac, DGraph scaffoldGraph, 
+        int index, FragmentSpace fragSpace, FragmenterParameters frgParams)
+    {
+        DGraph graph = null;
+
+        // Run a template-based fragmentation to identify any pre-existing
+        // graph structure to build on.
+        try {
+            graph = makeTemplatedGraph(iac, scaffoldGraph);
+        } catch (DENOPTIMException e) {
+            //TODO-ai consider counting events in monitor
+            return null;
+        } 
+
+        // Since the scaffoldGraph is decorated with placeholder fragments,
+        // we can use the placeholder class to identify attachment points.
+        List<AttachmentPoint> placeholdingAPs = new ArrayList<>();
+        //TODO-gg consider APClassQuery
+        for (AttachmentPoint ap : graph.getAttachmentPoints())
+        {
+            if (ap.getAPClass().getRule().startsWith(PLACEHOLDERAPCLASSNAME))
+            {
+                placeholdingAPs.add(ap);
+            }
+        }
+
+        // Each placeholdingAPs is on a fragment that we must try to chop further.
+        Map<Vertex,DGraph> replacements = new HashMap<>();
+        Set<Vertex> visitedFragments = new HashSet<>();
+        for (AttachmentPoint placeholdingAP : placeholdingAPs)
+        {
+            Vertex fragToFragment = placeholdingAP.getOwner();
+            if (visitedFragments.contains(fragToFragment)) {
+                continue;
+            }
+
+            // TODO: this will benefit from copying of RunTimeParameters
+            IAtomContainer fragIAC = fragToFragment.getIAtomContainer();
+            DGraph fragGraph = null;
             try {
-                graph = makeTemplatedGraph(iac, scaffoldGraph);
+                FragmenterParameters frgParamsNoScaffolding = new FragmenterParameters();
+                frgParamsNoScaffolding.setCuttingRules(frgParams.getCuttingRules());
+                frgParamsNoScaffolding.setScaffoldingPolicy(ScaffoldingPolicy.NONE);
+                fragGraph = FragmenterTools.makeGraphFromFragmentationOfMol(
+                    fragIAC, frgParamsNoScaffolding, fragSpace, false);
             } catch (DENOPTIMException e) {
+                // Keep the original un-fragmented fragment, so do nothing.
+            }
+            if (fragGraph != null && fragGraph.getVertexList().size() > 1) {
+                replacements.put(fragToFragment, fragGraph);
+            }
+            visitedFragments.add(fragToFragment);
+        }
+
+        // Replace un-fragmented fragments with the graphs resulting from fragmentation.
+        for (Map.Entry<Vertex,DGraph> e : replacements.entrySet()) 
+        {
+            Vertex fragToReplace = e.getKey();
+            DGraph incomingGraph = e.getValue();
+
+            List<AttachmentPoint> placeholdingAPsOnIncGraph = new ArrayList<>();
+            //TODO-gg consider APClassQuery
+            for (AttachmentPoint ap : incomingGraph.getAttachmentPoints())
+            {
+                if (ap.getAPClass().getRule().startsWith(PLACEHOLDERAPCLASSNAME))
+                {
+                    placeholdingAPsOnIncGraph.add(ap);
+                }
+            }
+
+            APMapping apMapOldToIncoming = new APMapping();
+            for (AttachmentPoint apOnIncGraph : placeholdingAPsOnIncGraph)
+            {
+                for (AttachmentPoint placeholdingAP : placeholdingAPs)
+                {
+                    if (placeholdingAP.getAPClass().equals(apOnIncGraph.getAPClass()))
+                    {
+                        apMapOldToIncoming.put(placeholdingAP, apOnIncGraph);
+                        break;
+                    }
+                }
+            }
+
+            try {
+                graph.replaceSubGraph(Arrays.asList(fragToReplace), incomingGraph, 
+                    apMapOldToIncoming, fragSpace);
+            } catch (DENOPTIMException e2) {
                 //TODO-ai consider counting events in monitor
                 return null;
-            } 
-
-            // Since the scaffoldGraph is decorated with placeholder fragments,
-            // we can use the placeholder class to identify attachment points.
-            List<AttachmentPoint> placeholdingAPs = new ArrayList<>();
-            //TODO-gg consider APClassQuery
-            for (AttachmentPoint ap : graph.getAttachmentPoints())
-            {
-                if (ap.getAPClass().getRule().startsWith(PLACEHOLDERAPCLASSNAME))
-                {
-                    placeholdingAPs.add(ap);
-                }
             }
+        }
 
-            // Each placeholdingAPs is on a fragment that we must try to chop further.
-            Map<Vertex,DGraph> replacements = new HashMap<>();
-            Set<Vertex> visitedFragments = new HashSet<>();
-            for (AttachmentPoint placeholdingAP : placeholdingAPs)
+        // Re-assign APClass to reflect the AP on the scaffold graph.
+        // This is needed to avoid the placeholding APClass to end up
+        // into the final graph and thus pollute future fragmentations
+        // of derived graphs.
+        for (AttachmentPoint ap : graph.getAttachmentPoints())
+        {
+            if (ap.getAPClass().getRule().startsWith(PLACEHOLDERAPCLASSNAME))
             {
-                Vertex fragToFragment = placeholdingAP.getOwner();
-                if (visitedFragments.contains(fragToFragment)) {
-                    continue;
+                if (ap.getLinkedAP() == null) {
+                    throw new IllegalStateException("Unexpected free placeholding AP.");
                 }
-
-                // TODO: this will benefit from copying of RunTimeParameters
-                IAtomContainer fragIAC = fragToFragment.getIAtomContainer();
-                DGraph fragGraph = null;
+                APClass apcOnScaff = ap.getLinkedAP().getAPClass();
+                // WARNING: we assume asymmetric cutting rule!
+                int subClass = 1;
+                if (apcOnScaff.getSubClass() == 1) {
+                    subClass = 0;
+                }
+                // TODO-ai: consider getting APClass from cutting rules.
                 try {
-                    FragmenterParameters frgParamsNoScaffolding = new FragmenterParameters();
-                    frgParamsNoScaffolding.setCuttingRules(frgParams.getCuttingRules());
-                    frgParamsNoScaffolding.setScaffoldingPolicy(ScaffoldingPolicy.NONE);
-                    fragGraph = FragmenterTools.makeGraphFromFragmentationOfMol(
-                        fragIAC, frgParamsNoScaffolding, fragSpace, false);
-                } catch (DENOPTIMException e) {
-                    // Keep the original un-fragmented fragment, so do nothing.
-                }
-                if (fragGraph != null && fragGraph.getVertexList().size() > 1) {
-                    replacements.put(fragToFragment, fragGraph);
-                }
-                visitedFragments.add(fragToFragment);
-            }
-
-            // Replaced un-fragmented fragment with the graph resulting from fragmentation.
-            for (Map.Entry<Vertex,DGraph> e : replacements.entrySet()) 
-            {
-                Vertex fragToReplace = e.getKey();
-                DGraph incomingGraph = e.getValue();
-
-                List<AttachmentPoint> placeholdingAPsOnIncGraph = new ArrayList<>();
-                //TODO-gg consider APClassQuery
-                for (AttachmentPoint ap : incomingGraph.getAttachmentPoints())
-                {
-                    if (ap.getAPClass().getRule().startsWith(PLACEHOLDERAPCLASSNAME))
-                    {
-                        placeholdingAPsOnIncGraph.add(ap);
-                    }
-                }
-
-                APMapping apMapOldToIncoming = new APMapping();
-                for (AttachmentPoint apOnIncGraph : placeholdingAPsOnIncGraph)
-                {
-                    for (AttachmentPoint placeholdingAP : placeholdingAPs)
-                    {
-                        if (placeholdingAP.getAPClass().equals(apOnIncGraph.getAPClass()))
-                        {
-                            apMapOldToIncoming.put(placeholdingAP, apOnIncGraph);
-                            break;
-                        }
-                    }
-                }
-
-                try {
-                    graph.replaceSubGraph(Arrays.asList(fragToReplace), incomingGraph, 
-                        apMapOldToIncoming, fragSpace);
+                    ap.setAPClass(APClass.make(apcOnScaff.getRule(), subClass));
                 } catch (DENOPTIMException e2) {
-                    //TODO-ai consider counting events in monitor
-                    return null;
-                }
-            }
-
-            // Re-assign APClass to reflect the AP on the scaffold graph.
-            // This is needed to avoid the placeholding APClass to end up
-            // into the final graph and thus pollute future fragmentations
-            // of derived graphs.
-            for (AttachmentPoint ap : graph.getAttachmentPoints())
-            {
-                if (ap.getAPClass().getRule().startsWith(PLACEHOLDERAPCLASSNAME))
-                {
-                    if (ap.getLinkedAP() == null) {
-                        throw new IllegalStateException("Unexpected free placeholding AP.");
-                    }
-                    APClass apcOnScaff = ap.getLinkedAP().getAPClass();
-                    // WARNING: we assume asymmetric cutting rule!
-                    int subClass = 1;
-                    if (apcOnScaff.getSubClass() == 1) {
-                        subClass = 0;
-                    }
-                    // TODO-ai: consider getting APClass from cutting rules.
-                    try {
-                        ap.setAPClass(APClass.make(apcOnScaff.getRule(), subClass));
-                    } catch (DENOPTIMException e2) {
-                        // Not possible
-                        throw new IllegalStateException("Not possible to make APClass: " 
-                            + e2.getMessage());
-                    }
+                    // Not possible
+                    throw new IllegalStateException("Not possible to make APClass: " 
+                        + e2.getMessage());
                 }
             }
         }
         return graph;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Converts a SMILES string to a {@link DGraph} that doe NOT include the
+     * warheads given as parameters.
+     * @param smiles The SMILES string
+     * @param parentWarhead part of the graph that acts as parent to the linker.
+     * @param childWarwead part of the graph that acts as child ofthe linker.
+     * @param index The index of the graph in the list of graphs. 
+     * This is only meant for logging.
+     * @return The graph, or <code>null</code> when the SMILES string cannot be
+     * converted.
+     */
+    private DGraph parseAtomContainerToLinkedGraph(IAtomContainer iac,
+        DGraph parentWarhead, DGraph childWarhead, int index,
+        FragmentSpace fragSpace, FragmenterParameters frgParams)
+    {
+        // Run a template-based fragmentation to identify any pre-existing
+        // graph structure on the parent side
+        DGraph parentSideGraph = null;
+        try {
+            parentSideGraph = makeTemplatedGraph(iac, parentWarhead);
+        } catch (DENOPTIMException e) {
+            //TODO-ai consider counting events in monitor
+            return null;
+        }
+        if (parentSideGraph == null) 
+        {
+            // Cannot identify parent warhead: abbandon
+            return null;
+        }
+
+        // Identify the whole linker+child vertex Because 
+        // of the constraint to only TWO warheads, there is only linker
+        // vertex.
+        Vertex linkerAndChildVertex = null;
+        AttachmentPoint apOfLinkerOnParentGraph = null;
+        APClass parentSideAPClass = null;
+        try {
+            parentSideAPClass = APClass.make("parentSide" + PLACEHOLDERAPCLASSNAME,0);
+        } catch (DENOPTIMException e) {
+            // Not possible 
+            throw new IllegalStateException("Not possible to make parentSideAPClass: " 
+                + e.getMessage());
+        }
+        for (AttachmentPoint ap : parentSideGraph.getAttachmentPoints())
+        {
+            if (ap.getAPClass().getRule().startsWith(PLACEHOLDERAPCLASSNAME))
+            {
+                linkerAndChildVertex = ap.getOwner();
+                // Rename the APClass to acoid clash with the fragmentation 
+                // on the child side.
+                ap.setAPClass(parentSideAPClass);
+                // And keep track of the AP on the parent graphg:
+                // we'll need it to replace the placeholder APs with the linker graph.
+                apOfLinkerOnParentGraph = ap;
+                break;
+            }
+        }
+        if (linkerAndChildVertex == null) {
+            // Cannot identify linker vertex: abbandon
+            return null;
+        }
+
+        // Fragment the linker+child vertex to isolate the two components.
+        DGraph childSideGraph = null;
+        try {
+            FragmenterParameters frgParsChildSide = new FragmenterParameters();
+            frgParsChildSide.setScaffoldingPolicy(ScaffoldingPolicy.NONE);
+            frgParsChildSide.setFragmentationTmpls(Arrays.asList(childWarhead));
+            childSideGraph = FragmenterTools.makeGraphFromFragmentationOfMol(
+                linkerAndChildVertex.getIAtomContainer(), 
+                frgParsChildSide, fragSpace, false);
+            //TODO-ai vertex types seem wrong, here
+        } catch (DENOPTIMException e) {
+            // Cannot identify child warhead: abbandon
+            return null;
+        }
+        if (childSideGraph == null) 
+        {
+            // Cannot identify child warhead: abbandon
+            return null;
+        }
+        
+        // Identify the whole linker, which we further fragment. Because 
+        // of the constraint to only TWO warheads, there is only one linker
+        // vertex, but there could be many from the child warhead.
+        Vertex linkerToFragment = null;
+        AttachmentPoint linkerToParentApOnChildGraph = childSideGraph.findAPs(
+            new AttachmentPointQuery(null, //apID
+                null, // apIndex, 
+                parentSideAPClass, // apClass, 
+                null, // vertexQuery, 
+                null, // edgeQuery, 
+                null), // linkedAPQuery
+                frgParams.getLogger()).get(0);
+        linkerToFragment = linkerToParentApOnChildGraph.getOwner();
+
+        // Identify the AP on the child warhead subgraph that will be 
+        // appended to the parent+linker graph.
+        AttachmentPoint linkerToChildApOnChildGraph = null;
+        //TODO-ai: consider APClassQuery
+        for (AttachmentPoint ap : childSideGraph.getAttachmentPoints())
+        {
+            if (ap.getAPClass().getRule().startsWith(PLACEHOLDERAPCLASSNAME))
+            {
+                // Only one expected
+                linkerToChildApOnChildGraph = ap;
+                break;
+            }
+        }
+        AttachmentPoint apToLinkerOnChildGraph = linkerToChildApOnChildGraph.getLinkedAP();
+        BondType bondTypeChildToLinker = linkerToChildApOnChildGraph.getEdgeUser().getBondType();
+
+        // Now, we can isolate the child warhead from the linker.
+        // This is what we'll append to the parent+linker graph.
+        childSideGraph.removeVertex(linkerToFragment);
+
+        // Further fragment the linker, if possible.
+        // TODO: this will benefit from copying of RunTimeParameters
+        IAtomContainer fragIAC = linkerToFragment.getIAtomContainer();
+        DGraph linkerGraph = null;
+        try {
+            FragmenterParameters frgParamsNoScaffolding = new FragmenterParameters();
+            frgParamsNoScaffolding.setCuttingRules(frgParams.getCuttingRules());
+            frgParamsNoScaffolding.setScaffoldingPolicy(ScaffoldingPolicy.NONE);
+            linkerGraph = FragmenterTools.makeGraphFromFragmentationOfMol(
+                fragIAC, frgParamsNoScaffolding, fragSpace, false);
+        } catch (DENOPTIMException e) {
+            // Keep the original un-fragmented fragment, so do nothing.
+        }
+        if (linkerGraph == null)
+        {
+            linkerGraph = new DGraph();
+            try {
+                linkerGraph.addVertex(linkerToFragment.clone());
+            } catch (DENOPTIMException e) {
+                throw new IllegalStateException("Not possible to clone vertex: " 
+                    + e.getMessage());
+            }
+        }
+
+        /*
+        
+        This code correctly merges parent+linker+child into a single graph.
+        But this is redundant, here, becasue to use the linker we still have to
+        explore the resulting graph again to find the APs at the parent/linker and 
+        linker/child interfaces. So, I do not see the point of returning a complete 
+        graph. Yet, the following code works...
+
+        // Define AP mapping to replace linker in the parent side graph
+        APMapping apMapParentToLinker = new APMapping();
+        AttachmentPoint apOnLinkerGraph = linkerGraph.findAPs(
+            new AttachmentPointQuery(null, //apID
+                null, // apIndex, 
+                parentSideAPClass, // apClass, 
+                null, // vertexQuery, 
+                null, // edgeQuery, 
+                null), // linkedAPQuery
+                frgParams.getLogger()).get(0);
+        apMapParentToLinker.put(apOfLinkerOnParentGraph, apOnLinkerGraph);
+
+        // Replace placeholder APs with the linker graph.
+        try {
+            parentSideGraph.replaceSubGraph(
+                Arrays.asList(linkerAndChildVertex), 
+                linkerGraph, apMapParentToLinker, fragSpace);
+        } catch (DENOPTIMException e) {
+            throw new IllegalStateException("Not possible to replace subgraph: " 
+                + e.getMessage());
+        }
+
+        // Define the AP on the parent+linker graph that will hold the child side.
+        AttachmentPoint apOnGrowingGraph = null;
+        //TODO-ai: consider APClassQuery
+        for (AttachmentPoint ap : parentSideGraph.getAttachmentPoints())
+        {
+            if (ap.getAPClass().getRule().startsWith(PLACEHOLDERAPCLASSNAME))
+            {
+                // Only one expected
+                apOnGrowingGraph = ap;
+                break;
+            }
+        }
+
+        // Append the child side to the parent+linker graph.
+        int vertexCountBefore = parentSideGraph.getVertexList().size();
+        try {
+            parentSideGraph.appendGraphOnAP(apOnGrowingGraph, apToLinkerOnChildGraph, 
+                bondTypeChildToLinker);
+        } catch (DENOPTIMException e) {
+            throw new IllegalStateException("Not possible to append graph on AP: " 
+                + e.getMessage());
+        }
+        int vertexCountAfter = parentSideGraph.getVertexList().size();
+        if (vertexCountAfter <= vertexCountBefore) {
+            throw new IllegalStateException("Expected at least 1 new vertex, got " + (vertexCountAfter - vertexCountBefore));
+        }
+
+        // Re-assign APClass to reflect the AP on the template graph.
+        // This is needed to avoid the placeholding APClasses to end up
+        // into the final graph and thus pollute future fragmentations
+        // of derived graphs.
+        for (AttachmentPoint ap : parentSideGraph.getAttachmentPoints())
+        {
+            if (ap.getAPClass().getRule().startsWith(PLACEHOLDERAPCLASSNAME)
+                || ap.getAPClass().equals(parentSideAPClass))
+            {
+                if (ap.getLinkedAP() == null) {
+                    throw new IllegalStateException("Unexpected free placeholding AP.");
+                }
+                APClass apcOnTemplate = ap.getLinkedAP().getAPClass();
+                // WARNING: we assume asymmetric cutting rule!
+                int subClass = 1;
+                if (apcOnTemplate.getSubClass() == 1) {
+                    subClass = 0;
+                }
+                // TODO-ai: consider getting APClass from cutting rules.
+                try {
+                    ap.setAPClass(APClass.make(apcOnTemplate.getRule(), subClass));
+                } catch (DENOPTIMException e2) {
+                    // Not possible
+                    throw new IllegalStateException("Not possible to make APClass: " 
+                        + e2.getMessage());
+                }
+            }
+        }
+
+        return parentSideGraph;
+        */
+
+        // Re-assign APClass to reflect the AP on the template graph.
+        // This is needed to avoid the placeholding APClasses to end up
+        // into the final graph and thus pollute future fragmentations
+        // of derived graphs.
+        for (AttachmentPoint ap : linkerGraph.getAttachmentPoints())
+        {
+            if (ap.getAPClass().getRule().startsWith(PLACEHOLDERAPCLASSNAME)
+                || ap.getAPClass().equals(parentSideAPClass))
+            {
+                APClass apcOnTemplate = null;
+                // Record the matched AP from the input warhead subgraphs: 
+                // we'll need it for installing the linker in the correct direction 
+                if (ap.getAPClass().getRule().startsWith(PLACEHOLDERAPCLASSNAME))
+                {
+                    ap.setProperty(AttachmentPoint.APPROPMATCHEDAP, 
+                        apToLinkerOnChildGraph.getProperty(
+                            AttachmentPoint.APPROPMATCHEDAP));
+                    apcOnTemplate = apToLinkerOnChildGraph.getAPClass();
+                } else if (ap.getAPClass().equals(parentSideAPClass))
+                {
+                    ap.setProperty(AttachmentPoint.APPROPMATCHEDAP, 
+                        apOfLinkerOnParentGraph.getLinkedAP().getProperty(
+                            AttachmentPoint.APPROPMATCHEDAP));
+                    apcOnTemplate = apOfLinkerOnParentGraph.getLinkedAP().getAPClass();
+                }
+
+                // WARNING: we assume asymmetric cutting rule!
+                int subClass = 1;
+                if (apcOnTemplate.getSubClass() == 1) {
+                    subClass = 0;
+                }
+                // TODO-ai: consider getting APClass from cutting rules.
+                try {
+                    ap.setAPClass(APClass.make(apcOnTemplate.getRule(), subClass));
+                } catch (DENOPTIMException e2) {
+                    // Not possible
+                    throw new IllegalStateException("Not possible to make APClass: " 
+                        + e2.getMessage());
+                }
+            }
+        }
+
+        return linkerGraph;
     }
 
 //------------------------------------------------------------------------------
@@ -889,7 +1233,7 @@ public class ReinventServerClient
      * @param settings the GA settings.
      * @return the scaffolds SMILES strings or null if no scaffolds are available.
      */
-    public Map<String, DGraph> getSMILESToDGraphMapForScaffolds(GAParameters settings)
+    public Map<String, List<DGraph>> getSMILESToDGraphMapForScaffolds(GAParameters settings)
     {
         FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
         if (settings.containsParameters(ParametersType.FS_PARAMS))
@@ -899,7 +1243,7 @@ public class ReinventServerClient
         }
         FragmentSpace fragSpace = fsParams.getFragmentSpace();
 
-        Map<String, DGraph> smilesDGraphMap = new HashMap<String, DGraph>();
+        Map<String, List<DGraph>> smilesDGraphMap = new HashMap<String, List<DGraph>>();
         if (fragSpace != null && fragSpace.getScaffoldLibrary() != null 
                 && !fragSpace.getScaffoldLibrary().isEmpty()) 
         {
@@ -919,7 +1263,7 @@ public class ReinventServerClient
                 try {
                     graph.addVertex(scafVertex);
                     smiles = addAPPlaceHoldersAndGetSMILES(graph, settings);
-                    smilesDGraphMap.put(smiles, graph);
+                    smilesDGraphMap.put(smiles, Arrays.asList(graph));
                 } catch (Exception e) {
                     settings.getLogger().log(Level.WARNING, 
                         "Scaffold decorated with AP placeholders "
@@ -993,14 +1337,14 @@ public class ReinventServerClient
             // Use apID in the "rule" part of the APClass to avoid having to 
             // match also the subclass.
             placeHolderFrag.addAPOnAtom(atm, APClass.make(
-                ReinventServerClient.PLACEHOLDERAPCLASSNAME+"_"+apId,0), 
+                PLACEHOLDERAPCLASSNAME+"_"+apId,0), 
                 new Point3d(new double[]{0.0, 0.0, 1.0}));
         } catch (DENOPTIMException e) {
             // This cannot happen unless there are unforeseen changed to APClass
             // basename syntax.
             throw new IllegalArgumentException(
                 "Illegal APClass built form '" 
-                + ReinventServerClient.PLACEHOLDERAPCLASSNAME + "'"
+                + PLACEHOLDERAPCLASSNAME + "'"
                 + " with apId=" + apId + ". "
                 + "Report this to the developers.", e);
         }

@@ -1,0 +1,40 @@
+{
+  "status": "SUCCESS",
+  "molecules": [
+    {
+      "SMILES": "CCOCCCN(Cc1nc2ccccc2[nH]1)C(=O)C(CCOCC)=CNC(N)=O",
+      "SMILES_state": "1",
+      "Warheads": "C(N(CCCOCC)*)c1nc2ccccc2[nH]1|O=C(*)N",
+      "Linker": "C(=CC(=O)[*])N[*]",
+      "NLL": "9.52"
+    },
+    {
+      "SMILES": "CCOCCCN(Cc1nc2ccccc2[nH]1)C(=O)C(CCOCC)=CNC(N)=O",
+      "SMILES_state": "1",
+      "Warheads": "C(N(CCCOCC)*)c1nc2ccccc2[nH]1|O=C(*)N",
+      "Linker": "C(=CC(=O)[*])N[*]",
+      "NLL": "9.52"
+    },
+    {
+      "SMILES": "CCOCCCN(Cc1nc2ccccc2[nH]1)C(=O)C(CCOCC)=CNC(N)=O",
+      "SMILES_state": "1",
+      "Warheads": "C(N(CCCOCC)*)c1nc2ccccc2[nH]1|O=C(*)N",
+      "Linker": "C(=CC(=O)[*])N[*]",
+      "NLL": "9.52"
+    },
+    {
+      "SMILES": "CCOCCCN(Cc1nc2ccccc2[nH]1)C(=O)C(CCOCC)=CNC(N)=O",
+      "SMILES_state": "1",
+      "Warheads": "C(N(CCCOCC)*)c1nc2ccccc2[nH]1|O=C(*)N",
+      "Linker": "C(=CC(=O)[*])N[*]",
+      "NLL": "9.52"
+    },
+    {
+      "SMILES": "CCOCCCN(Cc1nc2ccccc2[nH]1)C(=O)C(CCOCC)=CNC(N)=O",
+      "SMILES_state": "1",
+      "Warheads": "C(N(CCCOCC)*)c1nc2ccccc2[nH]1|O=C(*)N",
+      "Linker": "C(=CC(=O)[*])N[*]",
+      "NLL": "9.52"
+    }
+  ]
+}

@@ -123,7 +123,8 @@ public class ReinventServerClientTest
         GAParameters settings = settingsWithScaffolds(scaffolds);
         settings.getRandomizer().initialiseRNG(1L);
 
-        Map<String, DGraph> smilesDGraphMap = client.getSMILESToDGraphMapForScaffolds(settings);
+        Map<String, List<DGraph>> smilesDGraphMap = 
+            client.getSMILESToDGraphMapForScaffolds(settings);
         List<String> smiles = new ArrayList<>(smilesDGraphMap.keySet());
 
         assertNotNull(smiles);
@@ -279,7 +280,8 @@ public class ReinventServerClientTest
         scaffoldGraph.addCapOnAllFreeAPs(Arrays.asList(scaffoldFragment), 
             ReinventServerClient.getAPPlaceHolder(0));
 
-        DGraph graph = client.parseSmilesToGraph("CC(=O)CCC1C=CC1", scaffoldGraph, 0);
+        DGraph graph = client.parseSmilesToGraph("CC(=O)CCC1C=CC1", 
+            Arrays.asList(scaffoldGraph), 0);
 
         assertNotNull(graph);
         // NB: there is a C-C cutting rule in action!

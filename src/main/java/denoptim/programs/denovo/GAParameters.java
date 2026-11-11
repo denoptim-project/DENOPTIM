@@ -510,6 +510,17 @@ public class GAParameters extends RunTimeParameters
      */
     protected String reinventGrowthConfigPathname = null;
 
+    /**
+     * Flag requesting to use the Reinvent linker substitution engine.
+     */
+    protected boolean useReinventForLinkers = false;
+
+    /**
+     * Pathname to file where to store the configuration for the Reinvent linker
+     * substitution engine.
+     */
+    protected String reinventLinkersConfigPathname = null;
+
 //------------------------------------------------------------------------------
     
     /**
@@ -1019,6 +1030,20 @@ public class GAParameters extends RunTimeParameters
     {
         return reinventGrowthConfigPathname;
     } 
+
+//------------------------------------------------------------------------------
+
+    public boolean useReinventForLinkers() 
+    {
+        return useReinventForLinkers;
+    }
+
+//------------------------------------------------------------------------------
+
+    public String getReinventLinkersConfigPathname() 
+    {
+        return reinventLinkersConfigPathname;
+    }
 
 //------------------------------------------------------------------------------
 
@@ -1646,6 +1671,21 @@ public class GAParameters extends RunTimeParameters
                 if (value.length() > 0)
                 {
                     reinventGrowthConfigPathname = value;
+                }
+                break;
+            }
+
+            case "USEREINVENTFORLINKERS=":
+            {
+                useReinventForLinkers = readYesNoTrueFalse(value);
+                break;
+            }
+
+            case "REINVENTLINKERSCONFIGFILE=":
+            {
+                if (value.length() > 0)
+                {
+                    reinventLinkersConfigPathname = value;
                 }
                 break;
             }
