@@ -41,7 +41,7 @@ public class GeneOpsRunnerParameters extends RunTimeParameters
     /**
      * Testable Operators. {@link #XOVER} is an alias for {@link #CROSSOVER}
      */
-    protected enum Operator {MUTATION,XOVER,CROSSOVER}
+    protected enum Operator {MUTATION, XOVER, CROSSOVER}
     
     /**
      * Chosen operator
@@ -144,6 +144,17 @@ public class GeneOpsRunnerParameters extends RunTimeParameters
      * Output file female
      */
     protected String outFileF;
+
+    /**
+     * File containing precomputed answer from Reinvent's server (for testing purposes)
+     */
+    protected String precomputedReinventAnswerFile;
+
+    /**
+     * Pathname to file where to record answers from the Reinvent Server.
+     * If <code>null</code>, no file is written.
+     */
+    protected String reinventServerAnswersPathname = null;
     
 //-----------------------------------------------------------------------------
     
@@ -153,6 +164,30 @@ public class GeneOpsRunnerParameters extends RunTimeParameters
     public GeneOpsRunnerParameters()
     {
         super(ParametersType.GO_PARAMS);
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Returns the file containing precomputed answer from Reinvent's server
+     * meant to be used for testing purposes.
+     * @return the file containing precomputed answer from Reinvent's server
+     */
+    public String getPrecomputedReinventAnswerFile()
+    {
+        return precomputedReinventAnswerFile;
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Returns the pathname of the file where answers from the Reinvent server
+     * are recorded. <code>null</code> when recording is disabled.
+     * @return the pathname, or <code>null</code>
+     */
+    public String getReinventServerAnswersPathname()
+    {
+        return reinventServerAnswersPathname;
     }
 
 //-----------------------------------------------------------------------------
@@ -269,6 +304,15 @@ public class GeneOpsRunnerParameters extends RunTimeParameters
                 break;
             case "OUTFILEFEMALE=":
                 outFileF = value;
+                break;
+            case "PRECOMPUTEDREINVENTANSWERFILE=":
+                precomputedReinventAnswerFile = value;
+                break;
+            case "RECORDREINVENTANSWERSTOFILE=":
+                if (value.length() > 0)
+                {
+                    reinventServerAnswersPathname = value;
+                }
                 break;
             default:
                  msg = "Keyword " + key + " is not a known TestOperator-"

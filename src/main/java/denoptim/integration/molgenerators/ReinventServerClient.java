@@ -75,6 +75,7 @@ import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
 import denoptim.programs.fragmenter.FragmenterParameters;
+import denoptim.programs.genetweeker.GeneOpsRunnerParameters;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MoleculeUtils;
 import denoptim.utils.Randomizer;
@@ -166,9 +167,9 @@ public class ReinventServerClient
     private JsonObject configurations;
 
     /**
-     * APClass for placeholder atoms
+     * Basename for APClass of placeholder vertexes
      */
-    private static final String PLACEHOLDERAPCLASSNAME = "PlaceholderAPForReinvent"; 
+    static final String PLACEHOLDERAPCLASSNAME = "PlaceholderAPForReinvent"; 
 
 //------------------------------------------------------------------------------
     
@@ -369,6 +370,23 @@ public class ReinventServerClient
                 throw new Error("AI Generator socket server replied without "
                         + "including '" + requiredMember + "' member. " 
                         + "Aborting! " + answer.toString());
+            }
+        }
+
+        // Use this to generate pre-computed answers for testing purposes
+        if (gaSettings.containsParameters(ParametersType.GO_PARAMS))
+        {
+            GeneOpsRunnerParameters goParams = (GeneOpsRunnerParameters)
+                gaSettings.getParameters(ParametersType.GO_PARAMS);
+            String answerFileName = goParams.getReinventServerAnswersPathname();
+            if (answerFileName != null && !answerFileName.isEmpty())
+            {
+                try {
+                    DenoptimIO.writeData(answerFileName, answer.toString(), false);
+                } catch (DENOPTIMException e) {
+                    // Not handled as meant only to debugging
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -747,7 +765,24 @@ public class ReinventServerClient
      */
     private JsonObject sendRequest(String requestAsJSONString) 
             throws IOException, JsonSyntaxException
-    {        
+    {
+        JsonObject answer = null;
+        if (gaSettings.containsParameters(ParametersType.GO_PARAMS)) 
+        {
+            // For testing purposes, this bypasses the actual call to Reinvent's 
+            // server by retrieving the answer from the file specified in the settings.
+            GeneOpsRunnerParameters goParams = (GeneOpsRunnerParameters) 
+                gaSettings.getParameters(ParametersType.GO_PARAMS);
+            String answerFileName = goParams.getPrecomputedReinventAnswerFile();
+            if (answerFileName != null && !answerFileName.isEmpty()) 
+            {
+                File answerFile = new File(answerFileName);
+                answer = jsonConverter.fromJson(new FileReader(answerFile), 
+                    JsonObject.class);
+                return answer;
+            }
+        }
+
         Socket socket;
         try
         {
@@ -817,7 +852,6 @@ public class ReinventServerClient
         }
         
         // Read and process the answer from the socket
-        JsonObject answer = null;
         try {
             answer = jsonConverter.fromJson(readerFromSocket.readLine(), 
                     JsonObject.class);

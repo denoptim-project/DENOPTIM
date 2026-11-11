@@ -167,6 +167,7 @@ public class GeneOpsRunner extends ProgramTask
             gaParams.setParameters(((RingClosureParameters) 
                     settings.getParameters(ParametersType.RC_PARAMS)));
         }
+        gaParams.setParameters(settings);
         
         boolean done = false;
         if (mt != null)

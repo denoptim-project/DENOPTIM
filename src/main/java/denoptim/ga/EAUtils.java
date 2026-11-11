@@ -2932,8 +2932,11 @@ public class EAUtils
                 || !originalVertexIDs.contains(
                         ap.getLinkedAPThroughout().getOwner().getVertexId()))
         {
-            if (fs.getRCCompatibilityMatrix().containsKey(ap.getAPClass()))
+            if (fs.getRCCompatibilityMatrix()!=null 
+                && fs.getRCCompatibilityMatrix().containsKey(ap.getAPClass()))
+            {
                 return true;
+            }
         }               
         return false;
     }

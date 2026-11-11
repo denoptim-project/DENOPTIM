@@ -1,0 +1,47 @@
+{
+  "status": "SUCCESS",
+  "molecules": [
+    {
+      "SMILES": "NCC(=O)OCc1c(C2Oc3ccccc3C3CC(c4ccc(Cl)cc4)=NN32)cccc1[N+](=O)[O-]",
+      "SMILES_state": "1",
+      "Scaffold": "c1cc([N+](=O)[O-])c([*])c(C2Oc3ccccc3C3CC(c4ccc(Cl)cc4)=NN32)c1",
+      "R-groups": "NCC(=O)OC*",
+      "NLL": "0.89"
+    },
+    {
+      "SMILES": "NCC(=O)OCc1c(C2Oc3ccccc3C3CC(c4ccc(Cl)cc4)=NN32)cccc1[N+](=O)[O-]",
+      "SMILES_state": "1",
+      "Scaffold": "c1cc([N+](=O)[O-])c([*])c(C2Oc3ccccc3C3CC(c4ccc(Cl)cc4)=NN32)c1",
+      "R-groups": "NCC(=O)OC*",
+      "NLL": "0.89"
+    },
+    {
+      "SMILES": "NCC(=O)OCc1c(C2Oc3ccccc3C3CC(c4ccc(Cl)cc4)=NN32)cccc1[N+](=O)[O-]",
+      "SMILES_state": "1",
+      "Scaffold": "c1cc([N+](=O)[O-])c([*])c(C2Oc3ccccc3C3CC(c4ccc(Cl)cc4)=NN32)c1",
+      "R-groups": "NCC(=O)OC*",
+      "NLL": "0.89"
+    },
+    {
+      "SMILES": "NCC(=O)OCc1c(C2Oc3ccccc3C3CC(c4ccc(Cl)cc4)=NN32)cccc1[N+](=O)[O-]",
+      "SMILES_state": "1",
+      "Scaffold": "c1cc([N+](=O)[O-])c([*])c(C2Oc3ccccc3C3CC(c4ccc(Cl)cc4)=NN32)c1",
+      "R-groups": "NCC(=O)OC*",
+      "NLL": "0.89"
+    },
+    {
+      "SMILES": "NCC(=O)OCc1c(C2Oc3ccccc3C3CC(c4ccc(Cl)cc4)=NN32)cccc1[N+](=O)[O-]",
+      "SMILES_state": "1",
+      "Scaffold": "c1cc([N+](=O)[O-])c([*])c(C2Oc3ccccc3C3CC(c4ccc(Cl)cc4)=NN32)c1",
+      "R-groups": "NCC(=O)OC*",
+      "NLL": "0.89"
+    },
+    {
+      "SMILES": "NCC(=O)OCc1c(C2Oc3ccccc3C3CC(c4ccc(Cl)cc4)=NN32)cccc1[N+](=O)[O-]",
+      "SMILES_state": "1",
+      "Scaffold": "c1cc([N+](=O)[O-])c([*])c(C2Oc3ccccc3C3CC(c4ccc(Cl)cc4)=NN32)c1",
+      "R-groups": "NCC(=O)OC*",
+      "NLL": "0.89"
+    }
+  ]
+}

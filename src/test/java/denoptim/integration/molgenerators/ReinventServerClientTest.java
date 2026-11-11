@@ -305,7 +305,7 @@ public class ReinventServerClientTest
             }
         }
         assertEquals(1, numScaffolds);
-        assertEquals(2, numFragments);
+        assertEquals(3, numFragments);
         assertEquals(0, numCaps);
         
         int numCCAPClass = 0;
@@ -326,7 +326,7 @@ public class ReinventServerClientTest
             }
         }
         assertEquals(4, numCCAPClass);
-        assertEquals(1, numScaffAPClass);
+        assertEquals(2, numScaffAPClass);
         assertEquals(0, numPlaceholderAPClass);
     }
 

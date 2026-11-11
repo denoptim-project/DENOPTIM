@@ -2866,8 +2866,7 @@ public class GraphOperations
                 done = rebuildBranch(vertex, force, chosenVrtxIdx, chosenApId, 
                         settings);
                 if (!done)
-                    mnt.increase(
-                            CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGEBRANCH);
+                    mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGEBRANCH);
                 break;
                 
             case CHANGELINK:
@@ -2875,23 +2874,20 @@ public class GraphOperations
                 done = substituteLink(vertex, chosenVrtxIdx, mnt, 
                         fsParams.getFragmentSpace());
                 if (!done)
-                    mnt.increase(
-                            CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK);
+                    mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK);
                 break;
                 
             case DELETELINK:
                 done = deleteLink(vertex, chosenApId, mnt, 
                         fsParams.getFragmentSpace());
                 if (!done)
-                    mnt.increase(
-                            CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK);
+                    mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK);
                 break;
                 
             case DELETECHAIN:
                 done = deleteChain(vertex, mnt, fsParams.getFragmentSpace());
                 if (!done)
-                    mnt.increase(
-                            CounterID.FAILEDMUTATTEMTS_PERFORM_NODELETECHAIN);
+                    mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NODELETECHAIN);
                 break;
                 
             case ADDLINK:
@@ -2908,8 +2904,7 @@ public class GraphOperations
                     }
                     if (candidates.size() == 0)
                     {
-                        mnt.increase(
-                                CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDLINK);
+                        mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDLINK);
                         break;
                     }   
                     chosenApId = settings.getRandomizer().randomlyChooseOne(
@@ -2918,8 +2913,7 @@ public class GraphOperations
                 done = extendLink(vertex, chosenApId, chosenVrtxIdx, mnt,
                         fsParams.getFragmentSpace());
                 if (!done)
-                    mnt.increase(
-                            CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDLINK);
+                    mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDLINK);
                 break;
                 
             case ADDRING:
