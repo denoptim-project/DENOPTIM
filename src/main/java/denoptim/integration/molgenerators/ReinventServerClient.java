@@ -353,7 +353,7 @@ public class ReinventServerClient
         
         //This might be useful for debugging to get the actual request placed to the server
         gaSettings.getLogger().log(Level.FINE, 
-            "Request to the AI Generator socket server: " + requestAsJSONString);
+            "Request to the Reinvent socket server: " + requestAsJSONString);
         if (requestFileName != null) {
             try {
                 DenoptimIO.writeData(requestFileName, 
@@ -380,18 +380,72 @@ public class ReinventServerClient
                 ...
             ]
         }
+
+        or:
+
+        {
+            "status": "ERROR",
+            "error_code": "PROCESSING_ERROR",
+            "error_message": "Not enough molecules generated after..."
+            ...
+        }
         
         */
         
-        JsonObject answer = sendRequest(requestAsJSONString);
-        for (String requiredMember : new String[] {"status", "molecules"})
+        JsonObject answer = null;
+        
+        try {
+            answer = sendRequest(requestAsJSONString);
+        } catch (ClientException e) {
+            // We treat this as a failed attempt, which may be due to a temporary
+            // condition, so we return an empty list but do not throw to allow 
+            // further attempts.
+            gaSettings.getLogger().log(Level.WARNING, 
+                "Could not send request to Reinvent socket server: " + e.getMessage());
+            return new ArrayList<>();
+        }
+
+        // Handle any kind of bad/unsuccessful answer
+        if (answer == null)
         {
-            if (!answer.has(requiredMember))
-            {
-                throw new Error("AI Generator socket server replied without "
-                        + "including '" + requiredMember + "' member. " 
-                        + "Aborting! " + answer.toString());
+            // We treat this as a failed attempt, but do not throw to allow 
+            // further attempts.
+            return new ArrayList<>();
+        }
+        if (!answer.has("status"))
+        {
+            throw new Error("Reinvent socket server replied without "
+                    + "including 'status' member. " 
+                    + "Aborting! " + answer.toString());
+        }
+        if (answer.get("status").getAsString().equals("ERROR"))
+        {
+            String errorMessage = "Unknown error";
+            if (answer.has("error_message")) {
+                errorMessage = answer.get("error_message").getAsString();
             }
+
+            if (errorMessage.contains("Not enough molecules generated after"))
+            {
+                // We treat this as a failed attempt, but do not throw to allow 
+                // further attempts.
+                return new ArrayList<>();
+            }
+
+            throw new Error("Reinvent socket server replied with unhandled error: '" 
+                + errorMessage + "'. Aborting! " + answer.toString());
+        }
+        if (!answer.get("status").getAsString().equals("SUCCESS"))
+        {
+            throw new Error("Reinvent socket server replied with unexpected status=" 
+                + answer.get("status").getAsString() + ". " 
+                + "Aborting! " + answer.toString());
+        }
+        if (!answer.has("molecules"))
+        {
+            throw new Error("Reinvent socket server replied without "
+                    + "including 'molecules' member. " 
+                    + "Aborting! " + answer.toString());
         }
 
         // Utility to generate pre-computed answers for testing purposes
@@ -447,6 +501,24 @@ public class ReinventServerClient
         }
         
         return graphs;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Exception thrown when the Reinvent socket server cannot be reached.
+     */
+    private class ClientException extends Exception
+    {
+        public ClientException(String message)
+        {
+            super(message);
+        }
+
+        public ClientException(String message, Throwable cause)
+        {
+            super(message, cause);
+        }
     }
 
 //------------------------------------------------------------------------------
@@ -1104,11 +1176,14 @@ public class ReinventServerClient
      * Sends the given request to the socket server and waits for the answer, 
      * which is then processed and returned.
      * @param requestAsJSONString the request as a JSON string.
-     * @return the answer from the socket server as a JSON object.
+     * @return the answer from the socket server as a JSON object, or 
+     * <code>null</code> if we did not get an answer, for example because the 
+     * server looses connection or gets shut down.
      * @throws IOException if an I/O error occurs
+     * @throws ClientException 
      */
     private JsonObject sendRequest(String requestAsJSONString) 
-            throws IOException, JsonSyntaxException
+            throws IOException, JsonSyntaxException, ClientException
     {
         JsonObject answer = null;
         if (gaSettings.containsParameters(ParametersType.GO_PARAMS)) 
@@ -1133,7 +1208,7 @@ public class ReinventServerClient
             socket = new Socket(hostname, port);
         } catch (IOException e1)
         {
-            throw new IllegalArgumentException("Could not connect to socket",e1);
+            throw new ClientException("Could not connect to socket", e1);
         }
         
         Runtime.getRuntime().addShutdownHook(new Thread(){public void run(){
@@ -1156,15 +1231,14 @@ public class ReinventServerClient
             {
                 e.printStackTrace();
             }
-            throw new IllegalArgumentException("Could not connect to socket",e1);
+            throw new ClientException("Could not connect to socket",e1);
         }
         
         BufferedReader readerFromSocket;
         try
         {
             InputStream inputFromSocket = socket.getInputStream();
-            readerFromSocket = new BufferedReader(
-                    new InputStreamReader(inputFromSocket));
+            readerFromSocket = new BufferedReader(new InputStreamReader(inputFromSocket));
         } catch (IOException e1)
         {
             try
@@ -1174,7 +1248,7 @@ public class ReinventServerClient
             {
                 e.printStackTrace();
             }
-            throw new IllegalArgumentException("Could not read from socket",e1);
+            throw new ClientException("Could not read from socket",e1);
         }
 
         // Here we send the request to the socket
@@ -1191,7 +1265,7 @@ public class ReinventServerClient
             {
                 // At this point the socket is probably closed already...
             }
-            throw new IllegalStateException("Could not half-close socket from "
+            throw new ClientException("Could not half-close socket from "
                     + this.getClass().getName(),e1);
         }
         
@@ -1199,29 +1273,37 @@ public class ReinventServerClient
         try {
             answer = jsonConverter.fromJson(readerFromSocket.readLine(), 
                     JsonObject.class);
-            if (!(answer.has("status")))
+
+            // Answer may be null if the server looses connection or gets shut down.
+            // We behave as a filed attempt, but do not throw to allow further attempts.
+            if (answer != null)
             {
-                throw new Error("Socket server replied without "
-                        + "including " + "status" + " member. " 
-                        + "Something is badly wrong: aborting! " + answer.toString());
-            }
-            if (!answer.get("status").getAsString().equals("SUCCESS"))
-            {
-                throw new Error("Socket server replied but with status=" 
-                        + answer.get("status") + ". " 
-                        + "Something is badly wrong: aborting! " + answer.toString());
+                if (!(answer.has("status")))
+                {
+                    throw new Error("Socket server replied without "
+                            + "including " + "status" + " member. " 
+                            + "Something is badly wrong: aborting! " + answer.toString());
+                }
+                if (!answer.get("status").getAsString().equals("SUCCESS")
+                    && !answer.get("status").getAsString().equals("ERROR"))
+                {
+                    // Only when the status is neither SUCCESS nor ERROR, we throw an error.
+                    throw new Error("Socket server replied but with status=" 
+                            + answer.get("status") + ". " 
+                            + "Something is badly wrong: aborting! " + answer.toString());
+                }
             }
         } catch (JsonSyntaxException e) {
             throw new Error("Socket server replied with invalid JSON: " + e.getMessage());
         } catch (IOException e) {
-            throw new Error("Error reading from socket: " + e.getMessage());
+            throw new ClientException("Error reading from socket.", e);
         }
         
         try
         {
             socket.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new ClientException("Could not close socket.", e);
         }
         return answer;
     }
