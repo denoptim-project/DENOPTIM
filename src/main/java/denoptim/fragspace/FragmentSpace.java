@@ -535,7 +535,8 @@ public class FragmentSpace
                     BBType.SCAFFOLD, this);
         } catch (DENOPTIMException e)
         {
-            //This cannot happen!
+            throw new IllegalStateException("Error creating scaffold: " 
+                + e.getMessage(), e);
         }
         return scaffold;
     }
@@ -1880,7 +1881,12 @@ public class FragmentSpace
                 new Point3d());
         rcv.addAtom(atom);
         rcv.addAP(0, new Point3d(1.5, 0.0, 0.0), apc);
-        rcv.setAsRCV(true);
+        try {
+            rcv.setAsRCV(true);
+        } catch (DENOPTIMException e) {
+            // Not possible, unless the code above is changed to dd more than one AP
+            throw new IllegalStateException(e);
+        }
         return rcv;
     }
 

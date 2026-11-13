@@ -280,8 +280,14 @@ public abstract class Vertex implements Cloneable
 
 //------------------------------------------------------------------------------
     
-    public void setAsRCV(boolean isRCV)
+    public void setAsRCV(boolean isRCV) throws DENOPTIMException 
     {
+        if (isRCV && getNumberOfAPs() != 1)
+        {
+            throw new DENOPTIMException("A ring closing vertex must have "
+                + "exactly one attachment point. Found " + getNumberOfAPs() 
+                + " attachment points in vertex " + getVertexId() + ".");
+        }
         this.isRCV = isRCV;
     }
     

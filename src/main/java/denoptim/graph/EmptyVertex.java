@@ -28,6 +28,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import com.google.gson.Gson;
 
 import denoptim.constants.DENOPTIMConstants;
+import denoptim.exception.DENOPTIMException;
 import denoptim.json.DENOPTIMgson;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;
@@ -105,18 +106,26 @@ public class EmptyVertex extends Vertex
      * Constructor for an identified vertex.
      * @param id the VertedID of the vertex to construct. Note that this ID 
      * should be unique within a graph. To generate unique IDs either use 
-     * @param lstAPs the list of attachment point on this vertex.
+     * @param numAPs the number of attachment points on this vertex.
      * @param lstSymAPs the list of symmetric sets of APs.
      * @param isRCV set <code>true</code> to mark this vertex as a 
      * ring-closing vertex.
      */
-    public EmptyVertex(long id, List<AttachmentPoint> lstAPs,
-            List<SymmetricAPs> lstSymAPs, boolean isRCV)
+    public EmptyVertex(long id, int numAPs, boolean isRCV)
     {
         super(VertexType.EmptyVertex, id);
-        this.lstAPs = lstAPs;
-        this.lstSymAPs = lstSymAPs;
-        setAsRCV(isRCV);
+        this.lstAPs = new ArrayList<AttachmentPoint>(numAPs);
+        this.lstSymAPs = new ArrayList<SymmetricAPs>();
+        for (int i = 0; i < numAPs; i++)
+        {
+            this.lstAPs.add(new AttachmentPoint(this, i, null, null));
+        }
+        try {
+            setAsRCV(isRCV);
+        } catch (DENOPTIMException e) {
+            // Not possible, unless the code above is changed to add more than one AP
+            throw new IllegalStateException(e);
+        }
     }
 
 //------------------------------------------------------------------------------
@@ -256,7 +265,7 @@ public class EmptyVertex extends Vertex
     public EmptyVertex clone()
     {
         EmptyVertex c = new EmptyVertex(getVertexId());
-        c.setAsRCV(this.isRCV());
+
         c.setBuildingBlockId(this.getBuildingBlockId());
         c.setBuildingBlockType(this.getBuildingBlockType());
         
@@ -269,6 +278,13 @@ public class EmptyVertex extends Vertex
             cAp.setCutId(ap.getCutId());
             cAp.setID(ap.getID());
             c.lstAPs.add(cAp);
+        }
+
+        try {
+            c.setAsRCV(this.isRCV());
+        } catch (DENOPTIMException e) {
+            // Not possible, unless this class has been tampered with
+            throw new IllegalStateException(e);
         }
 
         List<SymmetricAPs> cLstSymAPs = new ArrayList<SymmetricAPs>();
@@ -302,15 +318,24 @@ public class EmptyVertex extends Vertex
       
 //------------------------------------------------------------------------------
 
-      /**
-       * Adds an attachment point with the specified {@link APClass}.
-       * @param apClass the APClass
-       */
-      public void addAP(APClass apClass) {
-          AttachmentPoint ap = new AttachmentPoint(this,
+    /**
+     * Adds an attachment point with the specified {@link APClass}.
+     * @param apClass the APClass
+     * @throws DENOPTIMException 
+     */
+    public void addAP(APClass apClass) throws DENOPTIMException 
+    {
+        if (isRCV() && getNumberOfAPs() == 1)
+        {
+            throw new DENOPTIMException("A ring closing vertex must have "
+                + "exactly one attachment point. Found " + getNumberOfAPs() 
+                + " attachment points in vertex " + getVertexId() + ".");
+        }
+
+        AttachmentPoint ap = new AttachmentPoint(this,
                   -1, null, apClass);
-          getAttachmentPoints().add(ap);
-      }
+        getAttachmentPoints().add(ap);
+    }
       
 //------------------------------------------------------------------------------
 

@@ -912,9 +912,14 @@ public class FragmentSpaceTest
         Fragment rcv = new Fragment(
                 GraphUtils.getUniqueVertexIndex(),
                 dummyMol, 
-                BBType.FRAGMENT,
-                true);
+                BBType.FRAGMENT);
         rcv.addAP(0, APC1, getRandomVector());
+        try {
+            rcv.setAsRCV(true);
+        } catch (DENOPTIMException e) {
+            // Not possible, unless this class has been tampered with
+            throw new IllegalStateException(e);
+        }
         return rcv;
     }
 

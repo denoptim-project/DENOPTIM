@@ -188,7 +188,6 @@ public class FragmentTest
         // serialized/deserialized.
         v.setSymmetricAPSets(ssaps);
         v.setVertexId(18);
-        v.setAsRCV(true);
         //NB thy bond type is check by other methods: do not change it.
         v.setBuildingBlockType(Vertex.BBType.SCAFFOLD);
         

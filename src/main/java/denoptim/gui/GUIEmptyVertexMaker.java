@@ -342,12 +342,24 @@ public class GUIEmptyVertexMaker extends GUIModalDialog
                                 "Error",
                                 JOptionPane.ERROR_MESSAGE,
                                 UIManager.getIcon("OptionPane.errorIcon"));
+                        return;
                     }
 			    }
 			    
 			    //TODO : add props
 			    
-			    ev.setAsRCV(rcbIsRCV.isSelected());
+			    try {
+                    ev.setAsRCV(rcbIsRCV.isSelected());
+                } catch (DENOPTIMException eRcv) {
+                    JOptionPane.showMessageDialog(btnDone,
+                        "<html>Could not set this vertex as a ring-closing vertex. "
+                        + "<br>Hint on cause: " + eRcv.getMessage() 
+                        +"</html>",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE,
+                        UIManager.getIcon("OptionPane.errorIcon"));
+                    return;
+                }
 			    
 			    result = ev;
 			    close();

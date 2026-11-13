@@ -689,6 +689,19 @@ public class Template extends Vertex
     }
 
 //-----------------------------------------------------------------------------
+    
+    @Override
+    public void setAsRCV(boolean isRCV) throws DENOPTIMException 
+    {
+        if (isRCV)
+        {
+            throw new DENOPTIMException(this.getClass().getSimpleName() 
+                + " cannot be a ring closing vertex. Vertex " + getVertexId() 
+                + " is a template.");
+        }
+    }
+
+//-----------------------------------------------------------------------------
        
     @Override
     public int getHeavyAtomsCount()

@@ -340,7 +340,14 @@ public class Fragment extends Vertex
      * @param atomPositionNumber the index of the source atom (0-based)
      */
     
-    public void addAP(int atomPositionNumber) {
+    public void addAP(int atomPositionNumber) throws DENOPTIMException 
+    {
+        if (isRCV() && getNumberOfAPs() == 1)
+        {
+            throw new DENOPTIMException("A ring closing vertex must have "
+                + "exactly one attachment point. Found " + getNumberOfAPs() 
+                + " attachment points in vertex " + getVertexId() + ".");
+        }
         APClass apc = null;
         addAP(atomPositionNumber, null, apc);
     }
@@ -780,7 +787,13 @@ public class Fragment extends Vertex
         }
         clone.setSymmetricAPSets(cLstSymAPs);
         
-        clone.setAsRCV(this.isRCV());
+        try {
+            clone.setAsRCV(this.isRCV());
+        } catch (DENOPTIMException e) {
+            // Not possible, unless this class has been tampered with
+            throw new IllegalStateException(e);
+        }
+
         clone.setProperties(this.copyStringBasedProperties());
         if (uniquefyingPropertyKeys!=null)
             clone.uniquefyingPropertyKeys.addAll(uniquefyingPropertyKeys);

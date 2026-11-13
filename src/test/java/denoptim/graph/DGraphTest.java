@@ -196,8 +196,8 @@ public class DGraphTest
         
         EmptyVertex v7 = new EmptyVertex();
         v7.setBuildingBlockType(BBType.FRAGMENT);
-        v7.setAsRCV(true);
         v7.addAP(APClass.make("ATneutral:0", BondType.ANY));
+        v7.setAsRCV(true);
         fs.appendVertexToLibrary(v7, BBType.FRAGMENT, fs.getFragmentLibrary());
 
         EmptyVertex c0 = new EmptyVertex();

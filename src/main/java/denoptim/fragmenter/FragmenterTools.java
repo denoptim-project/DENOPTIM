@@ -2214,7 +2214,6 @@ public class FragmenterTools
                     Double.valueOf(apv.z))));
         
         Fragment rcv = new Fragment(mol, BBType.FRAGMENT);
-        rcv.setAsRCV(true);
 
         Point3d aps = MoleculeUtils.getPoint3d(
                 ap.getOwner().getIAtomContainer().getAtom(
@@ -2223,6 +2222,13 @@ public class FragmenterTools
                 Double.valueOf(aps.x),
                 Double.valueOf(aps.y),
                 Double.valueOf(aps.z)));
+
+        try {
+            rcv.setAsRCV(true);
+        } catch (DENOPTIMException e) {
+            // Not possible, unless the code above is changed to add more than one AP
+            throw new IllegalStateException(e);
+        }
         return rcv;
     }
     

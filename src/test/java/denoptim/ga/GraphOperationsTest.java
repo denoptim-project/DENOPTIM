@@ -23,22 +23,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import javax.vecmath.Point3d;
 
-import org.jgrapht.alg.util.Pair;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.DefaultChemObjectBuilder;
@@ -57,6 +48,7 @@ import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.DGraph;
+import denoptim.graph.Edge.BondType;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
 import denoptim.graph.GraphPattern;
@@ -86,19 +78,6 @@ public class GraphOperationsTest {
     private static APClass APCA, APCB, APCC, APCD;
     
     IChemObjectBuilder chemBuilder = DefaultChemObjectBuilder.getInstance();
-    private final Random rng = new Random();
-    private static APClass DEFAULT_APCLASS;
-
-//------------------------------------------------------------------------------
-
-    @BeforeAll
-    static void setUpClass() {
-        try {
-            DEFAULT_APCLASS = APClass.make("norule:0");
-        } catch (DENOPTIMException e) {
-            e.printStackTrace();
-        }
-    }
 
 //------------------------------------------------------------------------------
 
@@ -136,230 +115,112 @@ public class GraphOperationsTest {
 
 //------------------------------------------------------------------------------
 
-    @Test
-    public void testExtractPattern_fusedRings() throws Throwable 
-    {
-        ExtractPatternCase testCase = getFusedRings();
-
-        List<DGraph> subgraphs = testCase.g.extractPattern(GraphPattern.RING);
-
-        assertTrue(testCase.matchesExpected(subgraphs));
-    }
-
-//------------------------------------------------------------------------------
-
     /**
-     * Returns a molecule consisting of two pairs of fused rings connected
-     * by an oxygen atom. The dots represents chords. The molecule looks as
-     * follows:
-     *     Cl
-     *     |   ↑
-     * O - C - C →       ← N - |
-     * .   |   .       ↑   .   |
-     * .   N - C - O - C - C - C →
-     * .   |   .       |   .   ↓
-     * . . N . .       O . .
+     * Two rings that share an edge are one pattern. A third ring, joined to
+     * them by a vertex that is not part of any ring, is a second pattern.
      *
-     * The atoms are labelled in order of the leftmost then topmost.
-     *     2
-     *     |   ↑
-     * 0 - 1 - 4 →        ← 12 - |
-     * .   |   .       ↑    .    |
-     * .   3 - 6 - 7 - 8 - 10 - 11 →
-     * .   |   .       |   .     ↓
-     * . . 5 . .       9 . .
+     * <pre>
+     * rcvA       rcvB
+     *  |          |
+     * v1 -- v2 -- v4 -- rcvD
+     *  |     |
+     * v3    link -- v5 -- rcvE
+     *  |           |
+     * rcvC        v6 -- rcvF
+     * </pre>
+     *
+     * The chords are rcvA-rcvB, rcvC-rcvD, and rcvE-rcvF. Each ring-closing
+     * vertex has one attachment point.
      */
-    private ExtractPatternCase getFusedRings() throws Throwable
+    @Test
+    public void testExtractPattern_fusedRings() throws Exception
     {
-        BiFunction<String, Boolean, Vertex> vertexSupplier =
-                (s, isRCV) -> {
-            int apCount = 0;
-            switch (s) {
-                case "Cl":
-                    apCount = 1;
-                    break;
-                case "O":
-                    apCount = 2;
-                    break;
-                case "N":
-                    apCount = 3;
-                    break;
-                case "C":
-                    apCount = 4;
-                    break;
-            }
-            return buildFragment(s, apCount, isRCV);
-        };
+        APClass apc = APClass.make("A", 0, BondType.SINGLE);
 
-        /* We label the vertices in order of top left to bottom right. */
-        List<Vertex> vertices = Stream.of(
-                new Pair<>("O", true), new Pair<>("C", false),
-                new Pair<>("Cl", false), new Pair<>("N",false),
-                new Pair<>("C", true), new Pair<>("N", true),
-                new Pair<>("C", true), new Pair<>("O", false),
-                new Pair<>("C", false), new Pair<>("O", true),
-                new Pair<>("C", true), new Pair<>("C", false),
-                new Pair<>("N", true)
-        ).map(p -> vertexSupplier.apply(p.getFirst(), p.getSecond()))
-                .collect(Collectors.toList());
+        EmptyVertex v1 = new EmptyVertex(1);
+        v1.addAP(apc);
+        v1.addAP(apc);
+        v1.addAP(apc);
 
-        /* Here we specify the connections between atoms. Previously
-        connected vertices are not connected twice. Chords are not connected. */
-        List<List<Integer>> edges = Arrays.asList(
-                Arrays.asList(1),
-                Arrays.asList(2, 3, 4),
-                Arrays.asList(),
-                Arrays.asList(5, 6),
-                Arrays.asList(),
-                Arrays.asList(),
-                Arrays.asList(7),
-                Arrays.asList(8),
-                Arrays.asList(9, 10),
-                Arrays.asList(),
-                Arrays.asList(11),
-                Arrays.asList(12)
-        );
+        EmptyVertex v2 = new EmptyVertex(2);
+        v2.addAP(apc);
+        v2.addAP(apc);
+        v2.addAP(apc);
+        v2.addAP(apc);
 
-        DGraph g = null;
-        try
-        {
-            g = buildGraph(vertices, edges);
-        } catch (DENOPTIMException e)
-        {
-            e.printStackTrace();
-        }
-        g.renumberGraphVertices();
-        DGraph.setScaffold(vertices.get(0));
-        addRings(vertices, g);
-        Set<DGraph> expectedSubgraphs = getExpectedSubgraphs(g);
-        return new ExtractPatternCase(g, 2, expectedSubgraphs);
-    }
+        EmptyVertex v3 = new EmptyVertex(3);
+        v3.addAP(apc);
+        v3.addAP(apc);
 
-//------------------------------------------------------------------------------
+        EmptyVertex v4 = new EmptyVertex(4);
+        v4.addAP(apc);
+        v4.addAP(apc);
 
-    private DGraph buildGraph(List<Vertex> vertices,
-                                     List<List<Integer>> edges) 
-                                             throws DENOPTIMException {
+        EmptyVertex link = new EmptyVertex(5);
+        link.addAP(apc);
+        link.addAP(apc);
+
+        EmptyVertex v5 = new EmptyVertex(6);
+        v5.addAP(apc);
+        v5.addAP(apc);
+        v5.addAP(apc);
+
+        EmptyVertex v6 = new EmptyVertex(7);
+        v6.addAP(apc);
+        v6.addAP(apc);
+
+        EmptyVertex rcvA = new EmptyVertex(8);
+        rcvA.addAP(apc);
+        rcvA.setAsRCV(true);
+        EmptyVertex rcvB = new EmptyVertex(9);
+        rcvB.addAP(apc);
+        rcvB.setAsRCV(true);
+        EmptyVertex rcvC = new EmptyVertex(10);
+        rcvC.addAP(apc);
+        rcvC.setAsRCV(true);
+        EmptyVertex rcvD = new EmptyVertex(11);
+        rcvD.addAP(apc);
+        rcvD.setAsRCV(true);
+        EmptyVertex rcvE = new EmptyVertex(12);
+        rcvE.addAP(apc);
+        rcvE.setAsRCV(true);
+        EmptyVertex rcvF = new EmptyVertex(13);
+        rcvF.addAP(apc);
+        rcvF.setAsRCV(true);
+
         DGraph g = new DGraph();
-        g.addVertex(vertices.get(0));
-        for (int i = 0; i < edges.size(); i++) {
-            Vertex srcVertex = vertices.get(i);
-            for (Integer adj : edges.get(i)) {
-                Vertex trgVertex = vertices.get(adj);
+        g.addVertex(v1);
+        g.appendVertexOnAP(v1.getAP(0), rcvA.getAP(0));
+        g.appendVertexOnAP(v1.getAP(1), v2.getAP(0));
+        g.appendVertexOnAP(v2.getAP(1), rcvB.getAP(0));
+        g.appendVertexOnAP(v1.getAP(2), v3.getAP(0));
+        g.appendVertexOnAP(v3.getAP(1), rcvC.getAP(0));
+        g.appendVertexOnAP(v2.getAP(2), v4.getAP(0));
+        g.appendVertexOnAP(v4.getAP(1), rcvD.getAP(0));
+        g.addRing(rcvA, rcvB, BondType.SINGLE);
+        g.addRing(rcvC, rcvD, BondType.SINGLE);
 
-                AttachmentPoint srcAP = srcVertex
-                        .getAttachmentPoints()
-                        .stream()
-                        .filter(ap -> ap.getEdgeUser() == null)
-                        .findFirst()
-                        .get();
-                AttachmentPoint trgAP = trgVertex
-                        .getAttachmentPoints()
-                        .stream()
-                        .filter(ap -> ap.getEdgeUser() == null)
-                        .findFirst()
-                        .get();
+        g.appendVertexOnAP(v2.getAP(3), link.getAP(0));
+        g.appendVertexOnAP(link.getAP(1), v5.getAP(0));
+        g.appendVertexOnAP(v5.getAP(1), rcvE.getAP(0));
+        g.appendVertexOnAP(v5.getAP(2), v6.getAP(0));
+        g.appendVertexOnAP(v6.getAP(1), rcvF.getAP(0));
+        g.addRing(rcvE, rcvF, BondType.SINGLE);
 
-                try {
-                    g.appendVertexOnAP(srcAP, trgAP);
-                } catch (DENOPTIMException e) {
-                    // Should not happen
-                    e.printStackTrace();
-                }
-            }
-        }
-        return g;
-    }
+        List<DGraph> subgraphs = g.extractPattern(GraphPattern.RING);
 
-//------------------------------------------------------------------------------
+        assertEquals(2, subgraphs.size());
+        DGraph fused = subgraphs.get(0).getVertexCount() == 8
+                ? subgraphs.get(0) : subgraphs.get(1);
+        DGraph separate = fused == subgraphs.get(0)
+                ? subgraphs.get(1) : subgraphs.get(0);
 
-    private void addRings(List<Vertex> vertices, DGraph g) {
-        List<List<Vertex>> ringVertices = Stream.of(
-                Arrays.asList(0, 1, 3, 5),
-                Arrays.asList(4, 1, 3, 6),
-                Arrays.asList(6, 3, 5),
-                Arrays.asList(9, 8, 10),
-                Arrays.asList(10, 11, 12))
-                .map(indices -> indices
-                        .stream()
-                        .map(vertices::get)
-                        .collect(Collectors.toList())
-                )
-                .collect(Collectors.toList());
-
-        for (List<Vertex> vs : ringVertices) {
-            Ring r = new Ring();
-            for (Vertex v : vs) {
-                r.addVertex(v);
-            }
-            g.addRing(r);
-        }
-    }
-
-//------------------------------------------------------------------------------
-
-    private Set<DGraph> getExpectedSubgraphs(DGraph graph) {
-        List<Set<Integer>> keepVertices = Stream.of(
-                Stream.of(0, 1, 3, 4, 5, 6),
-                Stream.of(8, 9, 10, 11, 12))
-                .map(indices -> indices.collect(Collectors.toSet()))
-                .collect(Collectors.toList());
-
-        List<DGraph> expectedSubgraphs = new ArrayList<>(2);
-        for (Set<Integer> keepVertex : keepVertices) {
-            DGraph expSubgraph = graph.clone();
-            List<Vertex> vertices = expSubgraph.getVertexList();
-            Set<Vertex> removeVertices = IntStream
-                    .range(0, vertices.size())
-                    .filter(i -> !keepVertex.contains(i))
-                    .mapToObj(vertices::get)
-                    .collect(Collectors.toSet());
-
-            for (Vertex removeVertex : removeVertices) {
-                expSubgraph.removeVertex(removeVertex);
-            }
-            expectedSubgraphs.add(expSubgraph);
-        }
-
-        return new HashSet<>(expectedSubgraphs);
-    }
-
-//------------------------------------------------------------------------------
-
-    private Vertex buildFragment(String elementSymbol, int apCount,
-            boolean isRCV)
-    {
-        try
-        {
-            IAtomContainer atomContainer = chemBuilder.newAtomContainer();
-            IAtom oxygen = chemBuilder.newAtom();
-            oxygen.setSymbol(elementSymbol);
-            atomContainer.addAtom(oxygen);
-    
-            Fragment v = new Fragment(
-                    GraphUtils.getUniqueVertexIndex(), atomContainer,
-                    BBType.FRAGMENT, isRCV);
-            for (int i = 0; i < apCount; i++) 
-            {
-                v.addAP(0, DEFAULT_APCLASS, getRandomVector());
-            }
-            return v;
-        } catch (Throwable t)
-        {
-            return null;
-        }
-   }
-
-//------------------------------------------------------------------------------
-
-    private Point3d getRandomVector() 
-    {
-        double precision = 10*10*10*10;
-        return new Point3d(
-                (double) (Math.round(rng.nextDouble() * precision)) / precision,
-                (double) (Math.round(rng.nextDouble() * precision)) / precision,
-                (double) (Math.round(rng.nextDouble() * precision)) / precision
-        );
+        assertEquals(8, fused.getVertexCount());
+        assertEquals(7, fused.getEdgeCount());
+        assertEquals(2, fused.getRingCount());
+        assertEquals(4, separate.getVertexCount());
+        assertEquals(3, separate.getEdgeCount());
+        assertEquals(1, separate.getRingCount());
     }
 
 //------------------------------------------------------------------------------
@@ -372,76 +233,27 @@ public class GraphOperationsTest {
      */
     private DGraph getThreeCycle() throws DENOPTIMException 
     {
-        EmptyVertex v1 = new EmptyVertex(0);
-        EmptyVertex rcv1 = new EmptyVertex(1, new ArrayList<>(),
-                new ArrayList<>(), true);
-        EmptyVertex rcv2 = new EmptyVertex(2, new ArrayList<>(),
-                new ArrayList<>(), true);
+        EmptyVertex v1 = new EmptyVertex(0, 2, false);
+        EmptyVertex rcv1 = new EmptyVertex(1, 1, true);
+        EmptyVertex rcv2 = new EmptyVertex(2, 1, true);
 
         List<EmptyVertex> vertices = Arrays.asList(v1, rcv1, rcv2);
         for (EmptyVertex v : vertices) {
             v.setBuildingBlockType(BBType.FRAGMENT);
-            v.addAP();
         }
-        // Need an additional AP on v1
-        v1.addAP();
 
         DGraph g = new DGraph();
         g.addVertex(v1);
         g.appendVertexOnAP(v1.getAP(0), rcv1.getAP(0));
         g.appendVertexOnAP(v1.getAP(1), rcv2.getAP(0));
 
-        Ring r = new Ring(new ArrayList<>(
-                Arrays.asList(rcv1, v1, rcv2)));
+        Ring r = new Ring(Arrays.asList(rcv1, v1, rcv2));
         g.addRing(r);
 
         g.renumberGraphVertices();
         return g;
     }
 
-//------------------------------------------------------------------------------
-
-    private static final class ExtractPatternCase 
-    {
-        final DGraph g;
-        final int expectedSize;
-        final Set<DGraph> expectedGraphs;
-        final Comparator<DGraph> graphComparator = (gA, gB) ->
-                gA.sameAs(gB, new StringBuilder()) ? 0 : -1;
-
-        private ExtractPatternCase(DGraph g, int expectedSize,
-                                         Set<DGraph> expectedGraphs) {
-            this.g = g;
-            this.expectedSize = expectedSize;
-            this.expectedGraphs = expectedGraphs;
-        }
-
-        private boolean matchesExpected(Collection<DGraph> actuals) {
-            if (actuals.size() != expectedSize) {
-                return false;
-            }
-                
-            Set<DGraph> unmatchedGraphs = new HashSet<>(expectedGraphs);
-            for (DGraph g : actuals) 
-            {
-                boolean hasMatch = expectedGraphs
-                        .stream()
-                        .anyMatch(exp -> graphComparator.compare(g, exp) == 0);
-                if (hasMatch) {
-                    unmatchedGraphs = unmatchedGraphs
-                            .stream()
-                            .filter(exp -> graphComparator.compare(g, exp) != 0)
-                            .collect(Collectors.toSet());
-                } else {
-                    return false;
-                }
-            }
-
-            // Check that no graphs are missing from actual
-            return unmatchedGraphs.size() == 0;
-        }
-    }
-    
 //------------------------------------------------------------------------------
 
     @Test
