@@ -489,6 +489,10 @@ public class ReinventServerClient
                     inputSMILES = molecule.get(WARHEADS_KEY).getAsString();
                 }
                 String inputKey = getCanonicalSMILES(inputSMILES);
+                if (!canonicalSmilesDGraphMap.containsKey(inputKey)) 
+                {
+                    continue;
+                }
                 graph = parseSmilesToGraph(smiles, 
                     canonicalSmilesDGraphMap.get(inputKey), i);
             } else {
@@ -498,6 +502,11 @@ public class ReinventServerClient
             if (graph != null) {
                 graphs.add(graph);
             }
+        }
+        if (graphs.isEmpty()) {
+            gaSettings.getLogger().log(Level.WARNING, 
+                "Failed to parse graphs from Reinvent server response.");
+            return new ArrayList<>();
         }
         
         return graphs;

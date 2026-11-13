@@ -447,8 +447,10 @@ public abstract class RunTimeParameters
             String header = "Started logging for " + loggerIdentifier;
             logger.log(Level.INFO,header);
         } else {
-            logger.addHandler(new StreamHandler(System.out, 
-                    new SimpleFormatter()));
+            logger.setUseParentHandlers(false);
+            ConsoleHandler consoleHdlr = new ConsoleHandler();
+            consoleHdlr.setFormatter(new SimpleFormatter());
+            logger.addHandler(consoleHdlr);
         }
         
         if (verbosity!=0)

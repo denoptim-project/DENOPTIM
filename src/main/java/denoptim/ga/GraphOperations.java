@@ -725,8 +725,20 @@ public class GraphOperations
 
 //------------------------------------------------------------------------------
 
-    protected static boolean substituteLink(Vertex vertex,
-            int chosenVrtxIdx, Monitor mnt, FragmentSpace fragSpace, GAParameters settings)
+    /**
+     * Substitutes a vertex with a subgraph while keeping its surrounding. 
+     * The way to replace the fragment is decided by the given parameters.
+     * @param vertex the vertex to replace with aa linker.
+     * @param settings the parameters to decide how to replace the fragment.
+     * @param mnt the monitor keeping track of what happens in EA operations.
+     * This does not affect the mutation. It only measures how many attempts and
+     * failures occur.
+     * @param fragSpace the fragment space to use for the mutation.
+     * @return <code>true</code> if the mutation is successful.
+     * @throws DENOPTIMException
+     */
+    public static boolean substituteLink(Vertex vertex, int chosenVrtxIdx, 
+        Monitor mnt, FragmentSpace fragSpace, GAParameters settings)
                     throws DENOPTIMException
     {
         if (settings.useReinventForLinkers())
@@ -739,7 +751,26 @@ public class GraphOperations
 
 //------------------------------------------------------------------------------
 
-    protected static boolean substituteLinkUsingReinvent(Vertex vertex,
+    /**
+     * Substitutes a vertex with a subgraph while keeping its surrounding. 
+     * Uses Reinvent to
+     * produce a linker to replace the given vertex with.
+     * @param vertex the vertex to replace with aa linker.
+     * @param chosenVrtxIdx if greater than or equals to zero, 
+     * sets the choice of the incoming vertex to the 
+     * given index. AP mapping between old and new vertex is not controllable
+     * in this method.
+     * @param mnt the monitor keeping track of what happens in EA operations.
+     * This does not affect the mutation. It only measures how many attempts and
+     * failures occur.
+     * @return <code>true</code> if the mutation is successful.
+     * @throws DENOPTIMException
+     */
+
+    // TODO-gg: optimize, for now there is plenty of redundancy with extendLinkUsingReinvent
+    // because the latter replaces an empty linker, which cannot be used here
+
+    public static boolean substituteLinkUsingReinvent(Vertex vertex,
             Monitor mnt, GAParameters settings)
                     throws DENOPTIMException
     {
@@ -755,13 +786,6 @@ public class GraphOperations
         {
             mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK);
             return false;
-        }
-
-        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
-        if (settings.containsParameters(ParametersType.FS_PARAMS))
-        {
-            fsParams = (FragmentSpaceParameters)settings.getParameters(
-                    ParametersType.FS_PARAMS);
         }
 
         DGraph graph = vertex.getGraphOwner();
@@ -780,7 +804,12 @@ public class GraphOperations
             }
         }
 
-        //TODO-ai move this into a dedicated method (from here) to be used for insertLink mutations
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        if (settings.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsParams = (FragmentSpaceParameters)settings.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
 
         int initialNumberOfFragments = graph.getVertexCount();
 
@@ -860,7 +889,7 @@ public class GraphOperations
 
         /*
         
-        // Attempt to do it by making the clinet return complete graphs
+        // Attempt to do it by making the client return complete graphs
         // with parent+linker+child. However, that means that we have to identify 
         // the APs at the paretn/chail-linker interfaces twice.
 
@@ -959,7 +988,7 @@ public class GraphOperations
 //------------------------------------------------------------------------------
 
     /**
-     * Substitutes a vertex while keeping its surrounding.
+     * Substitutes a vertex with a single vertex while keeping its surrounding.
      * Does not replace with same vertex (i.e., new vertex will have different 
      * building block ID, but might look the same wrt content and properties).
      * @param vertex the vertex to replace with another one.
@@ -974,7 +1003,7 @@ public class GraphOperations
      * @throws DENOPTIMException
      */
 
-    protected static boolean substituteLinkUsingFragSpace(Vertex vertex,
+    public static boolean substituteLinkUsingFragSpace(Vertex vertex,
             int chosenVrtxIdx, Monitor mnt, FragmentSpace fragSpace)
                     throws DENOPTIMException
     {
@@ -1026,10 +1055,11 @@ public class GraphOperations
      * does not exist on the given vertex.
      */
     public static boolean extendLink(Vertex vertex,
-            int chosenAPId, Monitor mnt, FragmentSpace fragSpace) 
+            int chosenAPId, Monitor mnt, FragmentSpace fragSpace,
+            GAParameters settings) 
                     throws DENOPTIMException
     {
-        return extendLink(vertex, chosenAPId, -1 , mnt, fragSpace);
+        return extendLink(vertex, chosenAPId, -1 , mnt, fragSpace, settings);
     }
     
 //------------------------------------------------------------------------------
@@ -1052,7 +1082,8 @@ public class GraphOperations
      * does not exist on the given vertex.
      */
     public static boolean extendLink(Vertex vertex, int chosenAPId, 
-            int chosenNewVrtxId, Monitor mnt, FragmentSpace fragSpace) 
+            int chosenNewVrtxId, Monitor mnt, FragmentSpace fragSpace,
+            GAParameters settings) 
                     throws DENOPTIMException
     {
         AttachmentPoint ap = vertex.getAP(chosenAPId);
@@ -1073,9 +1104,142 @@ public class GraphOperations
             throw new DENOPTIMException("Request to extend a link from a child "
                     + "vertex (AP "+chosenAPId+" of vertex "+vertex+").");
         }
-        return extendLink(e, chosenNewVrtxId, mnt, fragSpace);
+        return extendLink(e, chosenNewVrtxId, mnt, fragSpace, settings);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Replace an edge with two edges with a new vertex in between, thus 
+     * inserting a subgraph between two directly connected vertexes, which will
+     * no longer be directly connected.
+     * @param vertex holding the "source" end of the edge to
+     * @param chosenBBIdx the identifier of the building block to insert.
+     * @param mnt the monitor keeping track of what happens in EA operations.
+     * This does not affect the mutation. It only measures how many attempts and
+     * failures occur.
+     * @return <code>true</code> if the mutation is successful.
+     * @throws DENOPTIMException
+     */
+    public static boolean extendLink(Edge edge, int chosenBBIdx,
+        Monitor mnt, FragmentSpace fragSpace, GAParameters settings) 
+        throws DENOPTIMException
+    {
+        if (settings.useReinventForLinkers())
+        {
+            return extendLinkUsingReinvent(edge, mnt, settings);
+        } else {
+            return extendLinkUsingFragmentSpace(edge, chosenBBIdx, mnt, fragSpace);
+        }
     }
     
+//------------------------------------------------------------------------------
+
+    /**
+     * Replace an edge with two edges with a new subgraph in between.
+     * Uses Reinvent to produce a subgraph to replace the given edge with.
+     * @param edge the edge to replace with a subgraph.
+     * @param mnt the monitor keeping track of what happens in EA operations.
+     * This does not affect the mutation. It only measures how many attempts and
+     * failures occur.
+     * @param settings the parameters to decide how to replace the fragment.
+     * @return <code>true</code> if the mutation is successful.
+     * @throws DENOPTIMException
+     */
+    public static boolean extendLinkUsingReinvent(Edge edge,
+        Monitor mnt, GAParameters settings) throws DENOPTIMException
+    {                    
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        if (settings.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsParams = (FragmentSpaceParameters)settings.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
+
+        DGraph graph = edge.getSrcAP().getOwner().getGraphOwner();
+            
+        // Identify the AP that identify the two warheads. 
+        // NB: these two APs are pointing to each other , i.e., linker is empty!
+        AttachmentPoint linkerApToParent = edge.getTrgAP();
+        AttachmentPoint linkerApToChild = edge.getSrcAP();
+            
+        int initialNumberOfFragments = graph.getVertexCount();
+            
+        // Define the warheads: the subgraphs to be linked by the linker
+        AttachmentPoint parentSubgraphApToLinker = linkerApToParent.getLinkedAP();
+        DGraph parentSubgraph = graph.extractComplementarySubgraph(linkerApToParent.getOwner());
+        AttachmentPoint childSubgraphApToLinker = linkerApToChild.getLinkedAP();
+        DGraph childSubgraph = graph.extractSubgraph(childSubgraphApToLinker.getOwner());
+
+        //TODO-ai: check what happens with a ring involgins both warheads
+
+        // Configure Reinvent microservice
+        ReinventServerClient reinventClient = ReinventServerClient.getInstance(
+            ReinventServerClient.ServiceType.LINK, settings);
+        reinventClient.setRecordRequestsFileName(
+            settings.getReinventRequestsPathname());
+
+        // Define the SMILES representations for the two warheads
+        // NB: this changes the warheads graph by adding placeholders!
+        String smilesForParentWarhead = reinventClient.addAPPlaceHoldersAndGetSMILES(
+            parentSubgraph, settings);
+        String smilesForChildWarhead = reinventClient.addAPPlaceHoldersAndGetSMILES(
+            childSubgraph, settings);
+        Map<String, List<DGraph>> smilesDGraphMap = new HashMap<>();
+        smilesDGraphMap.put(smilesForParentWarhead + "|" + smilesForChildWarhead, 
+            Arrays.asList(parentSubgraph, childSubgraph));
+            
+        // Get the linker subgraphs from Reinvent
+        List<DGraph> linkerSubgraphs;
+        try {
+            // Ask for more than one hoping that at least one survives.
+            linkerSubgraphs = reinventClient.generateGraphs(smilesDGraphMap ,5); 
+        } catch (IOException e) {
+            throw new DENOPTIMException(
+                "Error extending graph with Reinvent service", e);
+        }
+            
+        // We identify the APs at the parent/linker and linker/child interfaces
+        // by looking at the matched APs from the input warhead subgraphs.
+        Set<AttachmentPoint> apsOnParentSubgraph = new HashSet<>(
+            parentSubgraph.getAttachmentPoints());
+        Set<AttachmentPoint> apsOnChildSubgraph = new HashSet<>(
+            childSubgraph.getAttachmentPoints());
+        
+        // We try any of the results, in random order 
+        // they are not sorted, so natural order is random order.
+        for (DGraph linkerGraph : linkerSubgraphs)
+        {
+            // Get mapping between APs on original graph and APs on linker 
+            APMapping apMapInitToLinker = new APMapping();
+            for (AttachmentPoint apOnLinkerGraph : linkerGraph.getAttachmentPoints())
+            {
+                Object objApOnLinkerGraph = apOnLinkerGraph.getProperty(
+                    AttachmentPoint.APPROPMATCHEDAP);
+                if (objApOnLinkerGraph != null)
+                {
+                    AttachmentPoint apMatchedByLinkerGraph = (AttachmentPoint) objApOnLinkerGraph;
+                    if (apsOnParentSubgraph.contains(apMatchedByLinkerGraph))
+                    {
+                        apMapInitToLinker.put(linkerApToParent, apOnLinkerGraph);
+                    } else if (apsOnChildSubgraph.contains(apMatchedByLinkerGraph))
+                    {
+                        apMapInitToLinker.put(linkerApToChild, apOnLinkerGraph);
+                    }
+                }
+            }
+
+            // Replace old linker with new one
+            if (graph.insertSubgraph(edge, apMapInitToLinker.get(linkerApToParent), 
+                    apMapInitToLinker.get(linkerApToChild),
+                    fsParams.getFragmentSpace()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
 //------------------------------------------------------------------------------
     
     /**
@@ -1087,10 +1251,11 @@ public class GraphOperations
      * @param mnt the monitor keeping track of what happens in EA operations.
      * This does not affect the mutation. It only measures how many attempts and
      * failures occur.
+     * @param fragSpace the fragment space to use for the mutation.
      * @return <code>true</code> if the mutation is successful.
      * @throws DENOPTIMException
      */
-    public static boolean extendLink(Edge edge, int chosenBBIdx,
+    public static boolean extendLinkUsingFragmentSpace(Edge edge, int chosenBBIdx,
             Monitor mnt, FragmentSpace fragSpace) throws DENOPTIMException
     {
         //TODO: for reproducibility, the AP mapping should become an optional
@@ -1102,7 +1267,7 @@ public class GraphOperations
         {
             glf = new GraphLinkFinder(fragSpace, edge);
         } else {
-            glf = new GraphLinkFinder(fragSpace, edge,chosenBBIdx);
+            glf = new GraphLinkFinder(fragSpace, edge, chosenBBIdx);
         }
         if (!glf.foundAlternativeLink())
         {
@@ -3125,7 +3290,6 @@ public class GraphOperations
                 break;
                 
             case ADDLINK:
-                //TODO-ai: add AI analogue
                 if (chosenApId < 0)
                 {
                     List<Integer> candidates = new ArrayList<Integer>();
@@ -3145,7 +3309,7 @@ public class GraphOperations
                             candidates);
                 }
                 done = extendLink(vertex, chosenApId, chosenVrtxIdx, mnt,
-                        fsParams.getFragmentSpace());
+                        fsParams.getFragmentSpace(), settings);
                 if (!done)
                     mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDLINK);
                 break;

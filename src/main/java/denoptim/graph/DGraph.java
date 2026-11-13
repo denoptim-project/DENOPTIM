@@ -1718,9 +1718,11 @@ public class DGraph implements Cloneable
         
         GraphUtils.ensureVertexIDConsistency(this.getMaxVertexId());
         
-        // Verify that also the surrounding of vertices in the lists is 
-        // consistent between subGrpVrtxs and verticesToRemove. Even if the
-        // two are consistent, there can still be differences in the childs.
+        // Verify that any subgraph identified as symmetric to the original
+        // one has a consistent topological surrounding that allows to use the
+        // same AP mapping. In fact, even if the two subgraphs are symmetric,
+        // the two surroundings can be different, and, if so, prevent the 
+        // use of the same incoming subgraph on both symmetric subgraphs.
         List<List<Vertex>> compatibleSymSubGrps = new ArrayList<List<Vertex>>();
         for (List<Vertex> symmetricSubGrpVrtx : getSymmetricSubGraphs(subGrpVrtxs))
         {
@@ -1741,7 +1743,10 @@ public class DGraph implements Cloneable
                 symVsChildren.removeIf(v -> v.getBuildingBlockType()==BBType.CAP);
                 if (oriVsChildren.size()!=symVsChildren.size())
                 {
-                    // we continue in the outer loop
+                    // yes, there are topologicaldifferences in the surroundings of 
+                    // the symmetric vertexes (different number of neighbours),
+                    // so we cannot apply the same subgraph substitution,
+                    // we then continue in the outer loop
                     skip = true;
                     continue;
                 }
@@ -1749,14 +1754,16 @@ public class DGraph implements Cloneable
                 {
                     if (skip)
                         break;
-                    // We have already checked those in the subgraph
+                    // We have already checked those in subGrpVrtxs
                     if (subGrpVrtxs.contains(oriVsChildren.get(ic)))
                         continue;
-                    // We do allow the two child to be different vertices, but
-                    // we avoid having one CAP and one not. this because it will
+                    // We do ALLOW two childred that belong to the original
+                    // or to the symmetric subgraph to be different vertices, but
+                    // we avoid having one CAP and one not. This because it will
                     // lead to having free APs on the parent of the first and
                     // busy APs on the parent of the second. This prevents 
-                    // finding a mapping of the free APs.
+                    // finding a mapping of the free APs that applies to both
+                    // original and symmetric subgraph.
                     if (oriVsChildren.get(ic).getBuildingBlockType()
                             != symVsChildren.get(ic).getBuildingBlockType())
                     {
@@ -1787,7 +1794,7 @@ public class DGraph implements Cloneable
             for (Map.Entry<AttachmentPoint,AttachmentPoint> e : apMap.entrySet())
             {
                 // WARNING! Assumption that subGrpVrtxs and verticesToRemove
-                // are sorted accordingly to symmetry, which should be the case.
+                // are sorted accordingly to symmetry, which should be the case
                 int vrtPosOnOld = subGrpVrtxs.indexOf(e.getKey().getOwner());
                 int apPosOnOld = e.getKey().getIndexInOwner();
                 if (vrtPosOnOld == -1 || apPosOnOld == -1)
@@ -1802,7 +1809,7 @@ public class DGraph implements Cloneable
                 int apPosOnNew = e.getValue().getIndexInOwner();
                 AttachmentPoint apOnNew = graphToAdd.getVertexAtPosition(
                         vrtPosOnNew).getAP(apPosOnNew); 
-                localApMap.put(apOnOld,apOnNew);
+                localApMap.put(apOnOld, apOnNew);
             }
             
             if (!DGraph.replaceSingleSubGraph(localApMap, fragSpace))
@@ -1938,6 +1945,45 @@ public class DGraph implements Cloneable
     }
 
 //------------------------------------------------------------------------------
+
+    /**
+     * True when every used key is linked to another key of the same mapping.
+     * That mapping encodes a n "insert" operation, i.e., it replaces the edges 
+     * between those keys and removes no vertexes of the receiving graph.
+     * @param apMapping
+     * @return <code>true</code> if the mapping inserts into edges, 
+     * <code>false</code> otherwise.
+     * @throws DENOPTIMException if the mapping mixes attachment points that form 
+     * an edge to replace with attachment points on vertices to remove.
+     */
+    private static boolean mappingInsertsIntoEdges(APMapping apMapping)
+            throws DENOPTIMException
+    {
+        boolean anyLinkedToKey = false;
+        boolean anyNotLinkedToKey = false;
+        for (AttachmentPoint key : apMapping.keySet())
+        {
+            if (key.isAvailable())
+            {
+                anyNotLinkedToKey = true;
+                continue;
+            }
+            AttachmentPoint linked = key.getLinkedAP();
+            if (linked != null && apMapping.containsKey(linked))
+                anyLinkedToKey = true;
+            else
+                anyNotLinkedToKey = true;
+        }
+        if (anyLinkedToKey && anyNotLinkedToKey)
+        {
+            throw new DENOPTIMException("AP mapping mixes attachment points "
+                    + "that form an edge to replace with attachment points on "
+                    + "vertices to remove.");
+        }
+        return anyLinkedToKey;
+    }
+
+//------------------------------------------------------------------------------
     
     /**
      * Replaced the subgraph defined by a set of Attachment Points that
@@ -1949,7 +1995,7 @@ public class DGraph implements Cloneable
      * with AP included in the mapping or that are unused in the whole graph, 
      * an exception is thrown. 
      * For example, consider the following graph:
-     * <code>
+     * <pre>
      * Vertes_a
      *   \
      *   AP0-AP1 
@@ -1984,16 +2030,28 @@ public class DGraph implements Cloneable
      * template, if any.
      * <p>
      * @param apMapping mapping of attachment points on the first graph (key)
-     * to be replaces by attachment point on the incoming graph (value). The 
+     * to attachment points on the incoming graph (value). The 
      * graph ownership is checked for consistency: 
      * all key APs must belong to the first graph,
      * and all value APs must belong to the same incoming graph.
+     * <p>
+     * Two readings of the keys are supported. When a key is not linked to
+     * another key, its owner is part of the subgraph to remove and the
+     * incoming attachment point is connected to {@link AttachmentPoint#getLinkedAP()}.
+     * When every used key is linked to another key, the keys are the ends of
+     * the edges to replace: no vertex of the receiving graph is removed, those
+     * edges are removed, and each incoming attachment point is connected to
+     * the key itself.
      * @return <code>true</code> if the substitution is successful.
      * @throws DENOPTIMException
      */
     public static boolean replaceSingleSubGraph(APMapping apMapping, 
         FragmentSpace fragSpace) throws DENOPTIMException
     {
+        // Keys that are linked only to other keys describe an edge insertion:
+        // the vertices stay, and the edges between the keys are replaced.
+        boolean insertIntoEdge = mappingInsertsIntoEdges(apMapping);
+
         // Checks for consistency while identifying vertexes at the interface between 
         // the two subgraphs.
         DGraph receivingGraph = null;
@@ -2023,8 +2081,10 @@ public class DGraph implements Cloneable
                     + "for all incoming attachment points.");
             }
 
-            // collect all vertexes of receiving graph to connect to incoming graph
-            if (!apOnFirtsGraph.isAvailable()) //stay within template boundaries
+            // collect all vertexes of receiving graph to connect to incoming graph.
+            // In an edge insertion the key owners stay, so they are not limits
+            // of a subgraph to delete.
+            if (!insertIntoEdge && !apOnFirtsGraph.isAvailable()) //stay within template boundaries
             {
                 vertexesOfReceivingGraphToConnectToIncomingGraph.add(
                     apOnFirtsGraph.getLinkedAP().getOwner());
@@ -2057,12 +2117,16 @@ public class DGraph implements Cloneable
             AttachmentPoint apOnReceivingGraph = e.getKey();
             AttachmentPoint apOnIncomingGraph = e.getValue();
 
-            // On receiving graph the AP is on a vertex to delete
-            Vertex vToDelOnRecGraph = apOnReceivingGraph.getOwner();
-            verticesToRemoveFromReceivingGraph.add(vToDelOnRecGraph);
-            DGraph.exploreGraph(vToDelOnRecGraph, 
-                vertexesOfReceivingGraphToConnectToIncomingGraph,  // these stop the exploration
-                verticesToRemoveFromReceivingGraph); // these are those visited by the exploration
+            // On receiving graph the AP is on a vertex to delete, unless the
+            // mapping is an edge insertion, in which case nothing is deleted.
+            if (!insertIntoEdge)
+            {
+                Vertex vToDelOnRecGraph = apOnReceivingGraph.getOwner();
+                verticesToRemoveFromReceivingGraph.add(vToDelOnRecGraph);
+                DGraph.exploreGraph(vToDelOnRecGraph, 
+                    vertexesOfReceivingGraphToConnectToIncomingGraph,  // these stop the exploration
+                    verticesToRemoveFromReceivingGraph); // these are those visited by the exploration
+            }
 
             // On incoming graph the AP is on a vertex to keep
             if (!apOnIncomingGraph.isAvailable()) //stay within template boundaries
@@ -2137,7 +2201,17 @@ public class DGraph implements Cloneable
 
             BondType bondTypeOnRecGraph = null;
             Boolean directionIsThisToIncoming = true;
-            if (!apOnReceivingGraph.isAvailable())
+            // Edge insertion reconnects to the key, which stays. Replacement
+            // reconnects to the neighbour of the key, because the key's owner
+            // is removed.
+            AttachmentPoint apToReconnectOnReceiving = insertIntoEdge
+                    ? apOnReceivingGraph
+                    : apOnReceivingGraph.getLinkedAP();
+            if (insertIntoEdge)
+            {
+                bondTypeOnRecGraph = apOnReceivingGraph.getEdgeUser().getBondType();
+                directionIsThisToIncoming = apOnReceivingGraph.isSrcInUser();
+            } else if (!apOnReceivingGraph.isAvailable())
             {
                 bondTypeOnRecGraph = apOnReceivingGraph.getEdgeUser().getBondType();
                 directionIsThisToIncoming = !apOnReceivingGraph.isSrcInUser();
@@ -2155,7 +2229,7 @@ public class DGraph implements Cloneable
                     + bondTypeOnRecGraph + " != " + bondTypeOnIncoming + ".");
             }
             linkTypesToCreate.put(apOnIncomingGraph, bondTypeOnRecGraph);
-            linksToCreate.put(apOnIncomingGraph,apOnReceivingGraph.getLinkedAP());
+            linksToCreate.put(apOnIncomingGraph, apToReconnectOnReceiving);
             linkDirectionToCreate.put(apOnIncomingGraph,directionIsThisToIncoming);
         }
 
@@ -2285,7 +2359,22 @@ public class DGraph implements Cloneable
             }
         }
         
-        // Remove the vertexes to remove from the graphs
+        // An edge insertion removes the edges between the key APs and keeps
+        // every vertex. A replacement removes the vertices identified above,
+        // and their edges with them.
+        if (insertIntoEdge)
+        {
+            Set<Edge> edgesToRemove = new HashSet<Edge>();
+            for (AttachmentPoint key : apMapping.keySet())
+            {
+                if (key.getEdgeUser() != null)
+                    edgesToRemove.add(key.getEdgeUser());
+            }
+            for (Edge edgeToRemove : edgesToRemove)
+            {
+                receivingGraph.removeEdge(edgeToRemove);
+            }
+        }
         for (Vertex v : verticesToRemoveFromReceivingGraph)
         {
             receivingGraph.removeVertex(v);
@@ -2298,9 +2387,21 @@ public class DGraph implements Cloneable
         // we need to guarantee that new vertixe IDs are unique within a graph
         incomingGraph.renumberGraphVertices();
 
-        // Recover the incoming graph to obtain edge directions consistent with
-        // this graph's spanning tree structure. 
-        if (targetAPs.size() > 0)
+        // Reorder the incoming graph to obtain edge directions consistent with
+        // this graph's spanning tree structure. An insertion is rooted at the
+        // linker vertex that replaces the source end of each removed edge.
+        // A replacement is rooted at the image of each key that is not a source.
+        if (insertIntoEdge)
+        {
+            for (AttachmentPoint key : apMapping.keySet())
+            {
+                if (key.isSrcInUser())
+                {
+                    Vertex newSrcOfIncomingGraph = apMapping.get(key).getOwner();
+                    DGraph.fixEdgeDirections(newSrcOfIncomingGraph, new HashSet<>());
+                }
+            }
+        } else if (targetAPs.size() > 0)
         {
             for (AttachmentPoint targetAP : targetAPs)
             {
@@ -2366,14 +2467,14 @@ public class DGraph implements Cloneable
             boolean makeLinkAsRing = false;
             Vertex srcVertex = srcAP.getOwner();
             Vertex trgVertex = trgAP.getOwner();
+            // Connections are added one at a time. The first one joins two
+            // graphs that do not yet share a path, so it is an edge. Each
+            // later connection is an edge only when its endpoints are still
+            // not reachable from each other; otherwise it would close a ring
+            // and is stored as a ring closure. An endpoint that is already an
+            // RCV stays an edge, so that ring-closing vertices are not chained.
             if (srcVertex.isRCV() || trgVertex.isRCV())
             {
-                // It remains possible to request operations that place RCVs in chains
-                // that have no sense of existing (because RCVs are not expected to be
-                // connected to other RCVs), but we avoid adding RCVs connected to other 
-                // RCVs. Therefore, is either of the APs belong to an RCV, we do make
-                // an Edge instead of considering wherther th edge should be replaced
-                // by a pair of newly added RCVs.
                 makeLinkAsRing = false;
             } else {
                 // To consider whether to use an edge or a ring, we need to know if
@@ -2731,62 +2832,106 @@ public class DGraph implements Cloneable
             FragmentSpace fragSpace) 
                     throws DENOPTIMException
     {
+        Vertex newLink = Vertex.newVertexFromLibrary(
+            GraphUtils.getUniqueVertexIndex(), bbId, bbt, fragSpace);
+        DGraph incomingGraph = new DGraph();
+        incomingGraph.addVertex(newLink);
+
+        //TODO-ai verify
+
+        return insertSubgraph(edge, newLink.getAP(apMap.get(edge.getSrcAP())), 
+            newLink.getAP(apMap.get(edge.getTrgAP())), fragSpace);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    
+    /**
+     * Inserts the graph that contains the given attachment points in place of
+     * the given edge, and of the symmetric edges. The operation is performed
+     * by {@link #replaceSingleSubGraph(APMapping, FragmentSpace)} with a
+     * mapping whose keys are the two ends of the edge.
+     * @param edge the edge to replace.
+     * @param linkerAPPlayingTrgAP attachment point of the incoming graph that
+     * is connected to the source end of the edge.
+     * @param linkerAPPlayingSrcAP attachment point of the incoming graph that
+     * is connected to the target end of the edge.
+     * @param fragSpace the fragment space used when a replaced connection has
+     * to be closed as a ring.
+     * @return <code>true</code> if the insertion is successful.
+     * @throws DENOPTIMException
+     */
+    public boolean insertSubgraph(Edge edge, AttachmentPoint linkerAPPlayingTrgAP,
+        AttachmentPoint linkerAPPlayingSrcAP, FragmentSpace fragSpace)
+                throws DENOPTIMException
+    {
         if (!gEdges.contains(edge))
         {
             return false;
         }
+        if (linkerAPPlayingSrcAP == null || linkerAPPlayingTrgAP == null
+            || linkerAPPlayingSrcAP.getOwner().getGraphOwner() 
+                != linkerAPPlayingTrgAP.getOwner().getGraphOwner())
+        {
+            return false;
+        }
+        DGraph incomingGraph = linkerAPPlayingSrcAP.getOwner().getGraphOwner();
         
-        List<Edge> symSites = new ArrayList<Edge> ();
-        List<LinkedHashMap<AttachmentPoint,Integer>> symApMaps = 
-                new ArrayList<LinkedHashMap<AttachmentPoint,Integer>>();
+        // Identify symmetric sites where to project the insertion. The
+        // attachment points below still belong to the original incoming graph;
+        // each site is given a clone.
+        List<Edge> edgesToReplace = new ArrayList<Edge>();
         List<Vertex> symTrgvertices = getSymVerticesForVertex(
                 edge.getTrgAP().getOwner());
         if (symTrgvertices.size() == 0)
         {
-            symSites.add(edge);
-            symApMaps.add(apMap);
+            edgesToReplace.add(edge);
         } else {
             for (Vertex trgVrtx : symTrgvertices)
             {
-                Edge symEdge = trgVrtx.getEdgeToParent();
-                symSites.add(symEdge);
-                
-                LinkedHashMap<AttachmentPoint,Integer> locApMap = new
-                        LinkedHashMap<AttachmentPoint,Integer>();
-                locApMap.put(symEdge.getSrcAP(), apMap.get(edge.getSrcAP()));
-                locApMap.put(symEdge.getTrgAP(), apMap.get(edge.getTrgAP()));
-                symApMaps.add(locApMap);
+                edgesToReplace.add(trgVrtx.getEdgeToParent());
             }
         }
+
+        // Refresh the symmetry set labels so that clones of the branch inherit
+        // the same symmetry set labels.
+        incomingGraph.reassignSymmetricLabels();
+        GraphUtils.ensureVertexIDConsistency(this.getMaxVertexId());
         
-        SymmetricVertexes newSS = new SymmetricVertexes();
-        for (int i=0; i<symSites.size(); i++)
+        for (Edge edgeToReplace : edgesToReplace)
         {
-            Edge symEdge = symSites.get(i);
-            LinkedHashMap<AttachmentPoint,Integer> locApMap = symApMaps.get(i);
-            
-            GraphUtils.ensureVertexIDConsistency(this.getMaxVertexId());
-            Vertex newLink = Vertex.newVertexFromLibrary(
-                    GraphUtils.getUniqueVertexIndex(), bbId, bbt, fragSpace);
-            newSS.add(newLink);
-            LinkedHashMap<AttachmentPoint,AttachmentPoint> apToApMap =
-                    new LinkedHashMap<AttachmentPoint,AttachmentPoint>();
-            for (AttachmentPoint apOnGraph : locApMap.keySet())
-            {
-                apToApMap.put(apOnGraph, newLink.getAP(locApMap.get(apOnGraph)));
-            }
-            if (!insertSingleVertex(symEdge, newLink, apToApMap))
+            DGraph graphToAdd = incomingGraph.clone();
+            graphToAdd.renumberGraphVertices();
+            APMapping apMapping = new APMapping();
+            apMapping.put(edgeToReplace.getSrcAP(), correspondingAP(
+                    incomingGraph, graphToAdd, linkerAPPlayingTrgAP));
+            apMapping.put(edgeToReplace.getTrgAP(), correspondingAP(
+                    incomingGraph, graphToAdd, linkerAPPlayingSrcAP));
+
+            if (!replaceSingleSubGraph(apMapping, fragSpace))
             {
                 return false;
             }
         }
-        if (newSS.size()>1)
-        {
-            addSymmetricSetOfVertices(newSS);
-        }
+
+        convertSymmetricLabelsToSymmetricSets();
         return true;
     }
-    
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Attachment point on {@code clone} that corresponds to {@code ap} on
+     * {@code original}, matched by vertex position and attachment-point index.
+     */
+    private static AttachmentPoint correspondingAP(DGraph original, DGraph clone,
+            AttachmentPoint ap)
+    {
+        int vertexPos = original.indexOf(ap.getOwner());
+        int apPos = ap.getIndexInOwner();
+        return clone.getVertexAtPosition(vertexPos).getAP(apPos);
+    }
+
 //------------------------------------------------------------------------------
     
     /**

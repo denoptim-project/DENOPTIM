@@ -193,11 +193,6 @@ public class GeneOpsRunner extends ProgramTask
             if (mt==MutationType.ADDLINK)
             {
                 apID = settings.idTargetAP;
-                if (apID<0)
-                    throw new DENOPTIMException("ID of target AP is negative. "
-                            + "For mutation " + mt + " you should specify also "
-                            + "the index of the AP on the mutation target as "
-                            + "TESTGENOPS-APIDONTARGETVERTEX.");
             }
             
             v.setProperty(DENOPTIMConstants.STOREDVID, v.getVertexId());

@@ -351,6 +351,18 @@ public class GeneOpsRunnerParameters extends RunTimeParameters
             throw new DENOPTIMException(msg);
         }
 
+        if (mutationType == MutationType.ADDLINK)
+        {
+            if (idTargetAP<0)
+            {
+                msg = "ID of target AP is negative. "
+                    + "For mutation " + mutationType + " you should specify also "
+                    + "the index of the AP on the mutation target as "
+                    + "TESTGENOPS-APIDONTARGETVERTEX.";
+                throw new DENOPTIMException(msg);
+            }
+        }
+
         checkOtherParameters();
     }
 

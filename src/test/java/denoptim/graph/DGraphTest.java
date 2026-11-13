@@ -21,6 +21,7 @@ package denoptim.graph;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -1840,7 +1841,111 @@ public class DGraphTest
         assertEquals(5,ri.getDistance(ri.getHeadVertex(),ri.getTailVertex()),
                 "Distance Head-Tail in ring of inner graph");
     }
-    
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Same graphs as {@link #testReplaceSingleSubGraph_inTemplate()}, but the
+     * keys are the two ends of edges inside the template, so the incoming
+     * graph is inserted in place of those edges and no vertex is removed.
+     */
+    @Test
+    public void testInsertSingleSubGraph_inTemplate() throws Exception
+    {
+        FragmentSpace fs = prepare();
+        DGraph g = makeTestGraphI(fs);
+
+        DGraph innerGraph = ((Template) g.getVertexAtPosition(0))
+                .getInnerGraph();
+        Vertex central = innerGraph.getVertexAtPosition(0);
+        Vertex branchA = innerGraph.getVertexAtPosition(1);
+        Vertex branchB = innerGraph.getVertexAtPosition(2);
+        Ring originalRing = innerGraph.getRings().get(0);
+        Vertex originalRingHead = originalRing.getHeadVertex();
+        Vertex originalRingTail = originalRing.getTailVertex();
+
+        DGraph incomingSubGraph = makeTestGraphJ(fs);
+        Vertex incomingA = incomingSubGraph.getVertexAtPosition(0);
+        Vertex incomingB = incomingSubGraph.getVertexAtPosition(1);
+
+        APMapping apMap = new APMapping();
+        // Both ends of the edge central.AP(3) -- branchA.AP(0)
+        apMap.put(central.getAP(3), incomingA.getAP(1));
+        apMap.put(branchA.getAP(0), incomingA.getAP(4));
+        // Both ends of the edge central.AP(4) -- branchB.AP(0)
+        apMap.put(central.getAP(4), incomingB.getAP(4));
+        apMap.put(branchB.getAP(0), incomingB.getAP(0));
+
+        boolean res = DGraph.replaceSingleSubGraph(apMap, fs);
+
+        assertTrue(res);
+
+        assertEquals(5,g.getVertexCount(),"Vertex in outer graph");
+        assertEquals(4,g.getEdgeCount(),"Edges in outer graph");
+        assertEquals(1,g.getRingCount(),"Rings in outer graph");
+        assertEquals(5,g.getAvailableAPs().size(),"Free APs outer graph");
+        Ring r = g.getRings().get(0);
+        assertEquals(4,r.getDistance(r.getHeadVertex(),r.getTailVertex()),
+                "Distance Head-Tail in ring of outer graph");
+
+        DGraph innerGraphAfter =
+                ((Template) g.getVertexAtPosition(0)).getInnerGraph();
+        assertTrue(innerGraphAfter.containsVertex(central),
+                "Central vertex stays");
+        assertTrue(innerGraphAfter.containsVertex(branchA),
+                "Branch A stays");
+        assertTrue(innerGraphAfter.containsVertex(branchB),
+                "Branch B stays");
+        // The first two joins find no path and stay edges. The join from the
+        // central vertex to incoming B is reachable through incoming A, so it
+        // is a ring closure. Branch B is still not reachable, so that join
+        // stays an edge.
+        assertEquals(incomingA, central.getAP(3).getLinkedAP().getOwner(),
+                "Central AP3 connects to incoming graph");
+        assertEquals(incomingA, branchA.getAP(0).getLinkedAP().getOwner(),
+                "Branch A connects to incoming graph");
+        Vertex rcvOnCentral = central.getAP(4).getLinkedAP().getOwner();
+        Vertex rcvOnIncomingB = incomingB.getAP(4).getLinkedAP().getOwner();
+        assertTrue(rcvOnCentral.isRCV(), "Central AP4 closes a ring");
+        assertTrue(rcvOnIncomingB.isRCV(), "Incoming B AP4 closes a ring");
+        assertEquals(incomingB, branchB.getAP(0).getLinkedAP().getOwner(),
+                "Branch B connects to incoming graph");
+        assertEquals(9,innerGraphAfter.getVertexCount(),
+                "Vertex in inner graph");
+        assertEquals(8,innerGraphAfter.getEdgeCount(),
+                "Edges in inner graph");
+        assertEquals(2,innerGraphAfter.getRingCount(),
+                "Rings in inner graph");
+        assertEquals(7,innerGraphAfter.getAvailableAPs().size(),
+                "Free APs inner graph");
+        Ring closure = null;
+        Ring rebuilt = null;
+        for (Ring ring : innerGraphAfter.getRings())
+        {
+            boolean closesNewLink = (ring.getHeadVertex() == rcvOnCentral
+                    && ring.getTailVertex() == rcvOnIncomingB)
+                    || (ring.getHeadVertex() == rcvOnIncomingB
+                    && ring.getTailVertex() == rcvOnCentral);
+            if (closesNewLink)
+                closure = ring;
+            boolean isOriginal = ring.getHeadVertex() == originalRingHead
+                    || ring.getTailVertex() == originalRingHead
+                    || ring.getHeadVertex() == originalRingTail
+                    || ring.getTailVertex() == originalRingTail;
+            if (isOriginal)
+                rebuilt = ring;
+        }
+        assertNotNull("Ring closure between central and incoming B", closure);
+        assertEquals(4,closure.getDistance(closure.getHeadVertex(),
+                closure.getTailVertex()),
+                "Distance Head-Tail in the new ring");
+        assertNotNull("Original ring rebuilt through the insertion", rebuilt);
+        assertEquals(5,rebuilt.getDistance(originalRingHead,originalRingTail),
+                "Distance Head-Tail in ring of inner graph");
+
+    //TODO-ai something wrong in the template insertion as we cannot display the inner graph from version 4.1.2 
+    }
+
 //------------------------------------------------------------------------------
 
     @Test
@@ -2001,6 +2106,221 @@ public class DGraphTest
         assertEquals(graph.getVertexCount(), 12);
         assertEquals(graph.getEdgeCount(), 11);
         assertEquals(graph.getRingCount(), 2);
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testInsertSingleSubGraph_ringFormation() throws Exception
+    {
+        FragmentSpace fs = prepare();
+        DGraph graph = makeTestGraphO_A(fs);
+        Vertex scaffold = graph.getVertexAtPosition(0);
+        Vertex branchC = graph.getVertexAtPosition(1);
+        Vertex branchB = graph.getVertexAtPosition(6);
+        Ring originalRing = graph.getRings().get(0);
+        Vertex originalRingHead = originalRing.getHeadVertex();
+        Vertex originalRingTail = originalRing.getTailVertex();
+
+        DGraph incomingGraph = makeTestGraph_treeWithOutScaffold(fs);
+        Vertex incomingNear = incomingGraph.getVertexAtPosition(1);
+        Vertex incomingFar = incomingGraph.getVertexAtPosition(4);
+
+        APMapping apMapping = new APMapping();
+        // Both ends of scaffold.AP(0) -- branchC.AP(0)
+        apMapping.put(scaffold.getAP(0), incomingNear.getAP(0));
+        apMapping.put(branchC.getAP(0), incomingNear.getAP(4));
+        // Both ends of scaffold.AP(2) -- branchB.AP(0)
+        apMapping.put(scaffold.getAP(2), incomingFar.getAP(4));
+        apMapping.put(branchB.getAP(0), incomingFar.getAP(3));
+
+        DGraph.replaceSingleSubGraph(apMapping, fs);
+
+        assertTrue(graph.containsVertex(scaffold), "Scaffold stays");
+        assertTrue(graph.containsVertex(branchC), "Branch on AP0 stays");
+        assertTrue(graph.containsVertex(branchB), "Branch on AP2 stays");
+        assertEquals(incomingNear, scaffold.getAP(0).getLinkedAP().getOwner(),
+                "Scaffold AP0 connects by an edge");
+        assertEquals(incomingNear, branchC.getAP(0).getLinkedAP().getOwner(),
+                "Branch on AP0 connects by an edge");
+        Vertex rcvOnScaffold = scaffold.getAP(2).getLinkedAP().getOwner();
+        Vertex rcvOnIncomingFar = incomingFar.getAP(4).getLinkedAP().getOwner();
+        assertTrue(rcvOnScaffold.isRCV(), "Scaffold AP2 closes a ring");
+        assertTrue(rcvOnIncomingFar.isRCV(), "Far incoming AP closes a ring");
+        assertEquals(incomingFar, branchB.getAP(0).getLinkedAP().getOwner(),
+                "Branch on AP2 connects by an edge");
+
+        assertEquals(14, graph.getVertexCount(), "Vertices");
+        assertEquals(13, graph.getEdgeCount(), "Edges");
+        assertEquals(2, graph.getRingCount(), "Rings");
+
+        Ring closure = null;
+        Ring rebuilt = null;
+        for (Ring ring : graph.getRings())
+        {
+            boolean closesNewLink = (ring.getHeadVertex() == rcvOnScaffold
+                    && ring.getTailVertex() == rcvOnIncomingFar)
+                    || (ring.getHeadVertex() == rcvOnIncomingFar
+                    && ring.getTailVertex() == rcvOnScaffold);
+            if (closesNewLink)
+                closure = ring;
+            boolean isOriginal = ring.getHeadVertex() == originalRingHead
+                    || ring.getTailVertex() == originalRingHead
+                    || ring.getHeadVertex() == originalRingTail
+                    || ring.getTailVertex() == originalRingTail;
+            if (isOriginal)
+                rebuilt = ring;
+        }
+        assertNotNull("Ring closure along the inserted tree", closure);
+        assertEquals(6, closure.getDistance(closure.getHeadVertex(),
+                closure.getTailVertex()),
+                "Distance Head-Tail in the new ring");
+        assertNotNull("Original ring rebuilt", rebuilt);
+        assertEquals(4, rebuilt.getDistance(originalRingHead, originalRingTail),
+                "Distance Head-Tail in the original ring");
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * A mapping cannot combine the two readings: both ends of an edge, which
+     * means insert that edge, and an attachment point whose other end is not
+     * a key, which means remove that vertex.
+     */
+    @Test
+    public void testReplaceSingleSubGraph_mixedMappingRejected() throws Exception
+    {
+        FragmentSpace fs = prepare();
+        DGraph graph = makeTestGraphO_A(fs);
+        Vertex scaffold = graph.getVertexAtPosition(0);
+        Vertex branch = graph.getVertexAtPosition(1);
+        int vertexCount = graph.getVertexCount();
+        int edgeCount = graph.getEdgeCount();
+
+        DGraph incomingGraph = makeTestGraph_treeWithOutScaffold(fs);
+        int incomingVertexCount = incomingGraph.getVertexCount();
+
+        APMapping apMapping = new APMapping();
+        // Both ends of scaffold.AP(0) -- branch.AP(0): insertion.
+        apMapping.put(scaffold.getAP(0),
+                incomingGraph.getVertexAtPosition(1).getAP(0));
+        apMapping.put(branch.getAP(0),
+                incomingGraph.getVertexAtPosition(1).getAP(4));
+        // scaffold.AP(1) is used by another edge, and that other end is not a
+        // key, so its owner would be removed.
+        apMapping.put(scaffold.getAP(1),
+                incomingGraph.getVertexAtPosition(0).getAP(1));
+
+        DENOPTIMException thrown = assertThrows(DENOPTIMException.class,
+                () -> DGraph.replaceSingleSubGraph(apMapping, fs));
+        assertTrue(thrown.getMessage().contains("mixes attachment points"),
+                "Rejection explains the mixed mapping");
+        assertEquals(vertexCount, graph.getVertexCount(),
+                "Receiving graph is unchanged");
+        assertEquals(edgeCount, graph.getEdgeCount(),
+                "Receiving edges are unchanged");
+        assertEquals(incomingVertexCount, incomingGraph.getVertexCount(),
+                "Incoming graph is unchanged");
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * WARNING: this tests a case that should NOT be allowed: Insertion into one 
+     * edge whose endpoints stay joined by another path of edges. 
+     * 
+     *  <pre>
+     *   v0--v1
+     *   |  /
+     *   | /
+     *   v2
+     *  </pre>
+     * 
+     * However, the code allows to fix this case by inserting the subgraph AND
+     * adding the appropriate {@link Ring} closure.
+     */
+    @Test
+    public void testInsertSingleSubGraph_otherEndClosesRing() throws Exception
+    {
+        FragmentSpace fs = prepare();
+        DGraph graph = new DGraph();
+        Vertex source = Vertex.newVertexFromLibrary(1, BBType.FRAGMENT, fs);
+        Vertex target = Vertex.newVertexFromLibrary(1, BBType.FRAGMENT, fs);
+        Vertex bridge = Vertex.newVertexFromLibrary(6, BBType.FRAGMENT, fs);
+        graph.addVertex(source);
+        graph.addVertex(target);
+        graph.addVertex(bridge);
+        graph.addEdge(new Edge(source.getAP(0), target.getAP(2)));
+        graph.addEdge(new Edge(source.getAP(1), bridge.getAP(0)));
+        graph.addEdge(new Edge(bridge.getAP(1), target.getAP(0)));
+
+        DGraph incomingGraph = new DGraph();
+        Vertex linker = Vertex.newVertexFromLibrary(1, BBType.FRAGMENT, fs);
+        incomingGraph.addVertex(linker);
+
+        APMapping apMapping = new APMapping();
+        apMapping.put(source.getAP(0), linker.getAP(3));
+        apMapping.put(target.getAP(2), linker.getAP(4));
+
+        assertTrue(DGraph.replaceSingleSubGraph(apMapping, fs));
+
+        assertTrue(graph.containsVertex(source), "Source stays");
+        assertTrue(graph.containsVertex(target), "Target stays");
+        assertTrue(graph.containsVertex(bridge), "Alternate path stays");
+        assertEquals(linker, source.getAP(0).getLinkedAP().getOwner(),
+                "First join is an edge");
+        Vertex rcvOnLinker = linker.getAP(4).getLinkedAP().getOwner();
+        Vertex rcvOnTarget = target.getAP(2).getLinkedAP().getOwner();
+        assertTrue(rcvOnLinker.isRCV(), "Other end closes a ring");
+        assertTrue(rcvOnTarget.isRCV(), "Target end closes a ring");
+        assertEquals(6, graph.getVertexCount(), "Vertices");
+        assertEquals(5, graph.getEdgeCount(), "Edges");
+        assertEquals(1, graph.getRingCount(), "Rings");
+        Ring closure = graph.getRings().get(0);
+        assertEquals(5, closure.getDistance(rcvOnLinker, rcvOnTarget),
+                "Distance along the ring closed by the second join");
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testInsertSingleSubGraph_ringExpansion()
+            throws Exception
+    {
+        FragmentSpace fs = prepare();
+        DGraph graph = makeTestGraphO_A(fs);
+        Vertex scaffold = graph.getVertexAtPosition(0);
+        Vertex onRing = graph.getVertexAtPosition(2);
+        Ring originalRing = graph.getRings().get(0);
+        Vertex originalRingHead = originalRing.getHeadVertex();
+        Vertex originalRingTail = originalRing.getTailVertex();
+
+        DGraph incomingGraph = new DGraph();
+        Vertex linker = Vertex.newVertexFromLibrary(1, BBType.FRAGMENT, fs);
+        incomingGraph.addVertex(linker);
+
+        APMapping apMapping = new APMapping();
+        apMapping.put(scaffold.getAP(1), linker.getAP(0));
+        apMapping.put(onRing.getAP(0), linker.getAP(1));
+
+        assertTrue(DGraph.replaceSingleSubGraph(apMapping, fs));
+
+        assertTrue(graph.containsVertex(scaffold), "Scaffold stays");
+        assertTrue(graph.containsVertex(onRing), "Ring vertex stays");
+        assertEquals(linker, scaffold.getAP(1).getLinkedAP().getOwner(),
+                "First join is an edge");
+        assertEquals(linker, onRing.getAP(0).getLinkedAP().getOwner(),
+                "Other end of the same edge is an edge");
+        assertEquals(8, graph.getVertexCount(), "Vertices");
+        assertEquals(7, graph.getEdgeCount(), "Edges");
+        assertEquals(1, graph.getRingCount(), "Rings");
+        Ring rebuilt = graph.getRings().get(0);
+        assertEquals(originalRingHead, rebuilt.getHeadVertex(),
+                "Rebuilt ring keeps its head");
+        assertEquals(originalRingTail, rebuilt.getTailVertex(),
+                "Rebuilt ring keeps its tail");
+        assertEquals(5, rebuilt.getDistance(originalRingHead, originalRingTail),
+                "Ring path now runs through the inserted vertex");
     }
 
 //------------------------------------------------------------------------------
@@ -3304,6 +3624,41 @@ public class DGraphTest
         assertEquals(1, graph.getRingCount());
         assertEquals(1, graph.getSymmetricSetCount());
         assertTrue(graph.containsVertex(v0));
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Insertion is a replace whose mapped attachment points are the two ends
+     * of an edge: both vertices stay, and a clone of the incoming graph sits
+     * between them.
+     */
+    @Test
+    public void testInsertSubgraph_betweenTwoVertices() throws Exception
+    {
+        FragmentSpace fs = new FragmentSpaceParameters().getFragmentSpace();
+        DGraph graph = new DGraph();
+        EmptyVertex source = new EmptyVertex(1);
+        EmptyVertex target = new EmptyVertex(2);
+        buildVertexAndConnectToGraph(source, 1, graph);
+        buildVertexAndConnectToGraph(target, 1, graph);
+        Edge edge = new Edge(source.getAP(0), target.getAP(0));
+        graph.addEdge(edge);
+
+        DGraph incoming = new DGraph();
+        EmptyVertex linker = new EmptyVertex(3);
+        buildVertexAndConnectToGraph(linker, 3, incoming);
+
+        assertTrue(graph.insertSubgraph(edge, linker.getAP(0), linker.getAP(1), fs));
+
+        assertEquals(3, graph.getVertexCount());
+        assertEquals(2, graph.getEdgeCount());
+        assertTrue(incoming.containsVertex(linker));
+        Vertex inserted = source.getAP(0).getLinkedAP().getOwner();
+        assertTrue(inserted != source && inserted != target);
+        assertEquals(target, inserted.getAP(1).getLinkedAP().getOwner());
+        assertEquals(3, inserted.getAttachmentPoints().size());
+        assertTrue(inserted.getAP(2).isAvailable());
     }
     
 //-----------------------------------------------------------------------------
