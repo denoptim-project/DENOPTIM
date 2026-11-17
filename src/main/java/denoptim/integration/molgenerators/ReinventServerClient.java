@@ -239,9 +239,33 @@ public class ReinventServerClient
                         gaSettings.getReinventLinkersConfigPathname());
                     break;
             }
+            checkConfigurations(client.configurations);
             instances.put(serviceType, client);
         }
         return instances.get(serviceType);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Checks the configurations for the Reinvent server.
+     * @param configurations The configurations
+     */
+    private static void checkConfigurations(JsonObject configurations)
+    {
+        if (configurations == null) {
+            throw new IllegalArgumentException(
+                "Reinvent configurations are null");
+        }
+        if (!configurations.has("parameters")) {
+            throw new IllegalArgumentException(
+                "Reinvent configurations do not have 'parameters' member");
+        }
+        if (!configurations.getAsJsonObject("parameters").has(
+                "model_file")) {
+            throw new IllegalArgumentException(
+                "Reinvent configurations do not have 'parameters' member with 'model_file' member");
+        }
     }
 
 //------------------------------------------------------------------------------
@@ -258,6 +282,15 @@ public class ReinventServerClient
      */
     private static JsonObject readReinventConfigurationFile(String pathname) 
     {
+        if (pathname == null || pathname.isEmpty()) {
+            throw new IllegalArgumentException(
+                "Reinvent de novo configuration file pathname is empty");
+        }
+        File file = new File(pathname);
+        if (!file.exists()) {
+            throw new IllegalArgumentException(
+                "Reinvent de novo configuration file does not exist: " + pathname);
+        }
         try (BufferedReader reader = new BufferedReader(new FileReader(pathname)))
         {
             JsonObject config = new Gson().fromJson(reader, JsonObject.class);

@@ -2052,6 +2052,14 @@ public class DGraph implements Cloneable
         // the vertices stay, and the edges between the keys are replaced.
         boolean insertIntoEdge = mappingInsertsIntoEdges(apMapping);
 
+        // Keep track of the roles of the APs (true for src, false for trg)
+        Map<AttachmentPoint,Boolean> keyApRoles = new HashMap<>();
+        for (Map.Entry<AttachmentPoint,AttachmentPoint> e : apMapping.entrySet())
+        {
+            AttachmentPoint apOnFirtsGraph = e.getKey();
+            keyApRoles.put(apOnFirtsGraph, apOnFirtsGraph.isSrcInUser());
+        }
+
         // Checks for consistency while identifying vertexes at the interface between 
         // the two subgraphs.
         DGraph receivingGraph = null;
@@ -2395,7 +2403,7 @@ public class DGraph implements Cloneable
         {
             for (AttachmentPoint key : apMapping.keySet())
             {
-                if (key.isSrcInUser())
+                if (keyApRoles.get(key))
                 {
                     Vertex newSrcOfIncomingGraph = apMapping.get(key).getOwner();
                     DGraph.fixEdgeDirections(newSrcOfIncomingGraph, new HashSet<>());

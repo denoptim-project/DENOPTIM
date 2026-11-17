@@ -1,1 +1,5 @@
-{}
+{
+    "parameters": {
+       "model_file": "placeholder_for_file_pathname"
+    }
+}

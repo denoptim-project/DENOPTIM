@@ -43,14 +43,18 @@ do
 done
 
 #Run sub tests
-nSubTests=2
 elSymbols=('C  ' 'N  ' 'P  ' 'H  ' 'ATM' 'O  ' 'Si ' 'F  ' 'S  ')
 graphFeatures=('DENOPTIMRing' 'SymmetricVertexes' 'CAP' 'UNDEFINED' 'vertexId' 'srcAPID')
 totChecks=0
-for i in $(seq 1 $nSubTests)
+paramFiles=($(ls t*.params))
+nSubTests=${#paramFiles[@]}
+for paramFile in "${paramFiles[@]}"
 do
-    "$javaDENOPTIM" -jar "$denoptimJar" -r GO "t35-$i.params" > "t35-$i.log" 2>&1
-    if ! grep -q 'Completed GeneOpsRunner' "t35-$i.log"
+    i=${paramFile%.params}
+    testName="$i"
+    i=${testName##*-}
+    "$javaDENOPTIM" -jar "$denoptimJar" -r GO "$paramFile" > "$testName.log" 2>&1
+    if ! grep -q 'Completed GeneOpsRunner' "$testName.log"
     then
         echo " "
         echo "Test 't35' NOT PASSED (symptom: completion msg not found - step $i)"

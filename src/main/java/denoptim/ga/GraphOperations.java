@@ -1125,8 +1125,12 @@ public class GraphOperations
         }
         if (e.getSrcAP().getOwner() != vertex)
         {
-            throw new DENOPTIMException("Request to extend a link from a child "
-                    + "vertex (AP "+chosenAPId+" of vertex "+vertex+").");
+            settings.getLogger().log(Level.WARNING, 
+                "Request to extend a link from a child "
+                + "vertex (AP "+chosenAPId+" of vertex "+vertex+"). "
+                + "Link will be added between vertices "
+                + e.getSrcAP().getOwner() + " and " 
+                + e.getTrgAP().getOwner()+".");
         }
         return extendLink(e, chosenNewVrtxId, mnt, fragSpace, settings);
     }
@@ -1241,7 +1245,7 @@ public class GraphOperations
             childSubgraph.getAttachmentPoints());
         
         // We try any of the results, in random order 
-        // they are not sorted, so natural order is random order.
+        // they are not sorted, so the given order is a random order.
         for (DGraph linkerGraph : linkerSubgraphs)
         {
             // Get mapping between APs on original graph and APs on linker 

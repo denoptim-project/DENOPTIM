@@ -1,0 +1,12 @@
+{
+  "status": "SUCCESS",
+  "molecules": [
+    {
+      "SMILES": "COC(=O)Oc1ccccc1-n1cncc1Cc1cc(OC)cc(OC(=O)c2ccc(OC)c(OC)c2OC)c1",
+      "SMILES_state": "1",
+      "Warheads": "c1(OC(c2c(OC)c(OC)c(OC)cc2)=O)cc(*)cc(OC)c1|O(C)*",
+      "Linker": "n1cc(C[*])n(-c2c(OC(=O)[*])cccc2)c1",
+      "NLL": "21.0"
+    }
+  ]
+}
