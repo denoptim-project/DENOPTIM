@@ -70,7 +70,6 @@ import denoptim.utils.ManySMARTSQuery;
 import denoptim.utils.MathUtils;
 import denoptim.utils.MoleculeUtils;
 import denoptim.utils.ObjectPair;
-import denoptim.utils.Randomizer;
 
 public class FragmenterTools
 {
@@ -590,11 +589,14 @@ public class FragmenterTools
             {
                 frgParams.restartNextCutId();
             }
-            for (int bufferShellSize = 0; bufferShellSize < frgParams.getMaxBufferShellSize(); bufferShellSize++)
+            for (int bufferShellSize = 0; 
+                bufferShellSize < frgParams.getMaxBufferShellSize(); bufferShellSize++)
             {
                 // Use a reduced templateMol for isomorphism search (faster)
-                IAtomContainer reducedTemplateMol = ttp.getTemplateWithBufferShell(bufferShellSize);
-                List<List<Map<IAtom,IAtom>>> redTmpltoMolMappings = MoleculeUtils.findUniqueAtomMappings(
+                IAtomContainer reducedTemplateMol = 
+                    ttp.getTemplateWithBufferShell(bufferShellSize);
+                List<List<Map<IAtom,IAtom>>> redTmpltoMolMappings = 
+                    MoleculeUtils.findUniqueAtomMappings(
                         reducedTemplateMol, mol, frgParams.getLogger());
 
                 // Convert mappings from reducedTemplateMol:mol to templateMol:mol using stored indices
@@ -611,7 +613,8 @@ public class FragmenterTools
                             IAtom molAtom = redEntry.getValue();
                             
                             // Get original atom index from reduced atom property
-                            Object indexObj = reducedAtom.getProperty("DENOPTIM_ORIGINAL_ATOM_INDEX");
+                            Object indexObj = reducedAtom.getProperty(
+                                "DENOPTIM_ORIGINAL_ATOM_INDEX");
                             if (indexObj != null)
                             {
                                 int originalIndex = ((Number) indexObj).intValue();

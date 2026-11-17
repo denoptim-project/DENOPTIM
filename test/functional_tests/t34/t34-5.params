@@ -1,0 +1,45 @@
+#
+# This is the parameter file for test t34-4
+#
+
+# Genetic Algorithm parameters
+GA-randomSeed=8572368003836
+GA-Parallelization=synchronous
+GA-numParallelTasks=1
+GA-populationSize=10
+GA-numChildren=5
+GA-numGenerations=2
+
+GA-crossoverWeight=0
+GA-mutationWeight=1
+GA-ConstructionWeight=0
+
+GA-InitPoplnFile=OTF_WDIR/initial_pop_4.sdf
+
+# Here we only want to run only ONE type of mutation
+GA-ExcludeMutationType=DELETE
+GA-ExcludeMutationType=EXTEND
+GA-ExcludeMutationType=CHANGEBRANCH
+#GA-ExcludeMutationType=CHANGELINK
+GA-ExcludeMutationType=ADDLINK
+GA-ExcludeMutationType=ADDRING
+GA-ExcludeMutationType=ADDFUSEDRING
+GA-ExcludeMutationType=DELETELINK
+GA-ExcludeMutationType=DELETECHAIN
+
+# Interface with Reinvent
+GA-UseReinventForConstruction=true
+GA-UseReinventForGrowth=true
+GA-UseReinventForLinkers=true
+GA-ReinventDeNovoConfigFile=OTF_WDIR/reinvent_config_denovo.json
+GA-ReinventGrowthConfigFile=OTF_WDIR/reinvent_config_fromScaffold.json
+GA-ReinventLinkersConfigFile=OTF_WDIR/reinvent_config_linkers.json
+
+# There is a default, but we want to ensure this info is shared
+GA-ReinventServerHostname=localhost 
+# There is a default, but we want to ensure this info is shared
+GA-ReinventServerPort=5974
+
+# fitness provider
+FP-EQUATION=${3*Zagreb - 0.2*nAtom}
+FP-CheckUidBeforeFitness=yes

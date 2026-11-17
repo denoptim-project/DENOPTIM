@@ -810,11 +810,14 @@ public class ReinventServerClient
             return null;
         }
 
-        // Identify the whole linker+child vertex Because 
-        // of the constraint to only TWO warheads, there is only linker
-        // vertex.
-        Vertex linkerAndChildVertex = null;
-        AttachmentPoint apOfLinkerOnParentGraph = null;
+        // Identify the whole linker+child graph. 
+        // Even though the constraint to two warheads suggests we should always
+        // get two vertices (parent and linker+child), the parent warhead might 
+        // be matched multiple times, so we take the first match and collaps all 
+        // the rest into the linker+child atom container for further fragmentation.
+        AttachmentPoint linkerApOnParentGraph = null;
+        AttachmentPoint parentApOnParentGraph = null;
+        AttachmentPoint parentWarheadAP = null;
         APClass parentSideAPClass = null;
         try {
             parentSideAPClass = APClass.make("parentSide" + PLACEHOLDERAPCLASSNAME,0);
@@ -827,29 +830,62 @@ public class ReinventServerClient
         {
             if (ap.getAPClass().getRule().startsWith(PLACEHOLDERAPCLASSNAME))
             {
-                linkerAndChildVertex = ap.getOwner();
-                // Rename the APClass to acoid clash with the fragmentation 
+                // Rename the APClass to avoid clashes with the fragmentation 
                 // on the child side.
                 ap.setAPClass(parentSideAPClass);
-                // And keep track of the AP on the parent graphg:
+                // And keep track of the AP on the parent graph:
                 // we'll need it to replace the placeholder APs with the linker graph.
-                apOfLinkerOnParentGraph = ap;
+                linkerApOnParentGraph = ap;
+                parentApOnParentGraph = ap.getLinkedAP();
+                parentWarheadAP = (AttachmentPoint) parentApOnParentGraph.getProperty(
+                    AttachmentPoint.APPROPMATCHEDAP);
                 break;
             }
         }
-        if (linkerAndChildVertex == null) {
-            // Cannot identify linker vertex: abbandon
+        if (linkerApOnParentGraph == null) {
+            // Cannot identify the AP on the first linker vertex: abbandon
             return null;
         }
 
-        // Fragment the linker+child vertex to isolate the two components.
+        // Remove all the vertexes on the "parent side" of the linker's AP:
+        // This way, if there are multiple matches of the parent, those
+        // after the first are collapsed into the linker+child side and 
+        // further fragmented.
+        Vertex parentLinkedToLinker = parentApOnParentGraph.getOwner();
+        Set<Vertex> parentSideVertices = new HashSet<>();
+        parentSideVertices.add(parentLinkedToLinker);
+        DGraph.exploreGraph(
+            parentLinkedToLinker,
+            new HashSet<Vertex>(Arrays.asList(linkerApOnParentGraph.getOwner())),
+            parentSideVertices);
+        for (Vertex v : parentSideVertices)
+            parentSideGraph.removeVertex(v);
+
+        //TODO-ai t3d coule be a field in the client?
+        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(frgParams.getLogger(),
+            frgParams.getRandomizer());
+        t3d.setAlignBBsIn3D(false);
+        IAtomContainer linkerAndChildIAC;
+        try {
+            linkerAndChildIAC = t3d.convertGraphTo3DAtomContainer(
+                parentSideGraph, true);
+        } catch (DENOPTIMException e) {
+            // Cannot convert to 3D: abbandon
+            return null;
+        }
+        if (linkerAndChildIAC == null) {
+            // Cannot convert to 3D: abbandon
+            return null;
+        }
+
+        // Fragment the linker+child system to isolate the (first) child component.
         DGraph childSideGraph = null;
         try {
             FragmenterParameters frgParsChildSide = new FragmenterParameters();
             frgParsChildSide.setScaffoldingPolicy(ScaffoldingPolicy.NONE);
             frgParsChildSide.setFragmentationTmpls(Arrays.asList(childWarhead));
             childSideGraph = FragmenterTools.makeGraphFromFragmentationOfMol(
-                linkerAndChildVertex.getIAtomContainer(), 
+                linkerAndChildIAC, 
                 frgParsChildSide, fragSpace, false);
             //TODO-ai vertex types seem wrong, here
         } catch (DENOPTIMException e) {
@@ -862,50 +898,68 @@ public class ReinventServerClient
             return null;
         }
         
-        // Identify the whole linker, which we further fragment. Because 
-        // of the constraint to only TWO warheads, there is only one linker
-        // vertex, but there could be many from the child warhead.
-        Vertex linkerToFragment = null;
-        AttachmentPoint linkerToParentApOnChildGraph = childSideGraph.findAPs(
-            new AttachmentPointQuery(null, //apID
-                null, // apIndex, 
-                parentSideAPClass, // apClass, 
-                null, // vertexQuery, 
-                null, // edgeQuery, 
-                null), // linkedAPQuery
-                frgParams.getLogger()).get(0);
-        linkerToFragment = linkerToParentApOnChildGraph.getOwner();
-
-        // Identify the AP on the child warhead subgraph that will be 
-        // appended to the parent+linker graph.
-        AttachmentPoint linkerToChildApOnChildGraph = null;
-        //TODO-ai: consider APClassQuery
+        // Identify the whole linker side, which we further fragment.
+        // Again, the child warhead might be matched multiple 
+        // times, so we take the first match and collaps all the rest into the
+        // linker atom container for further fragmentation.
+        AttachmentPoint linkerApOnChildGraph = null;
+        AttachmentPoint childApOnChildGraph = null;
+        AttachmentPoint childWarheadAP = null;
         for (AttachmentPoint ap : childSideGraph.getAttachmentPoints())
         {
+            // this is why we need to rename the APClass on the linker
+            // otherwise we would match it here.
             if (ap.getAPClass().getRule().startsWith(PLACEHOLDERAPCLASSNAME))
             {
-                // Only one expected
-                linkerToChildApOnChildGraph = ap;
+                // We take only the first, as others matches of the child
+                // are collapsed into the linker+child vertex.
+                linkerApOnChildGraph = ap;
+                childApOnChildGraph = ap.getLinkedAP();
+                childWarheadAP = (AttachmentPoint) childApOnChildGraph.getProperty(
+                    AttachmentPoint.APPROPMATCHEDAP);
                 break;
             }
         }
-        AttachmentPoint apToLinkerOnChildGraph = linkerToChildApOnChildGraph.getLinkedAP();
-        BondType bondTypeChildToLinker = linkerToChildApOnChildGraph.getEdgeUser().getBondType();
+        if (linkerApOnChildGraph == null) {
+            // Cannot identify the AP on the first linker vertex: abbandon
+            return null;
+        }
+        
+        // Remove all the vertexes on the "child side" of the linker's AP:
+        // This way, if there are multiple matches of the child, those
+        // after the first are collapsed into the linker side and 
+        // further fragmented.
+        @SuppressWarnings("null")
+        Vertex childLinkedToLinker = childApOnChildGraph.getOwner();
+        Set<Vertex> childSideVertices = new HashSet<>();
+        childSideVertices.add(childLinkedToLinker);
+        DGraph.exploreGraph(
+            childLinkedToLinker,
+            new HashSet<Vertex>(Arrays.asList(linkerApOnChildGraph.getOwner())),
+            childSideVertices);
+        for (Vertex v : childSideVertices)
+            childSideGraph.removeVertex(v);
 
-        // Now, we can isolate the child warhead from the linker.
-        // This is what we'll append to the parent+linker graph.
-        childSideGraph.removeVertex(linkerToFragment);
+        IAtomContainer linkerIAC;
+        try {
+            linkerIAC = t3d.convertGraphTo3DAtomContainer(
+                childSideGraph, true);
+        } catch (DENOPTIMException e) {
+            // Cannot convert to 3D: abbandon
+            return null;
+        }
+        if (linkerIAC == null) {
+            // Cannot convert to 3D: abbandon
+            return null;
+        }
 
-        // Further fragment the linker, if possible.
-        // TODO: this will benefit from copying of RunTimeParameters
-        IAtomContainer fragIAC = linkerToFragment.getIAtomContainer();
         DGraph linkerGraph = null;
         try {
             FragmenterParameters frgParamsNoScaffolding = new FragmenterParameters();
             frgParamsNoScaffolding.setCuttingRules(frgParams.getCuttingRules());
             frgParamsNoScaffolding.setScaffoldingPolicy(ScaffoldingPolicy.NONE);
             linkerGraph = FragmenterTools.makeGraphFromFragmentationOfMol(
-                fragIAC, frgParamsNoScaffolding, fragSpace, false);
+                linkerIAC, frgParamsNoScaffolding, fragSpace, false);
         } catch (DENOPTIMException e) {
             // Keep the original un-fragmented fragment, so do nothing.
         }
@@ -913,7 +967,7 @@ public class ReinventServerClient
         {
             linkerGraph = new DGraph();
             try {
-                linkerGraph.addVertex(linkerToFragment.clone());
+                linkerGraph.addVertex(new Fragment(linkerIAC, BBType.FRAGMENT));
             } catch (DENOPTIMException e) {
                 throw new IllegalStateException("Not possible to clone vertex: " 
                     + e.getMessage());
@@ -938,7 +992,7 @@ public class ReinventServerClient
                 null, // edgeQuery, 
                 null), // linkedAPQuery
                 frgParams.getLogger()).get(0);
-        apMapParentToLinker.put(apOfLinkerOnParentGraph, apOnLinkerGraph);
+        apMapParentToLinker.put(linkerApOnParentGraph, apOnLinkerGraph);
 
         // Replace placeholder APs with the linker graph.
         try {
@@ -1023,16 +1077,12 @@ public class ReinventServerClient
                 // we'll need it for installing the linker in the correct direction 
                 if (ap.getAPClass().getRule().startsWith(PLACEHOLDERAPCLASSNAME))
                 {
-                    ap.setProperty(AttachmentPoint.APPROPMATCHEDAP, 
-                        apToLinkerOnChildGraph.getProperty(
-                            AttachmentPoint.APPROPMATCHEDAP));
-                    apcOnTemplate = apToLinkerOnChildGraph.getAPClass();
+                    ap.setProperty(AttachmentPoint.APPROPMATCHEDAP, childWarheadAP);
+                    apcOnTemplate = childApOnChildGraph.getAPClass();
                 } else if (ap.getAPClass().equals(parentSideAPClass))
                 {
-                    ap.setProperty(AttachmentPoint.APPROPMATCHEDAP, 
-                        apOfLinkerOnParentGraph.getLinkedAP().getProperty(
-                            AttachmentPoint.APPROPMATCHEDAP));
-                    apcOnTemplate = apOfLinkerOnParentGraph.getLinkedAP().getAPClass();
+                    ap.setProperty(AttachmentPoint.APPROPMATCHEDAP, parentWarheadAP);
+                    apcOnTemplate = parentApOnParentGraph.getAPClass();
                 }
 
                 // WARNING: we assume asymmetric cutting rule!

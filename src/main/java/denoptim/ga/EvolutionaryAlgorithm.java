@@ -459,13 +459,14 @@ public class EvolutionaryAlgorithm
             // async loop, but it allows to screen many more candidates because
             // it keeps only best N, where N is the size of the population.
             // Yet, there is plenty of repeated code, which is sub-optimal.
-            int i=0;
+            int numSubmittedTasks = 0;
             List<Task> batchOfSyncParallelTasks = new ArrayList<>();
             try 
             {
+                int numMolFragmented = 0;
                 while (iterMolsToFragment.hasNext()) 
                 {
-                    i++;
+                    numMolFragmented++;
                     
                     if (stopped)
                     {
@@ -481,7 +482,8 @@ public class EvolutionaryAlgorithm
                     
                     Candidate candidate = 
                         EAUtils.buildCandidateByFragmentingMolecule(
-                            iterMolsToFragment.next(), mnt, settings, i);
+                            iterMolsToFragment.next(), mnt, settings, 
+                            numMolFragmented);
                     if (candidate != null)
                     {
                         candidate.getGraph().setProvenance(
@@ -491,11 +493,15 @@ public class EvolutionaryAlgorithm
                     // NB: here we request to keep only the best candidates
                     // so that the tmp population does not become too large
                     // before being trimmed.
-                    i = processInitialPopCandidate(candidate, population, mnt, 
-                            batchOfSyncParallelTasks, i, true, true);
+                    numSubmittedTasks += processInitialPopCandidate(candidate, 
+                        population, mnt, batchOfSyncParallelTasks,
+                        numMolFragmented,
+                        true, true);
                 }
-                // We still need to submit the possibly partially-filled last batch
-                if (batchOfSyncParallelTasks.size()>0)
+                // Tasks are removed from the list when a batch is submitted, so
+                // anything left here is a partial batch that never reached the
+                // submission threshold.
+                if (!batchOfSyncParallelTasks.isEmpty())
                     submitSyncParallelBatch(batchOfSyncParallelTasks);
             } catch (DENOPTIMException dex)
             {
@@ -522,13 +528,14 @@ public class EvolutionaryAlgorithm
         // candidates or we have reached the max number of attempts.
         // WARNING: careful about the duplication of code in this loop and in 
         // the one above (with iterMolsToFragment)
-        int i=0;
-        List<Task> tasks = new ArrayList<>();
+        List<Task> tasksToBeSubmitted = new ArrayList<>();
+        int numSubmittedTasks = 0;
         try 
         {
-            while (i < settings.getPopulationSize() * settings.getMaxTriesFactor()) 
+            int numAttempts = 0;
+            while (numSubmittedTasks < settings.getPopulationSize() * settings.getMaxTriesFactor()) 
             {
-                i++;
+                numAttempts++;
                 if (stopped)
                     break;
 
@@ -545,18 +552,24 @@ public class EvolutionaryAlgorithm
                         break;
                 }
                 
-                int nextBatchSize = settings.getPopulationSize() - population.size();
+                int nextBatchSize = settings.getPopulationSize()
+                        - (numSubmittedTasks + tasksToBeSubmitted.size());
                 if (nextBatchSize <= 0)
                     break;
 
+                // NB: we might build more than necessary, but outside this method we trim.
                 List<Candidate> candidates = EAUtils.buildCandidatesFromScratch(mnt, 
                     settings, nextBatchSize);
                 for (Candidate candidate : candidates)
                 {
-                    i = processInitialPopCandidate(candidate, population, mnt, 
-                        tasks, i, false, false);
+                    numSubmittedTasks += processInitialPopCandidate(candidate, 
+                        population, mnt, 
+                        tasksToBeSubmitted, numAttempts, 
+                        false, false);
                 }
             }
+            if (!tasksToBeSubmitted.isEmpty())
+                submitSyncParallelBatch(tasksToBeSubmitted);
         } catch (DENOPTIMException dex)
         {
             if (isAsync)
@@ -579,7 +592,7 @@ public class EvolutionaryAlgorithm
         
         mnt.printSummary();
 
-        if (i >= (settings.getPopulationSize() * 
+        if (numSubmittedTasks >= (settings.getPopulationSize() * 
                 settings.getMaxTriesFactor()))
         {
             if (isAsync)
@@ -588,18 +601,26 @@ public class EvolutionaryAlgorithm
                 stopRun();
             }
             logger.log(Level.SEVERE,
-                    "Unable to initialize population in {0} attempts."+NL, i);
+                    "Unable to initialize population in {0} attempts." + NL, 
+                        numSubmittedTasks);
 
             throw new DENOPTIMException("Unable to initialize population in " 
-                    + i + " attempts (Population size: " + population.size() 
-                    + ", tasks batch size: " + tasks.size() + ").");
+                    + numSubmittedTasks + " attempts (Population size: " 
+                    + population.size() 
+                    + ", submitted tasks: " + numSubmittedTasks + ").");
         }
 
+        // sort the population and trim it to size: we might have produced more
+        // candidates that we needed.
         synchronized (population)
         {
+            Collections.sort(population, Collections.reverseOrder());
+            if (settings.getReplacementStrategy() == 1)
+            {
+                population.trim(settings.getPopulationSize());
+            }
             // NB: this does not remove any item from the list
             population.trimToSize();
-            Collections.sort(population, Collections.reverseOrder());
         }
     }
 
@@ -617,8 +638,7 @@ public class EvolutionaryAlgorithm
      * member in the population.
      * @param candidatesOverflow <code>true</code> to allow submission of 
      * more candidates than the size of the population.
-     * @return the update number of attemptsToFillBatch, if it needs to be 
-     * updated.
+     * @return the number of submitted tasks.
      * @throws DENOPTIMException
      */
     private int processInitialPopCandidate(Candidate candidate, 
@@ -628,7 +648,7 @@ public class EvolutionaryAlgorithm
                     throws DENOPTIMException
     {
         if (candidate == null)
-            return attemptsToFillBatch;
+            return 0;
 
         candidate.setGeneration(0);
         
@@ -640,11 +660,11 @@ public class EvolutionaryAlgorithm
                 if (!scs.addNewUniqueEntry(candidate.getUID()))
                 {
                     mnt.increase(CounterID.DUPLICATEPREFITNESS);
-                    return attemptsToFillBatch;
+                    return 0;
                 }
             } catch (Exception e) {
                 mnt.increase(CounterID.FAILEDDUPLICATEPREFITNESSDETECTION);
-                return attemptsToFillBatch;
+                return 0;
             }
         }
        
@@ -668,6 +688,7 @@ public class EvolutionaryAlgorithm
             {
                 cleanupCompleted();
             }
+            return 1;
         } else {
             batchOfSyncParallelTasks.add(task);
             boolean submitBatch = false;
@@ -678,7 +699,7 @@ public class EvolutionaryAlgorithm
                         ||
                         //This to avoid the fixed batch size to block the
                         //generation of new candidates for too long
-                        attemptsToFillBatch >= (0.1 * settings.getPopulationSize() *
+                        attemptsToFillBatch >= (0.05 * settings.getPopulationSize() *
                                 settings.getMaxTriesFactor());
             } else {
                 submitBatch = batchOfSyncParallelTasks.size() 
@@ -691,12 +712,15 @@ public class EvolutionaryAlgorithm
                 // Therefore we can run the execution service.
                 // TasksBatchManager takes the collection of tasks and runs
                 // them in batches of N according to the GA settings.
+                // The batch is cleared by the submission, so the count has to
+                // be taken first.
+                int numTasksInBatch = batchOfSyncParallelTasks.size();
                 submitSyncParallelBatch(batchOfSyncParallelTasks);
+                return numTasksInBatch;
             } else {
-                attemptsToFillBatch = 0;
+                return 0;
             }
         }
-        return attemptsToFillBatch;
     }
     
 //------------------------------------------------------------------------------

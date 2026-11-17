@@ -10,10 +10,11 @@ GA-populationSize=10
 GA-numChildren=5
 GA-numGenerations=2
 
-# We do only generation from scratch (evolutionary algorithm, not genetic algorithm)
+# We do only generation from scratch (no scaffolds)
 GA-crossoverWeight=0
 GA-mutationWeight=0
 GA-ConstructionWeight=1
+GA-InitPoplnFile=OTF_WDIR/initial_pop_2.sdf
 
 # Interface with Reinvent
 GA-UseReinventForConstruction=true
@@ -22,13 +23,6 @@ GA-ReinventDeNovoConfigFile=OTF_WDIR/reinvent_config_denovo.json
 GA-ReinventServerHostname=localhost 
 # There is a default, but we want to ensure this info is shared
 GA-ReinventServerPort=5974
-
-#TODO-ai remove
-# These caps are used to ensure consistency with the pre-computed expected results in case default values change
-GA-MaxXoverCompatVrtxPairs=500
-GA-MaxXoverEndPointsCombinations=50
-GA-MaxXoverEndPointsPermutations=10
-GA-MaxAPMappingCombinations=250
 
 # fitness provider
 FP-EQUATION=${3*Zagreb - 0.2*nAtom}

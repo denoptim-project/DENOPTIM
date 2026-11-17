@@ -877,10 +877,15 @@ public class EAUtils
             settings);
         reinventClient.setRecordRequestsFileName(
             settings.getReinventRequestsPathname());
+
+        // This map may be null, meaning no scaffold is defined.
+        Map<String, List<DGraph>> smilesDGraphMap = 
+            reinventClient.getSMILESToDGraphMapForScaffolds(settings);
+
         List<DGraph> graphs;
         try {
             graphs = reinventClient.generateGraphs(
-                reinventClient.getSMILESToDGraphMapForScaffolds(settings), 
+                smilesDGraphMap, 
                 nextBatchSize);
             // No more need to do AP-AP mapping, so cleanup to free-up memory
             graphs.forEach(g -> g.clearAPProperty(AttachmentPoint.APPROPMATCHEDAP));
@@ -903,8 +908,17 @@ public class EAUtils
                 candidates.add(candidate);
             }
         }
-        candidates.forEach(c -> c.getGraph().setProvenance(
-                Provenance.construction("Reinvent")));
+
+        if (smilesDGraphMap != null)
+        {
+            candidates.forEach(c -> c.getGraph().setProvenance(
+                // NB: the attribute string is deteted in functionality tests    
+                Provenance.construction("Reinvent (with scaffolds)")));
+        } else {
+            candidates.forEach(c -> c.getGraph().setProvenance(
+                // NB: the attribute string is deteted in functionality tests
+                Provenance.construction("Reinvent (de novo)")));
+        }
         return candidates;
     }
     
@@ -1593,8 +1607,9 @@ public class EAUtils
             throw new DENOPTIMException(msg);
         }
 
-        for (Candidate candidate : candidates)
+        for (int i = 0; i < candidates.size(); i++)
         {
+            Candidate candidate = candidates.get(i);
             if (uniqueIDsSet.addNewUniqueEntry(candidate.getUID()))
             {
                 int ctr = GraphUtils.getUniqueMoleculeIndex();
@@ -1616,9 +1631,16 @@ public class EAUtils
                 
                 population.add(candidate);
             } else {
-                settings.getLogger().log(Level.WARNING, "Candidate from intial "
+                String molName = "noName";
+                if (candidate != null && candidate.getName() != null)
+                {
+                    molName = candidate.getName();
+                }
+                settings.getLogger().log(Level.WARNING, "Candidate " + i 
+                        + " (" + molName + ") from intial "
                         + "population file '" + filename 
-                        + "' is rejected because its identifier is "
+                        + "' is rejected because its identifier (UID=" 
+                        + candidate.getUID() + ") is "
                         + "already listed among the previously visited "
                         + "identifiers.");
             }

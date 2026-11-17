@@ -51,6 +51,7 @@ import denoptim.graph.APMapping;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.DGraph;
 import denoptim.graph.Edge;
+import denoptim.graph.Fragment;
 import denoptim.graph.RelatedAPPair;
 import denoptim.graph.Ring;
 import denoptim.graph.SymmetricAPs;
@@ -74,6 +75,7 @@ import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
 import denoptim.utils.CrossoverType;
 import denoptim.utils.GraphUtils;
+import denoptim.utils.MoleculeUtils;
 import denoptim.utils.MutationType;
 import denoptim.utils.Randomizer;
 
@@ -774,35 +776,59 @@ public class GraphOperations
             Monitor mnt, GAParameters settings)
                     throws DENOPTIMException
     {
-        // Reinvent can only handle links to TWO warheads...
-        if (vertex.getAttachmentPoints().size() != 2)
-        {
-            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK);
-            return false;
-        }
-        // ...and the warheads must not be void
-        if (vertex.getAttachmentPoints().get(0).isAvailable() 
-            || vertex.getAttachmentPoints().get(1).isAvailable())
-        {
-            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK);
-            return false;
-        }
-
-        DGraph graph = vertex.getGraphOwner();
-
-        // Identify the AP that identify the two warheads
+        // Reinvent can only handle links to TWO warheads that are not H atoms:
         AttachmentPoint linkerApToParent = null;
         AttachmentPoint linkerApToChild = null;
         for (AttachmentPoint ap : vertex.getAttachmentPoints())
         {
-            // We have already ensured there are only two APs and both are used
+            // Available APs, if any, are ignored because this vertex is removed
+            if (ap.isAvailable())
+            {
+                continue;
+            }
+
+            // Reinvent can link only warheads that are not just H atoms
+            Vertex userVertex = ap.getLinkedAPThroughout().getOwner();
+            IAtomContainer userIAC = userVertex.getIAtomContainer();
+            if (userIAC.getAtomCount() == 1 
+                && MoleculeUtils.getSymbolOrLabel(userIAC.getAtom(0)).equals("H"))
+            {
+                continue;
+            }
+
+            // Which side of the linker is the AP on?
             if (ap.isSrcInUser())
             {
+                if (linkerApToChild != null)
+                {
+                    // Already found: the vertex has more than one outgoing edge
+                    // cannot use Reinvent to link more than two warheads
+                    return false;
+                }
                 linkerApToChild = ap;
             } else {
+                if (linkerApToParent != null)
+                {
+                    // Already found: the vertex has more than one incoming edge
+                    // cannot use Reinvent to link more than two warheads
+                    return false;
+                }
                 linkerApToParent = ap;
             }
         }
+
+        if (linkerApToParent == null || linkerApToChild == null)
+        {
+            // Cannot use Reinvent to link
+            // NB: monitored outside this method: 
+            // mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK);
+            // TODO: one may desire better resolution to distinguish between
+            // failed link changed due to non-linkable warheads and failed link
+            // changed due to too many warheads.
+            return false;
+        }
+
+        DGraph graph = vertex.getGraphOwner();
 
         FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
         if (settings.containsParameters(ParametersType.FS_PARAMS))
@@ -810,8 +836,6 @@ public class GraphOperations
             fsParams = (FragmentSpaceParameters)settings.getParameters(
                     ParametersType.FS_PARAMS);
         }
-
-        int initialNumberOfFragments = graph.getVertexCount();
 
         // Define the warheads: the subgraphs to be linked by the linker
         AttachmentPoint parentSubgraphApToLinker = linkerApToParent.getLinkedAP();
@@ -1148,21 +1172,31 @@ public class GraphOperations
      */
     public static boolean extendLinkUsingReinvent(Edge edge,
         Monitor mnt, GAParameters settings) throws DENOPTIMException
-    {                    
+    {
+        // Identify the AP that identify the two warheads. 
+        // NB: these two APs are pointing to each other , i.e., linker is empty!
+        AttachmentPoint linkerApToParent = edge.getTrgAP();
+        AttachmentPoint linkerApToChild = edge.getSrcAP();
+        for (AttachmentPoint ap : Arrays.asList(linkerApToParent, linkerApToChild))
+        {
+            // Reinvent can link only warheads that are not just H atoms
+            IAtomContainer userIAC = ap.getOwner().getIAtomContainer();
+            if (userIAC.getAtomCount() == 1 
+                && MoleculeUtils.getSymbolOrLabel(userIAC.getAtom(0)).equals("H"))
+            {
+                // Cannot use Reinvent to add linker in *–H connection.
+                return false;
+            }
+        }
+
         FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
         if (settings.containsParameters(ParametersType.FS_PARAMS))
         {
             fsParams = (FragmentSpaceParameters)settings.getParameters(
                     ParametersType.FS_PARAMS);
         }
-
+            
         DGraph graph = edge.getSrcAP().getOwner().getGraphOwner();
-            
-        // Identify the AP that identify the two warheads. 
-        // NB: these two APs are pointing to each other , i.e., linker is empty!
-        AttachmentPoint linkerApToParent = edge.getTrgAP();
-        AttachmentPoint linkerApToChild = edge.getSrcAP();
-            
         int initialNumberOfFragments = graph.getVertexCount();
             
         // Define the warheads: the subgraphs to be linked by the linker
