@@ -44,7 +44,7 @@ import javax.swing.table.DefaultTableModel;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
 import denoptim.gui.GUIPreferences.MolDimDisplay;
-import denoptim.gui.GUIPreferences.SMITo3DEngine;
+import denoptim.molecularmodeling.SmilesTo3DConverter;
 
 public class GUIPreferencesDialog extends GUIModalDialog
 {
@@ -118,7 +118,7 @@ public class GUIPreferencesDialog extends GUIModalDialog
     
     private String namSMILESTo3D = "SMILES-to-3D converer";
     private JPanel pnlSMILESTo3D;
-    private JComboBox<SMITo3DEngine> cmbSMILESTo3D;
+    private JComboBox<SmilesTo3DConverter.Engine> cmbSMILESTo3D;
     private JLabel lblSMILESTo3D;
     
 	
@@ -160,13 +160,13 @@ public class GUIPreferencesDialog extends GUIModalDialog
         
         pnlSMILESTo3D = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblSMILESTo3D = new JLabel(namSMILESTo3D + ":");
-        cmbSMILESTo3D = new JComboBox<SMITo3DEngine>(SMITo3DEngine.values());
+        cmbSMILESTo3D = new JComboBox<SmilesTo3DConverter.Engine>(SmilesTo3DConverter.Engine.values());
         cmbSMILESTo3D.setSelectedItem(GUIPreferences.smiTo3dResolver);
         cmbSMILESTo3D.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				GUIPreferences.smiTo3dResolver = (SMITo3DEngine) 
-						cmbSMILESTo3D.getSelectedItem();
+				GUIPreferences.smiTo3dResolver = 
+                    (SmilesTo3DConverter.Engine) cmbSMILESTo3D.getSelectedItem();
 			}
 		});
         pnlSMILESTo3D.add(lblSMILESTo3D);
@@ -325,6 +325,7 @@ public class GUIPreferencesDialog extends GUIModalDialog
         
 		// Customize the buttons of the modal dialog
 		this.btnDone.setText("Save");
+		this.getRootPane().setDefaultButton(this.btnDone);
 		this.btnDone.setToolTipText("Save the values to the preferences file "
 		        + "and close dialog");
 		this.btnDone.addActionListener(new ActionListener() {

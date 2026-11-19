@@ -36,6 +36,8 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
+import org.openscience.cdk.interfaces.IAtomContainer;
+
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
@@ -164,6 +166,15 @@ public class VertexAsTwoDimStructureViewPanel extends JSplitPane
 	
 //-----------------------------------------------------------------------------
     
+    public void loadPlainStructure(IAtomContainer mol)
+    {
+        setVertexSpecificEditableAPTable(false);
+        clearAPTable();
+        loadStructureToViewer(mol);
+    }
+	
+//-----------------------------------------------------------------------------
+    
     public void loadVertexToViewer(Vertex v)
     {
         setVertexSpecificEditableAPTable(true);
@@ -178,20 +189,26 @@ public class VertexAsTwoDimStructureViewPanel extends JSplitPane
 
     /*
      * Structure here means the single-node-graph-like visual depiction of the
+     * molecule.
      */
     private void loadVertexStructure()
     {
         if ((vertex instanceof EmptyVertex) 
                 || (vertex instanceof Fragment))
         {
-            clearPanel();
-            twoDimView.add(new TwoDimStructurePanel(
-                TwoDimStructurePanel.getIACFromVertex(vertex)));
+            loadStructureToViewer(TwoDimStructurePanel.getIACFromVertex(vertex));
         }
     }
     
 //-----------------------------------------------------------------------------
-    
+
+    private void loadStructureToViewer(IAtomContainer mol)
+    {
+        clearPanel();
+        twoDimView.add(new TwoDimStructurePanel(mol));
+    }
+
+//-----------------------------------------------------------------------------
     /**
      * trashed the current panel displaying any 2D structure and replaces it 
      * with a new empty panel.

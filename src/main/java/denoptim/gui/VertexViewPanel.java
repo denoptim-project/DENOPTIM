@@ -353,25 +353,6 @@ public class VertexViewPanel extends JPanel
                 break;
         }
     }
-    
-//-----------------------------------------------------------------------------
-	
-	/**
-	 * Loads a molecule build from a smiles string. The 3D geometry is either 
-	 * taken from remote CACTUS service (requires connection
-	 * to the Internet) or built with CDK tools, as a fall-back. The CDK
-	 * builder, however will produce a somewhat lower quality conformation than
-	 * that obtained from on online generator.
-	 * @param smiles the SMILES of the molecule to load
-	 * @return <code>true</code> if the SMILES could be converted into a 3D 
-	 * structure
-	 * @throws DENOPTIMException 
-	 */
-	public boolean loadSMILES(String smiles)
-	{
-        switchToMolViewer();
-	    return fragViewer.loadSMILES(smiles);
-	}
 
 //-----------------------------------------------------------------------------
 	
@@ -406,6 +387,7 @@ public class VertexViewPanel extends JPanel
 	public void loadPlainStructure(IAtomContainer mol)
 	{
 	    fragViewer.loadPlainStructure(mol);
+        twoDimViewer.loadPlainStructure(mol);
 	    switchToMolViewer();
 	}
 
@@ -520,6 +502,7 @@ public class VertexViewPanel extends JPanel
             switchbleByVertexType = false;
         }
         graphNodeViewer.loadVertexToViewer(tmpl);
+        twoDimViewer.loadVertexToViewer(tmpl);
         switchToGraphNodeViewer();
         graphNodeViewer.setVertexSpecificEditableAPTable(false);
     }

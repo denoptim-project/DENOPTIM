@@ -6,6 +6,7 @@ dependencies:
   - openjdk=17.*
   - maven
   - python
+  - rdkit
   - py4j
   - doxygen
   - graphviz

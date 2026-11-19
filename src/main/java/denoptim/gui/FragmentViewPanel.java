@@ -46,21 +46,12 @@ import javax.swing.table.JTableHeader;
 import javax.vecmath.Point3d;
 
 import org.jmol.viewer.Viewer;
-import org.openscience.cdk.DefaultChemObjectBuilder;
-import org.openscience.cdk.atomtype.CDKAtomTypeMatcher;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IAtomType;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.io.MDLV2000Reader;
-import org.openscience.cdk.modeling.builder3d.ModelBuilder3D;
-import org.openscience.cdk.modeling.builder3d.TemplateHandler3D;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
-import org.openscience.cdk.smiles.SmilesParser;
-import org.openscience.cdk.tools.CDKHydrogenAdder;
-import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
-import org.openscience.cdk.tools.manipulator.AtomTypeManipulator;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -68,6 +59,8 @@ import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Fragment;
 import denoptim.graph.Vertex;
 import denoptim.io.DenoptimIO;
+import denoptim.molecularmodeling.SmilesTo3DConverter;
+import denoptim.molecularmodeling.SmilesTo3DConverter.Engine;
 import denoptim.utils.MathUtils;
 import denoptim.utils.MoleculeUtils;
 
@@ -308,58 +301,25 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 	
 //-----------------------------------------------------------------------------
 	
-	private void make3DusingCDKgenerator(String smiles) throws CDKException, 
-	CloneNotSupportedException, IOException
+	private IAtomContainer make3DStructureLocally(String smiles, Engine engine) 
+        throws CDKException, 
+	CloneNotSupportedException, IOException, DENOPTIMException
 	{
-		IAtomContainer mol = null;
-
-		SmilesParser sp = new SmilesParser(
-				DefaultChemObjectBuilder.getInstance());
-		mol = sp.parseSmiles(smiles);
-		
-		// This seems to be needed in the opposite order since cdk-2.3
-		/*
-	    CDKHydrogenAdder adder = CDKHydrogenAdder.getInstance(
-	    		mol.getBuilder());
-	    adder.addImplicitHydrogens(mol);
-		*/
-		
-		CDKAtomTypeMatcher matcher = CDKAtomTypeMatcher.getInstance(
-				mol.getBuilder());
-	    for (IAtom atom : mol.atoms()) 
-	    {
-	        IAtomType type = matcher.findMatchingAtomType(mol, atom);
-	        AtomTypeManipulator.configure(atom, type);
-	    }
-	    
-	    CDKHydrogenAdder adder = CDKHydrogenAdder.getInstance(
-                mol.getBuilder());
-        adder.addImplicitHydrogens(mol);
-	    
-	    AtomContainerManipulator.convertImplicitToExplicitHydrogens(mol);
-
-        ModelBuilder3D mb3d = ModelBuilder3D.getInstance(
-                TemplateHandler3D.getInstance(), "mmff94", 
-                DefaultChemObjectBuilder.getInstance());
-		mol = mb3d.generate3DCoordinates(mol, false);
-
-		// Load the system int oJmol
-		loadPlainStructure(mol);
-		
-		// Run Jmol MM energy minimization
-		jmolPanel.viewer.evalString("minimize");
-		waitForJmolViewer(1500,"Energy minimization is taking some time.");
-		
-		// Re-load
-		IAtomContainer iac;
-		try {
-			iac = getStructureFromJmolViewer();
-			loadPlainStructure(iac);
-		} catch (DENOPTIMException e) {
-			e.printStackTrace();
-			//no data is coming, so we have to 'zap'
-			clearMolecularViewer(false);
-		}
+		IAtomContainer mol = SmilesTo3DConverter.getInstance()
+            .smilesTo3DMolecule(smiles, engine);
+        if (engine == Engine.CDK) {
+            jmolPanel.viewer.evalString("minimize");
+            waitForJmolViewer(1500,
+                "Energy minimization is taking some time.");
+            try {
+                mol = getStructureFromJmolViewer();
+            } catch (DENOPTIMException e) {
+                e.printStackTrace();
+                //no data is coming, so we have to 'zap'
+                clearMolecularViewer(false);
+            }
+        }
+        return mol;
 	}
 	
 //-----------------------------------------------------------------------------
@@ -370,162 +330,6 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 	    data = data.replaceAll(" Xx  ", 
 	            " " + DENOPTIMConstants.DUMMYATMSYMBOL + "  ");
 		return data;
-	}
-	
-//-----------------------------------------------------------------------------
-	
-	/**
-	 * Loads a molecule build from a smiles string. The 3D geometry is either 
-	 * taken from remote CACTUS service (requires connection
-	 * to the Internet) or built with CDK tools, as a fall-back. The CDK
-	 * builder, however will produce a somewhat lower quality conformation than
-	 * that obtained from on online generator.
-	 * @param smiles the SMILES of the molecule to load
-	 * @return <code>true</code> if the SMILES could be converted into a 3D 
-	 * structure
-	 * @throws DENOPTIMException 
-	 */
-	public boolean loadSMILES(String smiles)
-	{	
-		if (parent!=null)
-		{
-			parent.setCursor(Cursor.getPredefinedCursor(
-					Cursor.WAIT_CURSOR));
-		} else {
-			this.setCursor(Cursor.getPredefinedCursor(
-					Cursor.WAIT_CURSOR));
-		}
-		
-		switch (GUIPreferences.smiTo3dResolver)
-		{
-		case CACTVS:
-			jmolPanel.viewer.evalString("load $"+smiles);
-			waitForJmolViewer(1500,
-					"Slow response from https://cactus.nci.nih.gov");
-			// NB: this is a workaround to the lack of try/catch mechanism when
-			// executing Jmol commands.
-			// We want to catch errors that prevent loading the structure
-			// For example, offline mode and invalid SMILES
-			String data = getDataFromJmol();
-			
-			if (data == null || data.equals(""))
-			{
-				String[] options = new String[] {"Build 3D guess","Abandon"}; 
-				int res = JOptionPane.showOptionDialog(this,
-		                "<html>Could not find a valid structure.<br>"
-		                + "Possible reasons are:"
-		                + "<ul>"
-		                + "<li>unreachable remote service (we are offline)</li>"
-		                + "<li>too slow response from online service</li>"
-		                + "<li>no available structure for SMILES string<br>'" 
-		                + smiles 
-		                + "'</li></ul><br>"
-		                + "You can try to build a guess 3D structure, or<br>"
-		                + "prepare a refined structure elsewhere and import "
-		                + "it as "
-		                + "SDF file.</html>",
-		                "Error",
-		                JOptionPane.OK_CANCEL_OPTION,
-		                JOptionPane.QUESTION_MESSAGE,
-		                UIManager.getIcon("OptionPane.errorIcon"),
-		                options, 
-		                options[0]);
-				if (res == 0)
-				{
-					try {
-						make3DusingCDKgenerator(smiles);
-					} catch (CDKException | CloneNotSupportedException 
-							| IOException e1) {
-						e1.printStackTrace();
-						JOptionPane.showMessageDialog(this,
-				                "<html>Could not make 3D structure from SMILES."
-				                + " Cause: '"+e1.getMessage()+"'</html>",
-				                "Error",
-				                JOptionPane.ERROR_MESSAGE,
-				                UIManager.getIcon("OptionPane.errorIcon"));
-						if (parent!=null)
-						{
-							parent.setCursor(Cursor.getPredefinedCursor(
-									Cursor.DEFAULT_CURSOR));
-						} else {
-							this.setCursor(Cursor.getPredefinedCursor(
-									Cursor.DEFAULT_CURSOR));
-						}
-						return false;
-					}
-				} else {
-					if (parent!=null)
-					{
-						parent.setCursor(Cursor.getPredefinedCursor(
-								Cursor.DEFAULT_CURSOR));
-					} else {
-						this.setCursor(Cursor.getPredefinedCursor(
-								Cursor.DEFAULT_CURSOR));
-					}
-					return false;
-				}
-			}
-			break;
-			
-		case CDK:
-			try {
-				make3DusingCDKgenerator(smiles);
-			} catch (CDKException | CloneNotSupportedException 
-					| IOException e1) {
-				e1.printStackTrace();
-				JOptionPane.showMessageDialog(this,
-		                "<html>Could not make 3D structure from SMILES. "
-		                + "Cause: '"+e1.getMessage()+"'</html>",
-		                "Error",
-		                JOptionPane.ERROR_MESSAGE,
-		                UIManager.getIcon("OptionPane.errorIcon"));
-				if (parent!=null)
-				{
-					parent.setCursor(Cursor.getPredefinedCursor(
-							Cursor.DEFAULT_CURSOR));
-				} else {
-					this.setCursor(Cursor.getPredefinedCursor(
-							Cursor.DEFAULT_CURSOR));
-				}
-				return false;
-			}
-			break;
-		}
-		
-		// Now we should have a structure loaded in the viewer, 
-		// so we take that one and put it in the IAtomContainer representation
-		try	{ 
-		    // WARNING! Here we assume we are always making undefined building
-		    // blocks. Namely, neither a scaffold, nor a Fragment, nor a 
-		    // capping group. This because when we make frags 
-		    // from the GUI we are only saving an SDF file. The latter is later
-		    // imported as part of the library of scaffolds/fragments/capping
-		    // groups, and in that moment the BBType is re-assigned.
-		    fragment = new Fragment(getStructureFromJmolViewer(),
-		            Vertex.BBType.FRAGMENT);
-		} catch (Exception e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(this,
-	                "<html>Could not understand Jmol system.</html>",
-	                "Error",
-	                JOptionPane.ERROR_MESSAGE,
-	                UIManager.getIcon("OptionPane.errorIcon"));
-			return false;
-		}
-		
-		setJmolViewer();
-
-        jmolPanel.viewer.evalString("zoom OUT");
-		
-		if (parent!=null)
-		{
-			parent.setCursor(Cursor.getPredefinedCursor(
-					Cursor.DEFAULT_CURSOR));
-		} else {
-			this.setCursor(Cursor.getPredefinedCursor(
-					Cursor.DEFAULT_CURSOR));
-		}
-		return true;
 	}
 	
 //-----------------------------------------------------------------------------
@@ -726,7 +530,7 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
     
     /**
      * Loads the structure of the currently loaded 'fragment' (i.e., our member)
-     * into the Jmol viewer.
+     * into the molecular structure and node viewers.
      */
     private void loadStructure()
     {		
@@ -957,6 +761,9 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 	
 //-----------------------------------------------------------------------------
 	
+    /**
+     * Sets the Jmol viewer to the default state.
+     */
 	private void setJmolViewer()
 	{
 		StringBuilder sb = new StringBuilder();		

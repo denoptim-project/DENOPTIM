@@ -27,9 +27,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -78,6 +76,7 @@ import denoptim.graph.Fragment;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.io.DenoptimIO;
+import denoptim.molecularmodeling.SmilesTo3DConverter;
 import denoptim.programs.fragmenter.CuttingRule;
 import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.utils.DummyAtomHandler;
@@ -1434,26 +1433,30 @@ public class GUIVertexInspector extends GUICardPanel
 		// Cleanup
 		clearCurrentSystem();
 		
-		// Load the structure using CACTUS service or CDK builder
+		// Load the structure using the SMILES-to-3D engine configured in
+        // the preferences.
 		try {
-		    vertexViewer.loadSMILES(smiles);
+            IAtomContainer mol = SmilesTo3DConverter.getInstance()
+                    .smilesTo3DMolecule(smiles, GUIPreferences.smiTo3dResolver);
+            vertex = new Fragment(mol, Vertex.BBType.FRAGMENT);
 		} catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                "<html>Could not make 3D structure from SMILES."
+                + " Cause: '"+e.getMessage()+"'</html>",
+                "Error",
+                JOptionPane.ERROR_MESSAGE,
+                UIManager.getIcon("OptionPane.errorIcon"));
 			this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			return;
 		}
-		
-        try {
-		    vertex = vertexViewer.getLoadedStructure();
-        } catch (Exception e) {
-            this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-            return;
-        }
 
 		// The system is not a fragment but, this is done for consistency:
 		// when we have a molecule loaded the list is not empty:
 		// The currently viewed fragment (if any) is always part of the library
 	    verticesLibrary.add(vertex);
 		currVrtxIdx = verticesLibrary.size()-1;
+
+        loadCurrentVrtxIdxToViewer();
 		
 		// finalize GUI status
 		updateVrtxListSpinner();

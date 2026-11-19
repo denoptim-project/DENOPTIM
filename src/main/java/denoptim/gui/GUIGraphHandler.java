@@ -29,6 +29,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -82,6 +83,7 @@ import denoptim.graph.Vertex.BBType;
 import denoptim.gui.GraphViewerPanel.LabelType;
 import denoptim.io.DenoptimIO;
 import denoptim.io.IteratingAtomContainerReader;
+import denoptim.molecularmodeling.SmilesTo3DConverter;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.fragmenter.FragmenterParameters;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
@@ -281,23 +283,28 @@ public class GUIGraphHandler extends GUICardPanel
 				+ "list of graphs.");
 		btnAddGraph.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String[] options = new String[]{"Build", "Convert", "File", 
-				        "Cancel"};
+				String[] options = new String[]{
+                    "Cancel",
+                    "Import Graph", 
+                    "Convert Structure", 
+                    "Convert SMILES", 
+                    "Build"};
 				int res = JOptionPane.showOptionDialog(btnAddGraph,
-		                "<html>Please choose whether to start creations "
-		                + "of a new graph (Build), <br>"
+		                "<html>Please choose whether to: <ul><li>start creations "
+		                + "of a new graph using building blocks' space(Build) </li><li>"
+		                + "import graphs from a file (Import Graph) </li><li>"
 		                + "use fragmentation to convert molecules from a "
-		                + "file (Convert), <br>"
-		                + "or import graph from file (File).</html>",
+		                + "file (Convert Structure)</li><li> use fragmentation to "
+                        + "convert a SMILES (Convert SMILES)</li></ul></html>",
 		                "Specify source of new graph",
 		                JOptionPane.DEFAULT_OPTION,
 		                JOptionPane.QUESTION_MESSAGE,
 		                UIManager.getIcon("OptionPane.warningIcon"),
 		                options,
-		                options[3]);
+		                options[0]); // Default is "Cancel"
 				switch (res)
 				{
-					case 0:
+					case 4: // Build
 						if (fragSpace==null)
 						{
 							JOptionPane.showMessageDialog(btnAddGraph,
@@ -334,8 +341,78 @@ public class GUIGraphHandler extends GUICardPanel
                             return;
                         }
 						break;
-					    
-                    case 1:
+					
+                    case 3: // Convert SMILES
+                    {
+                        String smiles = JOptionPane.showInputDialog(btnAddGraph,
+                            "Please input one SMILES: ");
+                            
+                        if (smiles == null || smiles.trim().equals(""))
+                        {
+                            return;
+                        }
+
+                        IAtomContainer mol = null;
+                        try
+                        {
+                            mol = SmilesTo3DConverter.getInstance().smilesTo3DMolecule(
+                                smiles, SmilesTo3DConverter.Engine.RDKIT);
+                        } catch (DENOPTIMException e1)
+                        {
+                            String errMsg = e1.getMessage();
+                            if (errMsg.length() > 100) {
+                                errMsg = errMsg.substring(0, 100) + "...";
+                            }
+                            JOptionPane.showMessageDialog(btnAddGraph,
+                                "<html>Could not convert SMILES to 3D structure!<br>"
+                                + "Exception: " + errMsg 
+                                + "'</html>",
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE,
+                                UIManager.getIcon("OptionPane.errorIcon"));
+                            return;
+                        }
+
+                        if (mol == null)
+                        {
+                            JOptionPane.showMessageDialog(btnAddGraph,
+                                "<html>Could not convert SMILES to molecule!<br>"
+                                + "Exception thrown when converting the SMILES to a molecule.</html>",
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE,
+                                UIManager.getIcon("OptionPane.errorIcon"));
+                            return;
+                        }
+                        
+                        // All settings of the process are defined in the dialog 
+                        // and collected in the FragmenterParameters
+                        FragmenterParameters settings = new FragmenterParameters();
+                        boolean result = GUIVertexInspector.dialogToDefineCuttingRules(
+                                    settings, 
+                                    this.getClass().getClassLoader(), 
+                                    btnAddGraph, 
+                                    true);
+                        if (!result)
+                            return;
+
+                        String pathnameLastUsedCutRules = 
+                                settings.getCuttingRulesFilePathname();
+                        if (pathnameLastUsedCutRules != null 
+                                && !pathnameLastUsedCutRules.isBlank())
+                        {
+                            GUIPreferences.lastCutRulesFile = 
+                                    new File(pathnameLastUsedCutRules);
+                        }
+                        
+                        // Convert molecules one by one, but there is only one!
+                        List<IAtomContainer> mols = new ArrayList<IAtomContainer>(1);
+                        mols.add(mol);
+                        appendGraphsFromConvertingMolecule(mols.iterator(), null, false, 
+                            settings, btnAddGraph);
+                        break;
+                    }	
+
+                    case 2: // Convert Structure
                     {
                         File inFile = GUIFileOpener.pickFile(btnAddGraph);
                         if (inFile == null 
@@ -365,12 +442,12 @@ public class GUIGraphHandler extends GUICardPanel
                                     new File(pathnameLastUsedCutRules);
                         }
                         
-                        appendGraphsFromConvertingMolecule(inFile, settings, 
-                                btnAddGraph);
+                        appendGraphsFromConvertingMoleculesFromFile(inFile, 
+                            settings, btnAddGraph);
                         break;
 				    }
-					
-					case 2:
+
+					case 1: // Import Graph
 					{
 						File inFile = GUIFileOpener.pickFileWithGraph(
 						        btnAddGraph);
@@ -382,6 +459,11 @@ public class GUIGraphHandler extends GUICardPanel
 						appendGraphsFromFile(inFile);
 						break;
 					}
+
+                    default: // Cancel
+                    {
+                        break;
+                    }
 				}
 			}
 		});
@@ -1552,14 +1634,64 @@ public class GUIGraphHandler extends GUICardPanel
 		loadCurrentGraphIdxToViewer(false);
 		updateGraphListSpinner();
 	}
+
+//-----------------------------------------------------------------------------
+	
+    private void appendGraphsFromConvertingMolecule(
+        Iterator<IAtomContainer> iterMolsToFragment,
+        StructureDiagramGenerator sdg, 
+        boolean make2D,
+        FragmenterParameters frgParams, Component parent)
+    {
+        List<IAtomContainer> mols = new ArrayList<IAtomContainer>();
+        List<DGraph> graphs = new ArrayList<DGraph>();
+        int i=0;
+        while (iterMolsToFragment.hasNext())
+        {
+            i++;
+            IAtomContainer mol = iterMolsToFragment.next();
+            DGraph graph = convertOneMolToGraphInDialogue(mol, frgParams, i, 
+                sdg, make2D, parent);
+            if (graph == null)
+            {
+                continue;
+            }
+            graphs.add(graph);
+            mols.add(mol);
+        }
+
+        // Signal no result obtained
+        if (graphs.size() < 1)
+        {
+            JOptionPane.showMessageDialog(parent,
+                    "<html>Conversion produced no graphs!</html>",
+                    "Error",
+                    JOptionPane.WARNING_MESSAGE,
+                    UIManager.getIcon("OptionPane.warningIcon"));
+            return;
+        }
+
+        // append graph to current list of graphs
+        int oldSize = dnGraphLibrary.size();
+        if (graphs.size() > 0)
+        {
+            dnGraphLibrary.addAll(graphs);
+            molLibrary.addAll(mols);
+            
+            // We choose to display the first of the imported ones
+            currGrphIdx = oldSize;
+            
+            loadCurrentGraphIdxToViewer(false);
+            updateGraphListSpinner();
+        }
+    }
 	
 //-----------------------------------------------------------------------------
 	
-	private void appendGraphsFromConvertingMolecule(File file, 
+	private void appendGraphsFromConvertingMoleculesFromFile(File file, 
 	        FragmenterParameters frgParams, Component parent)
 	{
 	    // Reading molecules is format-agnostic manner
-	    List<IAtomContainer> mols = new ArrayList<IAtomContainer>();
 	    boolean make2D = false;
         StructureDiagramGenerator sdg = null;
 	    IteratingAtomContainerReader iterMolsToFragment = null;
@@ -1586,96 +1718,72 @@ public class GUIGraphHandler extends GUICardPanel
             return;
         }
         
-        // Read and convert molecules one by one
-        List<DGraph> graphs = new ArrayList<DGraph>();
-        int i=0;
-        while (iterMolsToFragment.hasNext())
+        // Convert molecules one by one
+        appendGraphsFromConvertingMolecule(iterMolsToFragment, sdg, make2D, 
+            frgParams, parent);
+	}
+
+//-----------------------------------------------------------------------------
+
+    private DGraph convertOneMolToGraphInDialogue(IAtomContainer mol, 
+        FragmenterParameters frgParams, int i, StructureDiagramGenerator sdg, 
+        Boolean make2D, Component parent)
+    {
+        FragmenterTools.prepareMolToFragmentation(mol, frgParams, i);
+        if (make2D)
         {
-            i++;
-            IAtomContainer mol = iterMolsToFragment.next();
-            FragmenterTools.prepareMolToFragmentation(mol, frgParams, i);
-            if (make2D)
+            try
             {
-                try
-                {
-                    sdg.generateCoordinates(mol);
-                } catch (CDKException e)
-                {
-                    // Ignore
-                    e.printStackTrace();
-                }
+                sdg.generateCoordinates(mol);
+            } catch (CDKException e)
+            {
+                // Ignore
+                e.printStackTrace();
             }
-            DGraph graph = null;
+        }
+        DGraph graph = null;
+        try {
+            graph = EAUtils.makeGraphFromFragmentationOfMol(mol, frgParams);
+        } catch (DENOPTIMException de)
+        {
+            String msg = "<html><body width='%1s'>Unable to convert "
+                    + "molecule " + i + " (" + mol.getAtomCount() 
+                    + " atoms) to DENOPTIM graph. " + de.getMessage()
+                    + "</html>";
+            JOptionPane.showMessageDialog(parent, String.format(msg,400),
+                    "Error",
+                    JOptionPane.WARNING_MESSAGE,
+                    UIManager.getIcon("OptionPane.warningIcon"));
+            return null;
+        }
+        
+        if (frgParams.embedRingsInTemplate())
+        {
             try {
-                graph = EAUtils.makeGraphFromFragmentationOfMol(mol, frgParams);
-            } catch (DENOPTIMException de)
-            {
-                String msg = "<html><body width='%1s'>Unable to convert "
-                        + "molecule " + i + " (" + mol.getAtomCount() 
-                        + " atoms) to DENOPTIM graph. " + de.getMessage()
+                if (fragSpace == null)
+                {
+                    FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+                    fragSpace = fsp.getFragmentSpace();
+                }
+                DGraph modGraph = graph.embedPatternsInTemplates(
+                        GraphPattern.RING, 
+                        fragSpace, frgParams.getEmbeddedRingsContract());
+                graph = modGraph;
+            } catch (DENOPTIMException e) {
+                String msg = "<html><body width='%1s'>Unable to embed "
+                        + "ring systems of molecule " + i 
+                        + " (" + mol.getAtomCount() 
+                        + " atoms) into Templates. Returning graph without "
+                        + "embedding of rings. " + e.getMessage()
                         + "</html>";
                 JOptionPane.showMessageDialog(parent, String.format(msg,400),
                         "Error",
                         JOptionPane.WARNING_MESSAGE,
                         UIManager.getIcon("OptionPane.warningIcon"));
-                continue;
             }
-            
-            if (frgParams.embedRingsInTemplate())
-            {
-                try {
-                    if (fragSpace == null)
-                    {
-                        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
-                        fragSpace = fsp.getFragmentSpace();
-                    }
-                    DGraph modGraph = graph.embedPatternsInTemplates(
-                            GraphPattern.RING, 
-                            fragSpace, frgParams.getEmbeddedRingsContract());
-                    graph = modGraph;
-                } catch (DENOPTIMException e) {
-                    String msg = "<html><body width='%1s'>Unable to embed "
-                            + "ring systems of molecule " + i 
-                            + " (" + mol.getAtomCount() 
-                            + " atoms) into Templates. Returning graph without "
-                            + "embedding of rings. " + e.getMessage()
-                            + "</html>";
-                    JOptionPane.showMessageDialog(parent, String.format(msg,400),
-                            "Error",
-                            JOptionPane.WARNING_MESSAGE,
-                            UIManager.getIcon("OptionPane.warningIcon"));
-                }
-            }
-            
-            graphs.add(graph);
-            mols.add(mol);
         }
-        
-        // Signal no result obtained
-        if (graphs.size() < 1)
-        {
-            JOptionPane.showMessageDialog(parent,
-                    "<html>Conversion produced no graphs!</html>",
-                    "Error",
-                    JOptionPane.WARNING_MESSAGE,
-                    UIManager.getIcon("OptionPane.warningIcon"));
-            return;
-        }
-        
-        // 
-        int oldSize = dnGraphLibrary.size();
-        if (graphs.size() > 0)
-        {
-            dnGraphLibrary.addAll(graphs);
-            molLibrary.addAll(mols);
-            
-            // WE choose to display the first of the imported ones
-            currGrphIdx = oldSize;
-            
-            loadCurrentGraphIdxToViewer(false);
-            updateGraphListSpinner();
-        }
-	}
+        return graph;
+    }
 
 //-----------------------------------------------------------------------------
 
@@ -1725,7 +1833,7 @@ public class GUIGraphHandler extends GUICardPanel
 			dnGraphLibrary.addAll(graphs);
 			molLibrary.addAll(mols);
 			
-			// WE choose to display the first of the imported ones
+			// We choose to display the first of the imported ones
 			currGrphIdx = oldSize;
 			
 			loadCurrentGraphIdxToViewer(false);

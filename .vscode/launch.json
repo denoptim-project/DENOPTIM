@@ -40,7 +40,7 @@
             "request": "launch",
             "mainClass": "denoptim.main.Main",
             "args": [
-                "test/functional_tests/t1/input/Mol9.sdf"
+                "/tmp/g_to_gui.json"
             ],
             "console": "integratedTerminal"
         },
@@ -69,12 +69,24 @@
         },
         {
             "type": "java",
-            "name": "Run test M2G t32-4",
+            "name": "Run test t30-26",
             "projectName": "denoptim",
             "request": "launch",
             "mainClass": "denoptim.main.Main",
             "args": [
-                "-r", "M2G", "t32-4.params"
+                "-r", "FRG", "t30-26.params"
+            ],
+            "cwd": "/tmp/denoptim_test/t30",
+            "console": "integratedTerminal"
+        },
+        {
+            "type": "java",
+            "name": "Run test M2G t32-2",
+            "projectName": "denoptim",
+            "request": "launch",
+            "mainClass": "denoptim.main.Main",
+            "args": [
+                "-r", "M2G", "t32-2.params"
             ],
             "cwd": "/tmp/denoptim_test/t32",
             "console": "integratedTerminal"
@@ -119,14 +131,38 @@
         },
         {
             "type": "java",
-            "name": "Run test t34-2 REINVENT4",
+            "name": "Run test t34-tt REINVENT4",
             "projectName": "denoptim",
             "request": "launch",
             "mainClass": "denoptim.main.Main",
             "args": [
-                "-r", "GA", "t34-2.params"
+                "-r", "GA", "tt.params"
             ],
             "cwd": "/tmp/denoptim_test/t34",
+            "console": "integratedTerminal"
+        },
+        {
+            "type": "java",
+            "name": "Run test t34-3 REINVENT4",
+            "projectName": "denoptim",
+            "request": "launch",
+            "mainClass": "denoptim.main.Main",
+            "args": [
+                "-r", "GA", "t34-3.params"
+            ],
+            "cwd": "/tmp/denoptim_test/t34",
+            "console": "integratedTerminal"
+        },
+        {
+            "type": "java",
+            "name": "Run test GO Reinvent",
+            "projectName": "denoptim",
+            "request": "launch",
+            "mainClass": "denoptim.main.Main",
+            "args": [
+                "-r", "GO", "go.params"
+            ],
+            "cwd": "/tmp/denoptim_test/t35",
             "console": "integratedTerminal"
         },
         {

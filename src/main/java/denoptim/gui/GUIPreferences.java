@@ -31,6 +31,7 @@ import com.google.gson.GsonBuilder;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
+import denoptim.molecularmodeling.SmilesTo3DConverter;
 
 /**
  * The collection of tunable preferences.
@@ -41,14 +42,29 @@ import denoptim.io.DenoptimIO;
 public class GUIPreferences
 {
 	/**
-	 * Available engines used to do SMILES-to-3D conversion
+	 * Available representations for molecular structures.
 	 */
-	protected enum SMITo3DEngine {CACTVS, CDK};
+	protected enum MolDimDisplay
+	{
+	    THREE_DIMENSIONAL("3D"),
+	    TWO_DIMENSIONAL("2D");
 
-    /**
-	 * Available representations for molecular structures
-	 */
-	protected enum MolDimDisplay {THREE_DIMENSIONAL, TWO_DIMENSIONAL};
+	    /**
+	     * Text shown for this choice in the preferences dialog.
+	     */
+	    private final String label;
+
+	    MolDimDisplay(String label)
+	    {
+	        this.label = label;
+	    }
+
+	    @Override
+	    public String toString()
+	    {
+	        return label;
+	    }
+	}
 
     /**
      * Factory-default values for all tunable preferences.
@@ -59,8 +75,8 @@ public class GUIPreferences
         public static final int GRAPH_NODE_SIZE = 30;
         public static final int CHART_POINT_SIZE = 8;
         public static final String TMP_SPACE = "/tmp";
-        public static final SMITo3DEngine SMI_TO_3D_RESOLVER =
-                SMITo3DEngine.CACTVS;
+        public static final SmilesTo3DConverter.Engine SMI_TO_3D_RESOLVER =
+                SmilesTo3DConverter.Engine.RDKIT;
         public static final MolDimDisplay MOL_DIM_DISPLAY =
                 MolDimDisplay.THREE_DIMENSIONAL;
         public static final boolean SHOW_2D_HYDROGENS = false;
@@ -122,7 +138,7 @@ public class GUIPreferences
 	/**
 	 * Selects the engine used to do SMILES-to-3D conversion
 	 */
-	protected static SMITo3DEngine smiTo3dResolver = Defaults.SMI_TO_3D_RESOLVER;
+	protected static SmilesTo3DConverter.Engine smiTo3dResolver = Defaults.SMI_TO_3D_RESOLVER;
 	
 	/**
 	 * Selects the representation for molecular structures
@@ -164,7 +180,7 @@ public class GUIPreferences
         TreeSet<String> chosenSDFTags = new TreeSet<String>(
                 Defaults.CHOSEN_SDF_TAGS);
         String tmpSpace = Defaults.TMP_SPACE;
-        SMITo3DEngine smiTo3dResolver = Defaults.SMI_TO_3D_RESOLVER;
+        SmilesTo3DConverter.Engine smiTo3dResolver = Defaults.SMI_TO_3D_RESOLVER;
         MolDimDisplay molDimDisplay = Defaults.MOL_DIM_DISPLAY;
         boolean showLegenInEvolutionPlot =
                 Defaults.SHOW_LEGEND_IN_EVOLUTION_PLOT;
