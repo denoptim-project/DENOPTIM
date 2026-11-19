@@ -23,6 +23,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -163,6 +164,8 @@ public class GUIVertexInspector extends GUICardPanel
 	
 	private JPanel pnlSaveEdits;
 	private JButton btnSaveEdits;
+	private Font saveEditsFont;
+	private Color saveEditsForeground;
 
 	
 //-----------------------------------------------------------------------------
@@ -192,7 +195,6 @@ public class GUIVertexInspector extends GUICardPanel
 		// - (East) vertex controls
 		// - (South) general controls (load, save, close)
 		
-		// The viewer with Jmol and APtable
 		vertexViewer = new VertexViewPanel(true);
 		vertexViewer.addPropertyChangeListener(
 		        IVertexAPSelection.APDATACHANGEEVENT, 
@@ -1132,8 +1134,10 @@ public class GUIVertexInspector extends GUICardPanel
 		
         pnlSaveEdits = new JPanel();
         btnSaveEdits = new JButton("Save Changes");
-        //btnSaveEdits.setForeground(Color.RED);
+        saveEditsFont = btnSaveEdits.getFont();
+        saveEditsForeground = btnSaveEdits.getForeground();
         btnSaveEdits.setEnabled(true);
+        setSaveEditsPending(false);
         btnSaveEdits.setToolTipText("<html>Save the current system replacing"
         		+ " <br>the original one in the loaded library.</html>");
         btnSaveEdits.addActionListener(new ActionListener() {
@@ -1404,6 +1408,7 @@ public class GUIVertexInspector extends GUICardPanel
 	        btnDelSel.setEnabled(true);
 	        btnAtmToAP.setEnabled(true);
 	        btnBondToAPPair.setEnabled(true);
+	        setSaveEditsPending(true);
 		} catch (Exception e) {
 			this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			e.printStackTrace();
@@ -1465,6 +1470,7 @@ public class GUIVertexInspector extends GUICardPanel
         btnAtmToAP.setEnabled(true);
         btnBondToAPPair.setEnabled(true);
         btnSaveEdits.setEnabled(true);
+        setSaveEditsPending(true);
 		
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
@@ -1770,7 +1776,7 @@ public class GUIVertexInspector extends GUICardPanel
 
 	private void deprotectEditedSystem()
 	{
-		//btnSaveEdits.setEnabled(false);
+		setSaveEditsPending(false);
 		btnAddVrtx.setEnabled(true);
 		btnOpenVrtxs.setEnabled(true);
 		btnOpenSMILES.setEnabled(true); 
@@ -1799,9 +1805,32 @@ public class GUIVertexInspector extends GUICardPanel
 	
 //-----------------------------------------------------------------------------
 	
+	/**
+	 * Makes the {@link #btnSaveEdits} label red and bold while edits are
+	 * unsaved, and restores the look-and-feel font and color once they
+	 * have been saved.
+	 */
+	private void setSaveEditsPending(boolean pending)
+	{
+		if (pending)
+		{
+			btnSaveEdits.setFont(saveEditsFont.deriveFont(Font.BOLD));
+			btnSaveEdits.setForeground(Color.RED);
+		}
+		else
+		{
+			btnSaveEdits.setFont(saveEditsFont);
+			btnSaveEdits.setForeground(saveEditsForeground);
+		}
+		btnSaveEdits.repaint();
+	}
+
+//-----------------------------------------------------------------------------
+
 	private void protectEditedSystem()
 	{
 		btnSaveEdits.setEnabled(true);
+		setSaveEditsPending(true);
 		btnAddVrtx.setEnabled(false);
 		btnOpenVrtxs.setEnabled(false);
 		btnOpenSMILES.setEnabled(false); 

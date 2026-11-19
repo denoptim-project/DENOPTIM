@@ -224,7 +224,8 @@ public class VertexViewPanel extends JPanel
         });
         centralPanel.add(fragViewer, MOLVIEWERCARDNAME);
         
-        twoDimViewer = new VertexAsTwoDimStructureViewPanel(editableAPTable);
+        twoDimViewer = new VertexAsTwoDimStructureViewPanel(editableAPTable,
+                fragViewer);
         twoDimViewer.addPropertyChangeListener(
                 IVertexAPSelection.APDATACHANGEEVENT, 
                 new PropertyChangeListener() {
@@ -236,7 +237,6 @@ public class VertexViewPanel extends JPanel
             }
         });
         centralPanel.add(twoDimViewer, TWODVIEWERCARDNAME);
-        
         
         switchToEmptyCard();
 	}

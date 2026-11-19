@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -45,7 +46,10 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.vecmath.Point3d;
 
+import org.jmol.api.JmolSelectionListener;
 import org.jmol.viewer.Viewer;
+
+import javajs.util.BS;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -94,6 +98,26 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 	public boolean alteredAPData = false;
 	
 	private JmolPanel jmolPanel;
+
+    /**
+     * Listeners told when the Jmol atom selection changes. The atoms are
+     * those of the fragment loaded in this viewer.
+     */
+    private final List<AtomSelectionListener> atomSelectionListeners =
+            new ArrayList<AtomSelectionListener>();
+
+    /**
+     * Notified with the atoms currently selected in this 3D viewer.
+     */
+    @FunctionalInterface
+    public interface AtomSelectionListener
+    {
+        /**
+         * @param selectedAtoms atoms of the loaded fragment. The list is a
+         * copy.
+         */
+        void selectionChanged(List<IAtom> selectedAtoms);
+    }
 	private JScrollPane tabPanel;
 	protected DefaultTableModel apTabModel;
 	protected JTable apTable;
@@ -157,6 +181,20 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
         
         // Jmol viewer panel
         jmolPanel = new JmolPanel();
+        jmolPanel.viewer.addSelectionListener(new JmolSelectionListener() {
+            @Override
+            public void selectionChanged(BS selection)
+            {
+                List<IAtom> selectedAtoms = atomsIn(selection);
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run()
+                    {
+                        notifyAtomSelectionListeners(selectedAtoms);
+                    }
+                });
+            }
+        });
         this.setTopComponent(jmolPanel);
         
 		// List of attachment points
@@ -831,6 +869,113 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 		}
 		
 		return selectedAtms;
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * @return the fragment currently drawn, or {@code null}.
+     */
+    public Fragment getLoadedFragment()
+    {
+        return fragment;
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Replaces the Jmol atom selection. The atoms must belong to the fragment
+     * loaded in this viewer. Buttons such as "Atoms to AP" read this
+     * selection.
+     */
+    public void setAtomSelection(List<IAtom> atoms)
+    {
+        if (jmolPanel == null || jmolPanel.viewer == null)
+        {
+            return;
+        }
+        StringBuilder command = new StringBuilder();
+        boolean any = false;
+        if (atoms != null && fragment != null)
+        {
+            for (IAtom atom : atoms)
+            {
+                int index = fragment.indexOf(atom);
+                if (index < 0)
+                {
+                    continue;
+                }
+                if (any)
+                {
+                    command.append(" or ");
+                }
+                else
+                {
+                    command.append("select ");
+                }
+                command.append("@").append(index + 1);
+                any = true;
+            }
+        }
+        if (!any)
+        {
+            command.append("select none");
+        }
+        jmolPanel.viewer.evalString(command.toString());
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * @param listener notified after the Jmol atom selection changes.
+     */
+    public void addAtomSelectionListener(AtomSelectionListener listener)
+    {
+        if (listener != null)
+        {
+            atomSelectionListeners.add(listener);
+        }
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * @param listener a listener previously passed to
+     * {@link #addAtomSelectionListener(AtomSelectionListener)}.
+     */
+    public void removeAtomSelectionListener(AtomSelectionListener listener)
+    {
+        atomSelectionListeners.remove(listener);
+    }
+
+//-----------------------------------------------------------------------------
+
+    private List<IAtom> atomsIn(BS selection)
+    {
+        List<IAtom> selectedAtoms = new ArrayList<IAtom>();
+        if (fragment == null || selection == null)
+        {
+            return selectedAtoms;
+        }
+        for (int i = selection.nextSetBit(0); i >= 0; i = selection.nextSetBit(i + 1))
+        {
+            if (i < fragment.getAtomCount())
+            {
+                selectedAtoms.add(fragment.getAtom(i));
+            }
+        }
+        return selectedAtoms;
+    }
+
+//-----------------------------------------------------------------------------
+
+    private void notifyAtomSelectionListeners(List<IAtom> selectedAtoms)
+    {
+        for (AtomSelectionListener listener : new ArrayList<AtomSelectionListener>(
+                atomSelectionListeners))
+        {
+            listener.selectionChanged(selectedAtoms);
+        }
     }
 
 //-----------------------------------------------------------------------------

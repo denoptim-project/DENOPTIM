@@ -36,6 +36,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.graph.AttachmentPoint;
@@ -85,6 +86,28 @@ public class VertexAsTwoDimStructureViewPanel extends JSplitPane
 	// this is vertex-specific, it does not overwrite editableAPTable, which is
 	// more general. The overall editablility is given by general && local.
 	private boolean vertexSpecificAPTabEditable = true;
+
+    /**
+     * 3D viewer that owns the atom selection used by the inspector buttons.
+     * {@code null} when this 2D viewer is not linked.
+     */
+    private FragmentViewPanel structureViewer3D;
+
+    /**
+     * Depiction currently installed in {@link #twoDimView}.
+     */
+    private TwoDimStructurePanel structurePanel;
+
+    /**
+     * Forwards the 3D viewer's selection onto {@link #structurePanel}.
+     */
+    private FragmentViewPanel.AtomSelectionListener structureSelectionListener;
+
+    /**
+     * {@code true} while a 2D click is writing the selection into the 3D
+     * viewer, so the echo of that write is not applied a second time.
+     */
+    private boolean projectingTo3D;
 	
 //-----------------------------------------------------------------------------
 
@@ -95,8 +118,21 @@ public class VertexAsTwoDimStructureViewPanel extends JSplitPane
 	 */
 	public VertexAsTwoDimStructureViewPanel(boolean editableTable)
 	{
-		this(editableTable, 340);
+		this(editableTable, 340, null);
 	}
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * @param editableTable use {@code true} to make the AP table editable.
+     * @param structureViewer3D 3D viewer whose atom selection this panel
+     * mirrors. {@code null} leaves the 2D selection local.
+     */
+    public VertexAsTwoDimStructureViewPanel(boolean editableTable,
+            FragmentViewPanel structureViewer3D)
+    {
+        this(editableTable, 340, structureViewer3D);
+    }
 	
 //-----------------------------------------------------------------------------
 
@@ -110,9 +146,24 @@ public class VertexAsTwoDimStructureViewPanel extends JSplitPane
 	public VertexAsTwoDimStructureViewPanel(boolean editableTable, 
 	        int dividerPosition)
 	{
-		editableAPTable = editableTable;
-		initialize(dividerPosition);
+		this(editableTable, dividerPosition, null);
 	}
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * @param editableTable use {@code true} to make the AP table editable.
+     * @param dividerPosition initial position of the divider.
+     * @param structureViewer3D 3D viewer whose atom selection this panel
+     * mirrors. {@code null} leaves the 2D selection local.
+     */
+    public VertexAsTwoDimStructureViewPanel(boolean editableTable,
+            int dividerPosition, FragmentViewPanel structureViewer3D)
+    {
+        editableAPTable = editableTable;
+        this.structureViewer3D = structureViewer3D;
+        initialize(dividerPosition);
+    }
 	
 //-----------------------------------------------------------------------------
 
@@ -204,8 +255,86 @@ public class VertexAsTwoDimStructureViewPanel extends JSplitPane
 
     private void loadStructureToViewer(IAtomContainer mol)
     {
+        detachStructureSelectionListener();
+        if (mol != null && structureViewer3D != null
+                && structureViewer3D.getLoadedFragment() != null)
+        {
+            TwoDimStructurePanel.stampAtomsIn3DView(mol,
+                    structureViewer3D.getLoadedFragment().getIAtomContainer());
+        }
         clearPanel();
-        twoDimView.add(new TwoDimStructurePanel(mol));
+        structurePanel = new TwoDimStructurePanel(mol,
+                GUIPreferences.show2DHydrogens, true);
+        twoDimView.add(structurePanel);
+        if (structureViewer3D == null)
+        {
+            return;
+        }
+        final TwoDimStructurePanel panel = structurePanel;
+        panel.addAtomClickListener(new TwoDimStructurePanel.AtomClickListener() {
+            @Override
+            public void atomClicked(IAtom atom, int index, boolean selected)
+            {
+                projectSelectionTo3D(panel);
+            }
+        });
+        structureSelectionListener = new FragmentViewPanel.AtomSelectionListener() {
+            @Override
+            public void selectionChanged(List<IAtom> selectedAtoms)
+            {
+                if (projectingTo3D)
+                {
+                    return;
+                }
+                panel.setSelectionFromAtomsIn3DView(selectedAtoms);
+            }
+        };
+        structureViewer3D.addAtomSelectionListener(structureSelectionListener);
+        panel.setSelectionFromAtomsIn3DView(
+                structureViewer3D.getAtomsSelectedFromJMol());
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Copies the depicted selection onto the linked 3D viewer. Only atoms
+     * that carry {@link TwoDimStructurePanel#ATOM_IN_3D_VIEW} are included,
+     * because that is the atom list the 3D viewer and its buttons use.
+     */
+    private void projectSelectionTo3D(TwoDimStructurePanel panel)
+    {
+        List<IAtom> atomsIn3DView = new ArrayList<IAtom>();
+        for (IAtom depicted : panel.getSelectedAtoms())
+        {
+            Object atomIn3DView = depicted.getProperty(
+                    TwoDimStructurePanel.ATOM_IN_3D_VIEW);
+            if (atomIn3DView instanceof IAtom)
+            {
+                atomsIn3DView.add((IAtom) atomIn3DView);
+            }
+        }
+        projectingTo3D = true;
+        try
+        {
+            structureViewer3D.setAtomSelection(atomsIn3DView);
+        }
+        finally
+        {
+            projectingTo3D = false;
+        }
+    }
+
+//-----------------------------------------------------------------------------
+
+    private void detachStructureSelectionListener()
+    {
+        if (structureViewer3D != null && structureSelectionListener != null)
+        {
+            structureViewer3D.removeAtomSelectionListener(
+                    structureSelectionListener);
+            structureSelectionListener = null;
+        }
+        structurePanel = null;
     }
 
 //-----------------------------------------------------------------------------
