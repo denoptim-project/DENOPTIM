@@ -997,12 +997,11 @@ public class GUIInspectGARun extends GUICardPanel
 		datasetPopMean.addSeries("Population_mean", popMean);
 		datasetPopMedian.addSeries("Population_median", popMedian);
 	
-		
 		//TODO: somehow collect and display the candidates that hit a mol error
 		//      Could it be a histogram (#failed x gen) below the evolution plot
 		
         NumberAxis xAxis = new NumberAxis("Generation");
-        xAxis.setRange(-0.5, numGen-0.5); //"-" because numGen includes 0
+        xAxis.setRange(-0.5, Math.max(1, numGen)-0.5); //"-" because numGen includes 0
         xAxis.setAutoRangeIncludesZero(false);
         NumberAxis yAxis = new NumberAxis("Fitness");
         yAxis.setAutoRangeIncludesZero(false);
@@ -1364,6 +1363,15 @@ public class GUIInspectGARun extends GUICardPanel
             {
                 List<String> membersPathnames = new ArrayList<String>(
                         DenoptimIO.readPopulationMemberPathnames(genSummary));
+                // Adjust pathnames to the current folder: the summary stores
+                // absolute paths from the original run, so replace the prefix
+                // before the Gen* folder. The Gen* name stays as stored.
+                for (int i=0; i<membersPathnames.size(); i++)
+                {
+                    membersPathnames.set(i, relocateToGenFolder(
+                            membersPathnames.get(i), genFolder));
+                }
+                    
                 candsPerGeneration.put(genId, membersPathnames);
             } catch (DENOPTIMException e1)
             {
@@ -1378,6 +1386,38 @@ public class GUIInspectGARun extends GUICardPanel
                         UIManager.getIcon("OptionPane.errorIcon"));
             }
         }
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Replaces the part of an absolute pathname before the generation folder
+     * ({@code Gen*}) with the parent of {@code genFolder}. The original
+     * {@code Gen*} folder name and the remainder of the pathname are kept.
+     * The original pathname is returned when it contains no generation folder.
+     */
+    private static String relocateToGenFolder(String pathname, File genFolder)
+    {
+        File current = new File(pathname);
+        List<String> belowGenFolder = new ArrayList<String>();
+        while (current != null && !current.getName().startsWith(
+                DENOPTIMConstants.GAGENDIRNAMEROOT))
+        {
+            belowGenFolder.add(0, current.getName());
+            current = current.getParentFile();
+        }
+        if (current == null)
+        {
+            return pathname;
+        }
+        File relocated = genFolder.getParentFile() == null
+                ? genFolder
+                : new File(genFolder.getParentFile(), current.getName());
+        for (String part : belowGenFolder)
+        {
+            relocated = new File(relocated, part);
+        }
+        return relocated.getAbsolutePath();
     }
 
 //------------------------------------------------------------------------------

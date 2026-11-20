@@ -996,7 +996,7 @@ public class DenoptimIO
     public static List<String> readPopulationMemberPathnames(File file) 
             throws DENOPTIMException 
     {
-        List<String>  vals = new ArrayList<String>();
+        List<String> vals = new ArrayList<String>();
         List<String> txt = readList(file.getAbsolutePath());
         for (String line : txt) 
         {
