@@ -129,6 +129,31 @@ MouseListener, MouseMotionListener
     private static final double CLICK_SLOP_PX = 4;
 
     /**
+     * Space kept around the atom bounding box, in pixels, so element symbols
+     * stay inside the panel when the depiction is fitted.
+     */
+    private static final int FIT_SYMBOL_PAD_PX = 18;
+
+    /**
+     * Smallest scale applied when zooming out. The depiction is not shrunk
+     * further than this, even when the structure still overflows the panel.
+     */
+    private static final double MIN_FIT_ZOOM = 0.20;
+
+    /**
+     * When {@code true}, a paint at a new panel size fits the structure again.
+     * Cleared once the user zooms or pans, so that adjustment is kept.
+     */
+    private boolean keepFittedZoom;
+
+    /**
+     * Panel size, in pixels, for which {@link #zoom} was last fitted.
+     * {@code -1} until the structure has been fitted during a paint.
+     */
+    private int fittedWidth = -1;
+    private int fittedHeight = -1;
+
+    /**
      * Where the current gesture started, in this panel's coordinates.
      */
     private Point pressPoint;
@@ -206,8 +231,9 @@ MouseListener, MouseMotionListener
 //-----------------------------------------------------------------------------
 
     /**
-     * Replaces the depicted structure. Zoom and pan are reset so the new
-     * structure is shown in the default view.
+     * Replaces the depicted structure. Pan is reset, and the view is zoomed
+     * out until the whole structure fits in the panel, but not below a scale
+     * of 0.20. A structure that already fits is left at the normal zoom.
      * @param extendedMol the atom container, possibly extended to include
      * {@link AttachmentPoint}s as pseudoatoms.
      * @param showHydrogens when <code>false</code>, explicit hydrogens that
@@ -218,6 +244,11 @@ MouseListener, MouseMotionListener
         resetView();
         clearAtomSelection();
         mol = layoutStructure(extendedMol, showHydrogens);
+        // The size reported before the first paint is not the size the panel
+        // is drawn at, so the fit is applied from paint once that size is known.
+        keepFittedZoom = mol != null;
+        fittedWidth = -1;
+        fittedHeight = -1;
         repaint();
     }
 
@@ -231,6 +262,9 @@ MouseListener, MouseMotionListener
         resetView();
         clearAtomSelection();
         mol = null;
+        keepFittedZoom = false;
+        fittedWidth = -1;
+        fittedHeight = -1;
         repaint();
     }
 
@@ -377,6 +411,34 @@ MouseListener, MouseMotionListener
 //-----------------------------------------------------------------------------
 
     /**
+     * Sets {@link #zoom} so the depiction, drawn at the normal bond length,
+     * fits inside this panel. The scale is not reduced below
+     * {@link #MIN_FIT_ZOOM}, and a structure that already fits stays at 1.
+     * Does nothing when the panel has no size yet.
+     */
+    private void zoomOutToFit()
+    {
+        int width = getWidth();
+        int height = getHeight();
+        if (renderer == null || mol == null || width <= 0 || height <= 0)
+        {
+            return;
+        }
+        renderer.setup(mol, new Rectangle(width, height));
+        Rectangle diagram = renderer.calculateDiagramBounds(mol);
+        if (diagram == null || diagram.width <= 0 || diagram.height <= 0)
+        {
+            return;
+        }
+        double neededWidth = diagram.width + 2.0 * FIT_SYMBOL_PAD_PX;
+        double neededHeight = diagram.height + 2.0 * FIT_SYMBOL_PAD_PX;
+        double fit = Math.min(width / neededWidth, height / neededHeight);
+        zoom = Math.min(1.0, Math.max(fit, MIN_FIT_ZOOM));
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
      * Get the IAtomContainer from the vertex, so that all {@link AttachmentPoint}s
      * are represented as pseudoatoms.
      * @param vertex the vertex to get the IAtomContainer from
@@ -509,6 +571,14 @@ MouseListener, MouseMotionListener
         if (renderer == null || mol == null)
             return;
 
+        if (keepFittedZoom && getWidth() > 0 && getHeight() > 0
+                && (getWidth() != fittedWidth || getHeight() != fittedHeight))
+        {
+            zoomOutToFit();
+            fittedWidth = getWidth();
+            fittedHeight = getHeight();
+        }
+
         renderer.setup(mol, new Rectangle(getWidth(), getHeight()));
         
         Graphics2D g2d = (Graphics2D) graphics;
@@ -539,12 +609,13 @@ MouseListener, MouseMotionListener
     
     @Override
     public void mouseWheelMoved(MouseWheelEvent e)
-    {   
+    {
+        keepFittedZoom = false;
         if (e.getWheelRotation() < 0) {
             zoom *= 1.1;
         }
         if (e.getWheelRotation() > 0) {
-            zoom /= 1.1;
+            zoom = Math.max(MIN_FIT_ZOOM, zoom / 1.1);
         }
         repaint();
     }
@@ -579,6 +650,7 @@ MouseListener, MouseMotionListener
             return;
         }
         panning = true;
+        keepFittedZoom = false;
         try {
             XFormedPoint = initialTransform.inverseTransform(e.getPoint(), 
                     null);
@@ -665,15 +737,11 @@ MouseListener, MouseMotionListener
         double closestDistance = ATOM_PICK_RADIUS_PX;
         for (IAtom atom : mol.atoms())
         {
-            Point2d modelPoint = atom.getPoint2d();
-            if (modelPoint == null)
+            Point onPanel = depictedCenter(atom);
+            if (onPanel == null)
             {
                 continue;
             }
-            Point2d rendered = renderer.toScreenCoordinates(modelPoint.x,
-                    modelPoint.y);
-            Point2D onPanel = viewTransform().transform(
-                    new Point2D.Double(rendered.x, rendered.y), null);
             double distance = onPanel.distance(point);
             if (distance <= closestDistance)
             {
@@ -682,6 +750,32 @@ MouseListener, MouseMotionListener
             }
         }
         return closest;
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * @param atom an atom of the depicted container.
+     * @return the atom centre in this panel, in pixels, after zoom and pan,
+     * or {@code null} when the atom has no 2D coordinates.
+     */
+    Point depictedCenter(IAtom atom)
+    {
+        if (atom == null)
+        {
+            return null;
+        }
+        Point2d modelPoint = atom.getPoint2d();
+        if (modelPoint == null || renderer == null)
+        {
+            return null;
+        }
+        Point2d rendered = renderer.toScreenCoordinates(modelPoint.x,
+                modelPoint.y);
+        Point2D onPanel = viewTransform().transform(
+                new Point2D.Double(rendered.x, rendered.y), null);
+        return new Point((int) Math.round(onPanel.getX()),
+                (int) Math.round(onPanel.getY()));
     }
 
     @Override

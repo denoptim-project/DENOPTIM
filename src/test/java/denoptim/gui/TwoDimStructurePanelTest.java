@@ -211,6 +211,93 @@ public class TwoDimStructurePanelTest
 
 //------------------------------------------------------------------------------
 
+    @Test
+    public void testLoadZoomsOutUntilStructureFits() throws Exception
+    {
+        IAtomContainer mol = new SmilesParser(SilentChemObjectBuilder.getInstance())
+                .parseSmiles("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
+        TwoDimStructurePanel panel = new TwoDimStructurePanel(mol, false, true);
+        panel.setSize(180, 120);
+        BufferedImage image = new BufferedImage(180, 120,
+                BufferedImage.TYPE_INT_RGB);
+        panel.paint(image.getGraphics());
+
+        boolean naturalViewOverflows = false;
+        for (IAtom atom : panel.mol.atoms())
+        {
+            Point natural = centerOf(panel, atom);
+            if (natural.x < 0 || natural.y < 0
+                    || natural.x >= panel.getWidth()
+                    || natural.y >= panel.getHeight())
+            {
+                naturalViewOverflows = true;
+            }
+            Point fitted = panel.depictedCenter(atom);
+            assertTrue(fitted.x >= 0 && fitted.x < panel.getWidth(),
+                    "fitted x " + fitted.x);
+            assertTrue(fitted.y >= 0 && fitted.y < panel.getHeight(),
+                    "fitted y " + fitted.y);
+        }
+        assertTrue(naturalViewOverflows);
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testLoadDoesNotZoomOutBelowMinimum() throws Exception
+    {
+        StringBuilder smiles = new StringBuilder();
+        for (int i = 0; i < 200; i++)
+        {
+            smiles.append('C');
+        }
+        IAtomContainer mol = new SmilesParser(SilentChemObjectBuilder.getInstance())
+                .parseSmiles(smiles.toString());
+        TwoDimStructurePanel panel = new TwoDimStructurePanel(mol, false, true);
+        panel.setSize(180, 120);
+        BufferedImage image = new BufferedImage(180, 120,
+                BufferedImage.TYPE_INT_RGB);
+        panel.paint(image.getGraphics());
+
+        IAtom farthest = farthestAtom(panel);
+        Point natural = centerOf(panel, farthest);
+        Point fitted = panel.depictedCenter(farthest);
+        double centerX = panel.getWidth() / 2.0;
+        double centerY = panel.getHeight() / 2.0;
+        double naturalDistance = natural.distance(centerX, centerY);
+        double fittedDistance = fitted.distance(centerX, centerY);
+        double scale = fittedDistance / naturalDistance;
+
+        assertTrue(naturalDistance > panel.getWidth());
+        assertTrue(scale >= 0.20 - 0.01, "scale " + scale);
+        assertTrue(scale < 0.25, "scale " + scale);
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testFitFollowsTheSizeThePanelIsDrawnAt() throws Exception
+    {
+        IAtomContainer mol = new SmilesParser(SilentChemObjectBuilder.getInstance())
+                .parseSmiles("CCO");
+        TwoDimStructurePanel panel = new TwoDimStructurePanel(mol, true, true);
+        panel.setSize(40, 30);
+        BufferedImage small = new BufferedImage(40, 30, BufferedImage.TYPE_INT_RGB);
+        panel.paint(small.getGraphics());
+
+        panel.setSize(500, 500);
+        BufferedImage drawn = new BufferedImage(500, 500, BufferedImage.TYPE_INT_RGB);
+        panel.paint(drawn.getGraphics());
+
+        IAtom farthest = farthestAtom(panel);
+        Point natural = centerOf(panel, farthest);
+        Point fitted = panel.depictedCenter(farthest);
+        assertTrue(fitted.distance(natural) <= 2,
+                "fitted " + fitted + " natural " + natural);
+    }
+
+//------------------------------------------------------------------------------
+
     private static void paint(TwoDimStructurePanel panel)
     {
         panel.setSize(500, 500);
