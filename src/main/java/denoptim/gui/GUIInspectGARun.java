@@ -1308,14 +1308,13 @@ public class GUIInspectGARun extends GUICardPanel
             {
                 JOptionPane.showMessageDialog(parent,
                         String.format("<html><body width='%1s'>"
-                                + "This evolutionary experiment seems to "
-                                + "have been run with the "
+                                + "No Candidate files found in " + genFolder 
+                                + ". This may be because the experiment "
+                                + "has still not finished running, or"
+                                + "it has been run with the "
                                 + "'FP-DontWriteCandidatesOnDisk' option. "
-                                + "Therefore, the definition of candidates "
-                                + "encountered during the evolution is not "
-                                + "present on disk. "
-                                + "We'll show only how the trace of such "
-                                + "candidates in the evolution. You may try "
+                                + "We can only show the candidates' traces "
+                                + "in the evolution. You may try "
                                 + "to inspect the final generation, "
                                 + "if present, by clicking on '" 
                                 + openFinalPopGraphs.getText() + "'"
